@@ -34,15 +34,17 @@ export default function ExcelComponent() {
 
   function filterData(where: number) {
     setLoading(true);
-    const newData = data.filter((item: any, index: number) => {
+    let newData = data;
+    if(search !== ""){
+    newData = data.filter((item: any, index: number) => {
       if (filterType === "begins with")
-        return item[where].toString().toLowerCase().startsWith(search);
+        return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
       if (filterType === "ends with")
-        return item[where].toString().toLowerCase().endsWith(search);
+        return item[where].toString().toLowerCase().endsWith(search.toLowerCase());
       if (filterType === "contains")
-        return item[where].toString().toLowerCase().includes(search);
+        return item[where].toString().toLowerCase().includes(search.toLowerCase());
       if (filterType === "does not contain")
-        return !item[where].toString().toLowerCase().includes(search);
+        return !item[where].toString().toLowerCase().includes(search.toLowerCase());
       if (filterType === "equals")
         return item[where].toString().toLowerCase() === search.toLowerCase();
       if (filterType === "does not equal")
@@ -54,9 +56,25 @@ export default function ExcelComponent() {
       if (filterType === "does not match regex")
         return !item[where].toString().toLowerCase().match(search);
       if (filterType === "matches")
-        return item[where].toString().toLowerCase().match(search);
-      return item[where].toString().toLowerCase().startsWith(search);
+        return item[where].toString().toLowerCase().match(search.toLowerCase());
+      return item[where].toString().toLowerCase().startsWith(search.toLowerCase());
     });
+  }
+    // sorting array of arrays
+    if (filterType === "Ascending") {
+      newData.sort(function (a: any, b: any) {
+        const priceA = a[where].toString().toLowerCase();
+        const priceB = b[where].toString().toLowerCase();
+        return priceA.localeCompare(priceB);
+      });
+    }
+    if (filterType === "Descending") {
+      newData.sort(function (a: any, b: any) {
+        const priceA = a[where].toString().toLowerCase();
+        const priceB = b[where].toString().toLowerCase();
+        return priceB.localeCompare(priceA);
+      });
+    }
     setFilterRecord([...filterRecord, { where: newData }]);
     setData(newData);
     setSearch("");
