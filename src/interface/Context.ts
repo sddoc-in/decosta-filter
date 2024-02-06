@@ -23,6 +23,8 @@ export default interface HappyClientMainContextInterface {
     setCurrentPage: React.Dispatch<React.SetStateAction<number>>,
     currentProduct: string,
     setCurrentProduct: React.Dispatch<React.SetStateAction<string>>,
+    currentFrame: string,
+    setCurrentFrame: React.Dispatch<React.SetStateAction<string>>,
 }
 
 

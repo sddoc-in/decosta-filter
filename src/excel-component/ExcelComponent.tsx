@@ -16,7 +16,7 @@ export default function ExcelComponent() {
     setColumnsHidden,
   } = React.useContext(ExcelContext);
 
-  const { setLoading } = React.useContext(MainContext);
+  const { setLoading, setCurrentFrame } = React.useContext(MainContext);
 
   const [data, setData] = React.useState<any>(fileData);
   const [search, setSearch] = React.useState<string>("");
@@ -144,9 +144,8 @@ export default function ExcelComponent() {
                       isChanging.header
                     ) ? (
                       <div
-                        className={`dropdown ${
-                          columnsHidden.includes(index) ? "hidden" : "block"
-                        }`}
+                        className={`dropdown ${columnsHidden.includes(index) ? "hidden" : "block"
+                          }`}
                         key={index}
                       >
                         <label
@@ -194,9 +193,8 @@ export default function ExcelComponent() {
               return (
                 <div
                   key={rowIndex}
-                  className={`flex justify-start items-center   text-black mx-auto  border-b w-fit border-[#bebbb8] ${
-                    flag ? "bg-blue-200" : ""
-                  }`}
+                  className={`flex justify-start items-center text-black border-b w-fit border-[#bebbb8] ${flag ? "bg-blue-200" : ""
+                    }`}
                 >
                   {!flag ? (
                     <TiTickOutline
@@ -212,60 +210,60 @@ export default function ExcelComponent() {
                   {item.map((rowItem: any, valIndex: number) => {
                     return (
                       <>
-                        {!(
-                          isChanging.status &&
-                          isChanging.columnIndex === valIndex &&
-                          isChanging.rowIndex === rowIndex &&
-                          !isChanging.header
-                        ) ? (
-                          <div
-                            key={valIndex}
-                            className={`w-[200px!important] text-start mx-2 overflow-hidden ${
-                              columnsHidden.includes(valIndex)
-                                ? "hidden"
-                                : "block"
-                            }`}
-                            onClick={() => {
-                              setIsChanging({
-                                status: true,
-                                columnIndex: valIndex,
-                                rowIndex: rowIndex,
-                                header: false,
-                                value: rowItem,
-                              });
-                            }}
-                          >
-                            {/* {rowItem
-                              ? Array.isArray(rowItem)
-                                ? ""
-                                : typeof rowItem === "object"
-                                ? ""
-                                : rowItem.length > 10
-                                ? rowItem.slice(0, 10) + "..."
-                                : rowItem
-                              : "-"} */}
-                              {
-                                rowItem.length > 25
-                                ? rowItem.slice(0, 25) + "..."
-                                : rowItem
-                              }
-                          </div>
-                        ) : (
-                          <input
-                            key={valIndex}
-                            type="text"
-                            className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
-                            defaultValue={rowItem}
-                            autoFocus
-                            onChange={(e) =>
-                              setIsChanging((prev: any) => ({
-                                ...prev,
-                                value: e.target.value,
-                              }))
-                            }
-                            onClick={changeCell}
-                          />
-                        )}
+                        {valIndex !== 12 ?
+                          <>
+                            {!(
+                              isChanging.status &&
+                              isChanging.columnIndex === valIndex &&
+                              isChanging.rowIndex === rowIndex &&
+                              !isChanging.header
+                            ) ? (
+                              <div
+                                key={valIndex}
+                                className={`w-[200px!important] text-start mx-2 overflow-hidden ${columnsHidden.includes(valIndex)
+                                  ? "hidden"
+                                  : "block"
+                                  }`}
+                                onClick={() => {
+                                  setIsChanging({
+                                    status: true,
+                                    columnIndex: valIndex,
+                                    rowIndex: rowIndex,
+                                    header: false,
+                                    value: rowItem,
+                                  });
+                                }}
+                              >
+                                {
+                                  rowItem.length > 25
+                                    ? rowItem.slice(0, 25) + "..."
+                                    : rowItem
+                                }
+                              </div>
+                            ) : (
+                              <input
+                                key={valIndex}
+                                type="text"
+                                className="w-[200px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                                defaultValue={rowItem}
+                                autoFocus
+                                onChange={(e) =>
+                                  setIsChanging((prev: any) => ({
+                                    ...prev,
+                                    value: e.target.value,
+                                  }))
+                                }
+                                onClick={changeCell}
+                              />
+                            )}
+                          </>
+                          : rowItem && rowItem !== "None" ?
+                            <button onClick={() => setCurrentFrame(rowItem)} className="btn btn-primary btn-active-shadow my-1 px-3 py-2 h-[auto] w-[auto] min-h-[auto] min-w-[auto]">
+                              View
+                            </button>
+                            : <div className="w-[200px!important] text-start mx-2 overflow-hidden">None</div>
+
+                        }
                       </>
                     );
                   })}

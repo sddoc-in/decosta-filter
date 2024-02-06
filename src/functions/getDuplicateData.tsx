@@ -21,7 +21,10 @@ function getDuplicateData(data1:any) {
         // Start Date
         obj.push('');
   
-        // End Date
+        // Stop Date
+        obj.push('');
+
+        // Days Running
         obj.push('');
   
         // Status

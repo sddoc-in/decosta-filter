@@ -18,6 +18,9 @@ export default function ContextProvider({ children }: any) {
     const [allProducts, setAllProducts] = React.useState<allProductsInterface[]>([])
     const [data, setData] = React.useState<any>([])
 
+    const [currentFrame, setCurrentFrame] = React.useState('')
+
+
     const lightTheme = {
         background: '#fff!important',
         color: '#000!important'
@@ -35,7 +38,7 @@ export default function ContextProvider({ children }: any) {
         <MainContext.Provider value={{
             theme, setTheme, lightTheme, darkTheme, loading, setLoading, themeObj,
             currentPage, setCurrentPage, currentProduct, setCurrentProduct, oppositeObj,
-            allProducts, setAllProducts, 
+            allProducts, setAllProducts,  currentFrame, setCurrentFrame
         }}>
             {children}
             {

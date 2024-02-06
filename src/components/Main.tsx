@@ -8,11 +8,13 @@ import { AiOutlineFileExcel } from "react-icons/ai";
 import { MainJSON } from '../constant/data'
 import getDuplicateData from '../functions/getDuplicateData'
 import getSourceData from '../functions/getSourceData'
+import axios from 'axios';
 
 export default function Main() {
 
-    const { setTheme, theme, themeObj } = React.useContext(MainContext)
+    const { setTheme, theme, currentFrame, setCurrentFrame } = React.useContext(MainContext)
     const { downloadAsCsv, downloadAsExcel, setFileData, setHeader, header } = React.useContext(ExcelContext)
+
 
     function changeTheme() {
         if (theme === 'light') {
@@ -24,14 +26,14 @@ export default function Main() {
     }
 
 
-    function ABCD() {
-
+    async function ABCD() {
         const headers = [
             "Name",
             "ID",
             "Reach",
             "Start Date",
             "Stop Date",
+            "Days Running",
             "Status",
             "Creative Id",
             "Creative Date Time",
@@ -41,10 +43,19 @@ export default function Main() {
             "IFrame"
         ]
 
-        let arr: any = [...getDuplicateData(MainJSON.duplicate_ads), ...getSourceData(MainJSON.source_add)];
+        try{
+        const response = await axios.get('https://decosta.onrender.com/ads?rows=200')
+        const data = response.data;
+        // if (data) {
+            let arr: any = [...getDuplicateData(data.duplicate_ads), ...getSourceData(data.source_add)];
+            setHeader(headers)
+            setFileData(arr)
+        } catch (error){
+            let arr: any = [...getDuplicateData(MainJSON.duplicate_ads), ...getSourceData(MainJSON.source_add)];
 
-        setHeader(headers)
-        setFileData(arr)
+            setHeader(headers)
+            setFileData(arr)
+        }
     }
 
 
@@ -102,11 +113,24 @@ export default function Main() {
                     </div>
                 }
             </div >
-            <div dangerouslySetInnerHTML={{
-                __html:`<iframe src="https://www.facebook.com/ads/api/preview_iframe.php?d=AQKrQYmmKuw01BZIpoEDcwkmhSL6YjtdQqnHB93khP38jsMcWvRePqSHlAGjQZLjOaSboKU_TB9VKfHD0mrbxq_e_dwnEe_9uzcIYIaYMQPlWv0hYIjdUhzSE6gOo3xFeLbIPW1TYclsIPYpezuZQBpwuES5JNDYei9ON5z370jfMuXl6nurq2-S_BEs2Xkf0M5J7XPbXSBl0goW4jOVHb96ANYCnQDPUNCyZwFITqxVcQ3GwxWXeq5OOtr6uJWNk2Z9xXkwQ0hg22RZGXxso-qXXfWeD28jkBnbsSZvy2Za6zq8deDD3SHB8xdHAbdTnX8N-cz7PrVNCaO1wruuU-8PHZfY2q5n8GZpv_RwviCW1UDM4Q4Pl9N8bpEhe6NXUn8zEDfhUZT1hZ7xogj6XCvsD5ZQNHjrfzyK3eYYeeo8Rytn7PiCiices_QxHdYqiHM&amp;t=AQIoZB4DhRhtfK-_uT4" width="540" height="690" scrolling="yes" style="border: none;"></iframe>`
-            }}>
 
-            </div>
+
+            {
+                currentFrame !== '' &&
+                <>
+                    <div className='w-full h-[100vh] absolute z-20 top-0 left-0 flex justify-center items-center'>
+                        <div className="w-full h-full backdrop-blur-sm absolute z-20"></div>
+                        <p
+                            className="right-2 top-3 absolute text-[30px] text-black cursor-pointer z-30"
+                            onClick={() => setCurrentFrame('')}
+                        >X</p>
+                        <div className='h-[600px] z-40' dangerouslySetInnerHTML={{
+                            __html: currentFrame
+                        }}>
+                        </div>
+                    </div>
+                </>
+            }
         </>
 
     )
