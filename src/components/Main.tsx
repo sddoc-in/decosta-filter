@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { ExcelContext } from '../context/ExcelContext'
 import ExcelComponent from '../excel-component/ExcelComponent'
 import { MainContext } from '../context/Context'
@@ -9,9 +9,11 @@ import { MainJSON } from '../constant/data'
 import getDuplicateData from '../functions/getDuplicateData'
 import getSourceData from '../functions/getSourceData'
 import axios from 'axios';
-
+import { DynamicApidata } from './ApiData';
+import Searchbar from '../functions/Searchbar';
+import PageFB from '../functions/PageFB';
 export default function Main() {
-
+    const [ApiDataResponse, setApiDataResponse] = useState([])
     const { setTheme, theme, currentFrame, setCurrentFrame } = React.useContext(MainContext)
     const { downloadAsCsv, downloadAsExcel, setFileData, setHeader, header } = React.useContext(ExcelContext)
 
@@ -44,13 +46,13 @@ export default function Main() {
         ]
 
         try{
-        const response = await axios.get('https://decosta.onrender.com/ads?rows=200')
-        const data = response.data;
-        // if (data) {
+            const response = await axios.get('https://decosta.onrender.com/ads?rows=200')
+            const data = response.data;
+            // if (data) {
             let arr: any = [...getDuplicateData(data.duplicate_ads), ...getSourceData(data.source_add)];
             setHeader(headers)
             setFileData(arr)
-        } catch (error){
+        } catch (error) {
             let arr: any = [...getDuplicateData(MainJSON.duplicate_ads), ...getSourceData(MainJSON.source_add)];
 
             setHeader(headers)
@@ -60,6 +62,31 @@ export default function Main() {
 
 
 
+
+    async function GetaData(params: any) {
+
+        try {
+            const recieveData = await DynamicApidata(params);
+            console.log(recieveData, 'recieveData');
+            if (recieveData.data.results) {
+                const newSetData = recieveData.data.results.map((item: any, index: any) => {
+                    setApiDataResponse(item)
+                })
+                return newSetData;
+            }
+        } catch (error) {
+
+
+        }
+
+    }
+
+    React.useEffect(() => {
+        if (ApiDataResponse) {
+            GetaData()
+        }
+    }, []);
+console.log(ApiDataResponse,"jhdfgdf")
     React.useEffect(() => {
         ABCD()
     }, []);
@@ -68,6 +95,8 @@ export default function Main() {
 
     return (
         <>
+       
+       <div className=''> <Searchbar/>
             <div className='w-[100%] min-h-[100vh] flex justify-center items-center' style={
                 theme === 'light' ? {
                     background: '#fff!important',
@@ -113,6 +142,8 @@ export default function Main() {
                     </div>
                 }
             </div >
+            </div>
+            <PageFB/>
 
 
             {
@@ -124,8 +155,7 @@ export default function Main() {
                             className="right-2 top-3 absolute text-[30px] text-black cursor-pointer z-30"
                             onClick={() => setCurrentFrame('')}
                         >X</p>
-                        <div className='h-[600px] z-40' dangerouslySetInnerHTML={{
-                            __html: currentFrame
+                        <div className='h-[600px] z-40' dangerouslySetInnerHTML={{__html: currentFrame
                         }}>
                         </div>
                     </div>
