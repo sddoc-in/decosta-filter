@@ -10,7 +10,8 @@ export default function InputSelect(props: Input) {
     props.selectArray || []
   );
 
-  const [defValue, setDefValue] = React.useState<string>(props.defValue || "");
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
 
   function Show() {
     if (!props.disabled) {
@@ -32,7 +33,7 @@ export default function InputSelect(props: Input) {
   }
 
   function onCountryClick(data: any) {
-    setDefValue(data.name);
+    inputRef.current!.value = data.name;
     setShow(false);
     if (props.onChange) {
       props.onChange(props.name, data.value);
@@ -41,7 +42,7 @@ export default function InputSelect(props: Input) {
   }
 
   React.useEffect(() => {
-    setDefValue(props.defValue);
+    inputRef.current!.value = props.defValue || "";
   }, [props.defValue]);
 
   React.useEffect(() => {
@@ -73,7 +74,7 @@ export default function InputSelect(props: Input) {
           </div>
           <input
             type="text"
-            defaultValue={defValue}
+            ref={inputRef}
             disabled={props.disabled ? true : false}
             name={props.name ? props.name : "select"}
             onChange={(e) => onChange(e)}

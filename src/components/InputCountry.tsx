@@ -10,7 +10,7 @@ export default function InputCountry(props: Input) {
   const [fileteredCountries, setFilteredCountries] =
     React.useState<CountriesInterface[]>(AllCountriesData);
 
-  const [defValue, setDefValue] = React.useState<string>(props.defValue);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   function Show() {
     if (!props.disabled) {
@@ -34,18 +34,17 @@ export default function InputCountry(props: Input) {
   }
 
   function onCountryClick(data: CountriesInterface) {
-    setDefValue(data.name);
+    inputRef.current!.value = data.name;
+
     setShow(false);
     if (props.onChange) {
       props.onChange(props.name, data.name);
     }
     setFilteredCountries(AllCountriesData);
   }
-
   React.useEffect(() => {
-    setDefValue(props.defValue);
+    inputRef.current!.value = props.defValue || "";
   }, [props.defValue]);
-
   return (
     <>
       <div className={"w-full h-fit text-start my-2" + props.inputClassName}>
@@ -71,7 +70,7 @@ export default function InputCountry(props: Input) {
           </div>
           <input
             type="text"
-            defaultValue={defValue}
+            ref={inputRef}
             disabled={props.disabled ? true : false}
             name={props.name ? props.name : "password"}
             onChange={(e) => onChange(e)}
