@@ -10,5 +10,6 @@ export default interface Input {
   inputClassName?: string;
   error?: string;
   onChange?: (type:string,value:string) => void;
-  selectArray?: { id: string; name: string; image?: string; value?: string }[];
+  selectArray?: { id?: string; name: string; image?: string; value?: string }[];
+  onClickSearch?: () => void;
 }

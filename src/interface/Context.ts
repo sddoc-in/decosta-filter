@@ -30,16 +30,12 @@ export default interface HappyClientMainContextInterface {
     setState:React.Dispatch<React.SetStateAction<number>>,
     maxState:number,
     setMaxState:React.Dispatch<React.SetStateAction<number>>,
-    startDate:Date,
-    setStartDate:React.Dispatch<React.SetStateAction<Date>>,
-    endDate:Date,
-    setEndDate:React.Dispatch<React.SetStateAction<Date>>,
-    params:any,
-    setParams:React.Dispatch<React.SetStateAction<any>>,
-    selectedCountry:string,
-    setSelectedCountry:React.Dispatch<React.SetStateAction<string>>
     dupes:string[],
-    setDupes:React.Dispatch<React.SetStateAction<string[]>>
+    setDupes:React.Dispatch<React.SetStateAction<string[]>>,
+    apiParams:any,
+    setApiParams:React.Dispatch<React.SetStateAction<any>>,
+    filterParams:any,
+    setFilterParams:React.Dispatch<React.SetStateAction<any>>,
 }
 
 

@@ -294,7 +294,7 @@ export default function ExcelComponent() {
                                   href={rowItem as string}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="text-blue-500  p-2 underline-none bg-[#0330fc] text-white rounded-sm"
+                                  className=" p-2 underline-none bg-[#0330fc] text-white rounded-sm"
                                 >
                                   Link
                                 </a>

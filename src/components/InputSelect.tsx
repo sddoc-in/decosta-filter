@@ -2,15 +2,15 @@ import React from "react";
 
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import Input from "../interface/Input";
-import CountriesInterface from "../interface/Country";
-import AllCountriesData from "../constant/countary";
 
-export default function InputCountry(props: Input) {
+
+export default function InputSelect(props: Input) {
   const [show, setShow] = React.useState(false);
-  const [fileteredCountries, setFilteredCountries] =
-    React.useState<CountriesInterface[]>(AllCountriesData);
+  const [fileteredCountries, setFilteredCountries] = React.useState(
+    props.selectArray || []
+  );
 
-  const [defValue, setDefValue] = React.useState<string>(props.defValue);
+  const [defValue, setDefValue] = React.useState<string>(props.defValue || "");
 
   function Show() {
     if (!props.disabled) {
@@ -20,48 +20,50 @@ export default function InputCountry(props: Input) {
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     setShow(true);
-    let filtered = AllCountriesData.filter((data: CountriesInterface) => {
+    let filtered = props.selectArray!.filter((data) => {
       return data.name.toLowerCase().includes(e.target.value.toLowerCase());
     });
     if (filtered.length === 0) {
-      filtered = AllCountriesData.filter((data: CountriesInterface) => {
-        return data.dial_code
-          .toLowerCase()
-          .includes(e.target.value.toLowerCase());
+      filtered = props.selectArray!.filter((data) => {
+        return data.value!.toLowerCase().includes(e.target.value.toLowerCase());
       });
     }
     setFilteredCountries(filtered);
   }
 
-  function onCountryClick(data: CountriesInterface) {
+  function onCountryClick(data: any) {
     setDefValue(data.name);
     setShow(false);
     if (props.onChange) {
-      props.onChange(props.name, data.name);
+      props.onChange(props.name, data.value);
     }
-    setFilteredCountries(AllCountriesData);
+    setFilteredCountries(props.selectArray || []);
   }
 
   React.useEffect(() => {
     setDefValue(props.defValue);
   }, [props.defValue]);
 
+  React.useEffect(() => {
+    setFilteredCountries(props.selectArray || []);
+  }, [props.selectArray]);
+
   return (
     <>
-      <div className={"w-full h-fit text-start my-2" + props.inputClassName}>
+      <div className={"w-full h-fit text-start my-1 " + props.inputClassName}>
         {props.label && (
           <label
             htmlFor={props.name ? props.name : "password"}
-            className="text-[16px] block leading-[24px] text-[#23262F] mt-4 mx-2 font-[700] my-1 md:my-2"
+            className="text-[16px] block leading-[24px] text-[#23262F] font-[700] mt-4 ml-3 md:mt-0  md:ml-0 my-1 md:my-2"
           >
             {props.label}
           </label>
         )}
-        <div className="relative w-full">
+        <div className="relative w-[95%] mx-auto">
           <div
-            className="absolute right-5"
+            className="absolute right-4"
             onClick={Show}
-            style={{ top: "22px" }}
+            style={{ top: "18.5px" }}
           >
             {show ? (
               <IoMdArrowDropup className="text-[#777E91] text-[20px] cursor-pointer" />
@@ -73,35 +75,30 @@ export default function InputCountry(props: Input) {
             type="text"
             defaultValue={defValue}
             disabled={props.disabled ? true : false}
-            name={props.name ? props.name : "password"}
+            name={props.name ? props.name : "select"}
             onChange={(e) => onChange(e)}
-            placeholder={
-              props.placeholder ? props.placeholder : `Enter Country`
-            }
+            placeholder={props.placeholder ? props.placeholder : `Select`}
             className={
-              "input w-[97%] rounded-lg text-[14px] text-black font-medium mx-2 disabled:bg-white disabled:text-black placeholder:font-normal placeholder:text-[#000] bg-white mt-2 "
+              "input w-full rounded-lg text-[14px] text-black font-medium disabled:bg-white disabled:text-black placeholder:font-normal placeholder:text-[#000] bg-white my-1 "
             }
             style={{ borderColor: "rgb(189, 189, 189)" }}
           />
           {props.error && (
             <p className="text-[12px] text-red-500">{props.error}</p>
           )}
+
           <div
             className={`absolute z-50 mt-2 top-full left-0 w-full bg-white rounded-lg shadow-md border border-gray-200 h-fit  max-h-[200px] overflow-y-scroll scroll-hide ${
               show ? "block" : "hidden"
             }`}
           >
-            {" "}
-            {fileteredCountries.map((data: CountriesInterface, i) => (
+            {fileteredCountries.map((data, i) => (
               <div
                 key={i}
                 onClick={() => onCountryClick(data)}
-                className="flex items-center justify-between px-4 transition hover:bg-green-500 py-2 border-b border-gray-200 cursor-pointer"
+                className="flex items-center justify-between text-black px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-[#004D3D] hover:text-[white!important]  transition-all"
               >
-                <div className="flex items-center">
-                  <p className="text-[20px] country-flag ">{data.flag}</p>
-                  <p className="text-[black] ml-2 text-[14px]">{data.name}</p>
-                </div>
+                <p className="text-[16px]  country-flag ">{data.name}</p>
               </div>
             ))}
           </div>

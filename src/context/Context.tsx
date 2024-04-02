@@ -21,18 +21,34 @@ export default function ContextProvider({ children }: any) {
   const [allProducts, setAllProducts] = React.useState<allProductsInterface[]>(
     []
   );
-  const [startDate, setStartDate] = React.useState<Date>(new Date());
-  const [endDate, setEndDate] = React.useState<Date>(new Date());
   const [currentRequest, setCurrentRequest] = React.useState<number>(0);
   const [loopBreaker, setLoopBreaker] = React.useState<boolean>(false);
   const [state, setState] = React.useState<number>(0);
   const [maxState, setMaxState] = React.useState<number>(0);
-  const [params, setParams] = React.useState<any>({
+  const [apiParams, setApiParams] = React.useState<any>({
+    country:"NL",
+    content_languages:"en",
+    filtterStart_date:new Date(),
+    filtterEnd_date:new Date(),
+    querry:"",
+    ad_status_type:"all",
+    ad_type:"all",
+    media_type:"all",
+    publisher_platforms:"all",
     Nextforward_cursor:"",
     Nextbackward_cursor:"",
     Nextcollation_token:"",
   })
-  const [selectedCountry, setSelectedCountry] = React.useState("NL");
+
+  const [filterParams, setFilterParams] = React.useState<any>({
+    minMaxLikes: [0, 0],
+    minMaxComments: [0, 0],
+    minMaxShares: [0, 0],
+    minMaxViews: [0, 0],
+    minMaxReach: [0, 0],
+    minDaysActive: 0,
+  })
+
   const [dupes, setDupes] = React.useState<string[]>([])
 
 
@@ -72,16 +88,12 @@ export default function ContextProvider({ children }: any) {
         setState,
         maxState,
         setMaxState,
-        startDate,
-        setStartDate,
-        endDate,
-        setEndDate,
-        params,
-        setParams,
-        selectedCountry,
-        setSelectedCountry,
         dupes,
-        setDupes
+        setDupes,
+        apiParams,
+        setApiParams,
+        filterParams,
+        setFilterParams
       }}
     >
       {children}

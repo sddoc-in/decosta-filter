@@ -3,6 +3,15 @@ import { ExcelContext } from "../context/ExcelContext";
 import { MainContext } from "../context/Context";
 import { BASE_API_URL } from "../constant/data";
 import InputCountry from "../components/InputCountry";
+import InputName from "../components/InputName";
+import InputSearch from "../components/InputSearch";
+import InputSelect from "../components/InputSelect";
+import { Languages } from "../constant/Languages";
+import { CallToAction } from "../constant/CallToAction";
+import { AdType } from "../constant/AdType";
+import { AdStatus } from "../constant/AdStatus";
+import InputNumber from "../components/InputNumber";
+import InputDate from "../components/InputDate";
 export default function FileTaker() {
   const { setHeader, setFileData, fileChoser, fileData } =
     React.useContext(ExcelContext);
@@ -16,38 +25,38 @@ export default function FileTaker() {
     setCurrentPage,
     oppositeObj,
     setCurrentRequest,
-    endDate,
-    startDate,
-    setEndDate,
-    setStartDate,
-    params,
-    setParams,
-    selectedCountry,
-    setSelectedCountry,
     setDupes,
     dupes,
+    apiParams,
+    setApiParams,
+    filterParams,
+    setFilterParams,
   } = React.useContext(MainContext);
+
+  const [numberofAds, setNumberofAds] = React.useState<number>(0);
 
   const getQueryData = React.useRef(() => {});
 
   function handleChange(type: string, value: string) {
-    setSelectedCountry(value);
+    setApiParams((prev: any) => {
+      return { ...prev, [type]: value };
+    });
   }
 
   getQueryData.current = async () => {
-    let param_Nextforward_cursor = params.Nextforward_cursor;
-    let param_Nextbackward_cursor = params.Nextbackward_cursor;
-    let param_Nextcollation_token = params.Nextcollation_token;
+    let param_Nextforward_cursor = apiParams.Nextforward_cursor;
+    let param_Nextbackward_cursor = apiParams.Nextbackward_cursor;
+    let param_Nextcollation_token = apiParams.Nextcollation_token;
 
     let Duplicate = dupes;
 
     // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
-    let param_startDate = startDate
+    let param_startDate = apiParams.startDate
       .toISOString()
       .split("T")
       .join(" ")
       .split(".")[0];
-    let param_endDate = endDate
+    let param_endDate = apiParams.endDate
       .toISOString()
       .split("T")
       .join(" ")
@@ -70,11 +79,16 @@ export default function FileTaker() {
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
-              country: selectedCountry,
-              page: (currentPage + i).toString(),
-              querry: currentProduct,
+              country: apiParams.country,
+              content_languages: apiParams.content_languages,
               filtterStart_date: param_startDate,
               filtterEnd_date: param_endDate,
+              querry: currentProduct,
+              ad_status_type: apiParams.ad_status_type,
+              ad_type: apiParams.ad_type,
+              media_type: apiParams.media_type,
+              publisher_platforms: "all",
+              page: (currentPage + i).toString(),
               Nextforward_cursor: param_Nextforward_cursor,
               Nextbackward_cursor: param_Nextbackward_cursor,
               Nextcollation_token: param_Nextcollation_token,
@@ -99,7 +113,8 @@ export default function FileTaker() {
         param_Nextforward_cursor = data.pageData.forward_cursor;
         param_Nextcollation_token = data.pageData.collation_token;
 
-        setParams({
+        setApiParams({
+          ...apiParams,
           Nextbackward_cursor: param_Nextbackward_cursor,
           Nextforward_cursor: param_Nextforward_cursor,
           Nextcollation_token: param_Nextcollation_token,
@@ -137,6 +152,70 @@ export default function FileTaker() {
     setLoading(false);
   };
 
+  async function getNumberofAds() {
+    let param_Nextforward_cursor = apiParams.Nextforward_cursor;
+    let param_Nextbackward_cursor = apiParams.Nextbackward_cursor;
+    let param_Nextcollation_token = apiParams.Nextcollation_token;
+
+    // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
+    let param_startDate = apiParams.startDate
+      .toISOString()
+      .split("T")
+      .join(" ")
+      .split(".")[0];
+    let param_endDate = apiParams.endDate
+      .toISOString()
+      .split("T")
+      .join(" ")
+      .split(".")[0];
+
+    try {
+      if (!currentProduct) {
+        alert("Enter Query to search");
+        return;
+      }
+      let temp: any = [];
+      let header: any = [];
+      if (fileData.length > 0) {
+        temp = fileData;
+      }
+
+      setLoading(true);
+      let data = await fetch(
+        BASE_API_URL +
+          new URLSearchParams({
+            country: apiParams.country,
+            content_languages: apiParams.content_languages,
+            filtterStart_date: param_startDate,
+            filtterEnd_date: param_endDate,
+            querry: currentProduct,
+            ad_status_type: apiParams.ad_status_type,
+            ad_type: apiParams.ad_type,
+            media_type: apiParams.media_type,
+            publisher_platforms: "all",
+            page: "1",
+            Nextforward_cursor: param_Nextforward_cursor,
+            Nextbackward_cursor: param_Nextbackward_cursor,
+            Nextcollation_token: param_Nextcollation_token,
+          }),
+        {
+          method: "GET",
+          headers: {
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      ).then((response) => response.json());
+
+      setNumberofAds(data.pageData.totalAdcount);
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong");
+    }
+    setLoading(false);
+  }
+
   function checkFileTypes(file: string) {
     const types = [
       "application/vnd.ms-excel",
@@ -162,10 +241,29 @@ export default function FileTaker() {
     fileChoser(file);
   }
 
+  function changeFilterParams(type: string, value: string) {
+    setFilterParams((prev: any) => {
+      return { ...prev, [type]: value.split("-") };
+    });
+  }
+
   return (
     <>
       <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
         <div className="flex justify-center items-center w-full">
+          <InputSearch
+            defValue=""
+            placeholder="Enter Query"
+            name="querry"
+            inputClassName={` w-[50%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setCurrentProduct(e.target.value);
+              setApiParams((prev: any) => {
+                return { ...prev, querry: e.target.value };
+              });
+            }}
+            onClickSearch={getNumberofAds}
+          />
           <InputCountry
             defValue=""
             placeholder="Select Country"
@@ -173,44 +271,132 @@ export default function FileTaker() {
             onChange={handleChange}
             inputClassName={` w-[25%!important] mr-2`}
           />
-          <input
-            type="text"
-            className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`}
-            placeholder="Enter Query"
-            onChange={(e) => setCurrentProduct(e.target.value)}
+          <button
+            className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] "
+            onClick={getQueryData.current}
+          >
+            View results
+          </button>
+        </div>
+        <div className="flex justify-center items-center w-full">
+          <InputSelect
+            defValue=""
+            placeholder="Select language"
+            name="content_languages"
+            selectArray={Languages}
+            inputClassName={` w-[30%!important] mr-2`}
+            onChange={handleChange}
+          />
+          <InputSelect
+            defValue=""
+            placeholder="Select Action"
+            name="media_type"
+            selectArray={CallToAction}
+            inputClassName={` w-[30%!important] mr-2`}
+            onChange={handleChange}
+          />
+          <InputSelect
+            defValue=""
+            placeholder="Select Ad Type"
+            name="ad_type"
+            selectArray={AdType}
+            inputClassName={` w-[30%!important] mr-2`}
+            onChange={handleChange}
+          />
+          <InputSelect
+            defValue=""
+            placeholder="Select Ad Status"
+            name="ad_status_type"
+            selectArray={AdStatus}
+            inputClassName={` w-[30%!important] mr-2`}
+            onChange={handleChange}
           />
         </div>
 
-        <div className="flex justify-center items-center">
-          <div className="w-[48%] mx-2">
-            <label htmlFor="">Start Date</label>
-            <input
-              type="date"
-              placeholder="Start Date"
-              defaultValue={startDate.toISOString().split("T")[0]}
-              className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`}
-              onChange={(e) => setStartDate(new Date(e.target.value))}
-            />
-          </div>
-          <div className="w-[48%] mx-2">
-            <label htmlFor="">End Date</label>
-            <input
-              type="date"
-              placeholder="End Date"
-              defaultValue={endDate.toISOString().split("T")[0]}
-              className={`file-input my-3 file-input-bordered file-input-secondary shadow-lg w-full max-w-xs text-white pl-3 ${oppositeObj}`}
-              onChange={(e) => setEndDate(new Date(e.target.value))}
-            />
-          </div>
+        <div className="flex justify-center items-center w-full">
+          <InputName
+            defValue=""
+            placeholder="Select Min/Max Likes"
+            name="minMaxLikes"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) =>
+              changeFilterParams("minMaxLikes", e.target.value)
+            }
+          />
+          <InputName
+            defValue=""
+            placeholder="Select Min/Max Shares"
+            name="minMaxShares"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) =>
+              changeFilterParams("minMaxShares", e.target.value)
+            }
+          />
+          <InputName
+            defValue=""
+            placeholder="Select Min/Max Reach"
+            name="minMaxReach"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) =>
+              changeFilterParams("minMaxReach", e.target.value)
+            }
+          />
+          <InputName
+            defValue=""
+            placeholder="Select Min/Max Comments"
+            name="minMaxComments"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) =>
+              changeFilterParams("minMaxComments", e.target.value)
+            }
+          />
         </div>
 
-        <div className="flex justify-center items-center">
-          <button
-            className="btn btn-primary btn-active-shadow my-1 px-3 py-2 h-[auto] w-[auto] min-h-[auto] min-w-[auto"
-            onClick={getQueryData.current}
-          >
-            Search
-          </button>
+        <div className="flex justify-center items-center w-full">
+          <InputDate
+            defValue=""
+            placeholder="Start Date"
+            label="Start Date"
+            name="filtterStart_date"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setApiParams((prev: any) => {
+                return { ...prev, filtterStart_date: e.target.value };
+              });
+            }}
+          />
+          <InputDate
+            defValue=""
+            placeholder="End Date"
+            label="End Date"
+            name="filtterEnd_date"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setApiParams((prev: any) => {
+                return { ...prev, filtterEnd_date: e.target.value };
+              });
+            }}
+          />
+          <InputNumber
+            defValue=""
+            placeholder="Enter Page Number"
+            label="Min Days Active"
+            name="query"
+            inputClassName={` w-[30%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setFilterParams((prev: any) => {
+                return { ...prev, minDaysActive: e.target.value };
+              });
+            }}
+          />
+          <InputName
+            defValue={numberofAds.toString()}
+            disabled={true}
+            label="Results Found"
+            placeholder="Enter Page Size"
+            name="query"
+            inputClassName={` w-[30%!important] mr-2`}
+          />
         </div>
 
         <div className="divider w-full">OR</div>

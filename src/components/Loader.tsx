@@ -19,7 +19,7 @@ export default function Loader() {
         {/* <h1 className="text-center text-2xl font-bold">
           Processed Requests : {currentRequest} / 60
         </h1> */}
-        <ScaleLoader  color={"#36d7b7"} cssOverride={override} size={60} />
+        <ScaleLoader  color={"#36d7b7"} cssOverride={override}  />
         {/* <button className="btn btn-secondary" onClick={CancelRequests}>Cancel</button> */}
       </div>
     </div>
