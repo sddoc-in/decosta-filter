@@ -76,16 +76,17 @@ export default function FileTaker() {
         temp = fileData;
       }
 
-      if(numberofAds === 0){
-        alert("No Ads Found")
+      if (numberofAds === 0) {
+        alert("No Ads Found");
         return;
       }
 
-      let i = 1;
+      let i = 0;
       setLoading(true);
+      // while (i < 1) {
       while (currentAds < numberofAds) {
-        if(loopBreaker){
-          console.log("Break")
+        if (loopBreaker) {
+          console.log("Break");
           break;
         }
         let response = await fetch(
@@ -419,8 +420,7 @@ export default function FileTaker() {
           onChange={(e) => getFile(e)}
         />
       </div>
-      {loading && <Loader adsFetched={adsFetched}  />}
-
+      {loading && <Loader adsFetched={adsFetched} />}
     </>
   );
 }

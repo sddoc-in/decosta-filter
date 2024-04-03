@@ -1,4 +1,5 @@
 // export const BASE_API_URL = "https://getapi-henna.vercel.app/getdata?";
+// export const BASE_API_URL = "http://localhost:80/ads?";
 export const BASE_API_URL = "https://api.sddoc.in/ads?";
 
 export const corsProxy = 'https://corsproxy.io/?';
