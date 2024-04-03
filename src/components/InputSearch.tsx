@@ -38,7 +38,7 @@ export default function InputSearch(props: Input) {
           }
           style={{ borderColor: "rgb(189, 189, 189)" }}
         />
-        <div className="bg-[#002F53] text-white p-[14px] rounded-r-lg" onClick={onSearchClick}>
+        <div className="bg-[#002F53] text-white p-[14px] rounded-r-lg cursor-pointer" onClick={onSearchClick}>
           <IoIosSearch className="text-[20px]" />
         </div>
       </div>

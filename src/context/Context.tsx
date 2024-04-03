@@ -97,7 +97,6 @@ export default function ContextProvider({ children }: any) {
       }}
     >
       {children}
-      {loading && <Loader />}
     </MainContext.Provider>
   );
 }

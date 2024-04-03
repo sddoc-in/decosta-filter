@@ -21,10 +21,9 @@ export default function InputDate(props: Input) {
         </label>
       )}
       <input
-        type="date"
+         type="date"
         name={props.name ? props.name : "name"}
         disabled={props.disabled ? true : false}
-        defaultValue={props.defValue}
         placeholder={props.placeholder ? props.placeholder : `Enter Name`}
         onChange={(e) => onChange(e)}
         className={

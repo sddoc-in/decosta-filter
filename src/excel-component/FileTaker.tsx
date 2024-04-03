@@ -12,12 +12,14 @@ import { AdType } from "../constant/AdType";
 import { AdStatus } from "../constant/AdStatus";
 import InputNumber from "../components/InputNumber";
 import InputDate from "../components/InputDate";
+import Loader from "../components/Loader";
 export default function FileTaker() {
   const { setHeader, setFileData, fileChoser, fileData } =
     React.useContext(ExcelContext);
 
   const {
     setLoading,
+    loading,
     setState,
     setCurrentProduct,
     currentProduct,
@@ -29,13 +31,12 @@ export default function FileTaker() {
     dupes,
     apiParams,
     setApiParams,
-    filterParams,
+    loopBreaker,
     setFilterParams,
   } = React.useContext(MainContext);
 
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
-
-  const getQueryData = React.useRef(() => {});
+  const [adsFetched, setAdsFetched] = React.useState<number>(0);
 
   function handleChange(type: string, value: string) {
     setApiParams((prev: any) => {
@@ -43,7 +44,9 @@ export default function FileTaker() {
     });
   }
 
-  getQueryData.current = async () => {
+  async function getQueryData() {
+    let currentAds = 0;
+
     let param_Nextforward_cursor = apiParams.Nextforward_cursor;
     let param_Nextbackward_cursor = apiParams.Nextbackward_cursor;
     let param_Nextcollation_token = apiParams.Nextcollation_token;
@@ -51,12 +54,12 @@ export default function FileTaker() {
     let Duplicate = dupes;
 
     // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
-    let param_startDate = apiParams.startDate
+    let param_startDate = apiParams.filtterStart_date
       .toISOString()
       .split("T")
       .join(" ")
       .split(".")[0];
-    let param_endDate = apiParams.endDate
+    let param_endDate = apiParams.filtterEnd_date
       .toISOString()
       .split("T")
       .join(" ")
@@ -73,9 +76,18 @@ export default function FileTaker() {
         temp = fileData;
       }
 
-      let i = 0;
+      if(numberofAds === 0){
+        alert("No Ads Found")
+        return;
+      }
+
+      let i = 1;
       setLoading(true);
-      for (i = 0; i < 3; i++) {
+      while (currentAds < numberofAds) {
+        if(loopBreaker){
+          console.log("Break")
+          break;
+        }
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
@@ -139,6 +151,9 @@ export default function FileTaker() {
             setCurrentRequest((prev) => prev + 1);
           }
         }
+        currentAds += data.results.length;
+        setAdsFetched(currentAds);
+        i++;
       }
       setHeader(header);
       setFileData(temp);
@@ -150,7 +165,11 @@ export default function FileTaker() {
       alert("Something went wrong");
     }
     setLoading(false);
-  };
+  }
+
+  React.useEffect(() => {
+    console.log("Loop Breaker", loopBreaker);
+  }, [loopBreaker]);
 
   async function getNumberofAds() {
     let param_Nextforward_cursor = apiParams.Nextforward_cursor;
@@ -158,12 +177,12 @@ export default function FileTaker() {
     let param_Nextcollation_token = apiParams.Nextcollation_token;
 
     // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
-    let param_startDate = apiParams.startDate
+    let param_startDate = apiParams.filtterStart_date
       .toISOString()
       .split("T")
       .join(" ")
       .split(".")[0];
-    let param_endDate = apiParams.endDate
+    let param_endDate = apiParams.filtterEnd_date
       .toISOString()
       .split("T")
       .join(" ")
@@ -174,12 +193,6 @@ export default function FileTaker() {
         alert("Enter Query to search");
         return;
       }
-      let temp: any = [];
-      let header: any = [];
-      if (fileData.length > 0) {
-        temp = fileData;
-      }
-
       setLoading(true);
       let data = await fetch(
         BASE_API_URL +
@@ -273,7 +286,7 @@ export default function FileTaker() {
           />
           <button
             className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] "
-            onClick={getQueryData.current}
+            onClick={getQueryData}
           >
             View results
           </button>
@@ -361,7 +374,7 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChangeHandler={(e) => {
               setApiParams((prev: any) => {
-                return { ...prev, filtterStart_date: e.target.value };
+                return { ...prev, filtterStart_date: new Date(e.target.value) };
               });
             }}
           />
@@ -373,7 +386,7 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChangeHandler={(e) => {
               setApiParams((prev: any) => {
-                return { ...prev, filtterEnd_date: e.target.value };
+                return { ...prev, filtterEnd_date: new Date(e.target.value) };
               });
             }}
           />
@@ -406,6 +419,8 @@ export default function FileTaker() {
           onChange={(e) => getFile(e)}
         />
       </div>
+      {loading && <Loader adsFetched={adsFetched}  />}
+
     </>
   );
 }

@@ -84,8 +84,8 @@ export default function Main() {
                 className="text-[#000] text-[20px] mx-2 cursor-pointer"
               />
             </div>
-            <GetOrLoadData />
-            <div className="my-1"></div>
+            {/* <GetOrLoadData /> */}
+            {/* <div className="my-1"></div> */}
             <ExcelComponent />
           </div>
         )}

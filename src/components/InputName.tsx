@@ -9,6 +9,14 @@ export default function InputName(props: Input) {
     }
   }
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (props.defValue && inputRef.current) {
+      inputRef.current.value = props.defValue;
+    }
+  }, [props.defValue]);
+
 
   return (
     <div className={"text-start px-2 my-1 " + props.inputClassName}>
@@ -24,7 +32,7 @@ export default function InputName(props: Input) {
         type="text"
         name={props.name ? props.name : "name"}
         disabled={props.disabled ? true : false}
-        defaultValue={props.defValue}
+        ref={inputRef}
         placeholder={props.placeholder ? props.placeholder : `Enter Name`}
         onChange={(e) => onChange(e)}
         className={
