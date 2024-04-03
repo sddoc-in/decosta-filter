@@ -260,7 +260,6 @@ export default function ExcelComponent() {
                   )}
                   {item.map(
                     (rowItem: string | number | boolean, valIndex: number) => {
-                      if(valIndex === 10 ) return;
                       return (
                         <>
                           {!(
