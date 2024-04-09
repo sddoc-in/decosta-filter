@@ -13,6 +13,8 @@ import { AdStatus } from "../constant/AdStatus";
 import InputNumber from "../components/InputNumber";
 import InputDate from "../components/InputDate";
 import Loader from "../components/Loader";
+import { MediaType } from "../constant/MediaType";
+import { PublisherPlatforms } from "../constant/PublisherPlatforms";
 export default function FileTaker() {
   const { setHeader, setFileData, fileChoser, fileData } =
     React.useContext(ExcelContext);
@@ -303,17 +305,17 @@ export default function FileTaker() {
           />
           <InputSelect
             defValue=""
-            placeholder="Select Action"
-            name="media_type"
-            selectArray={CallToAction}
+            placeholder="Select Publisher Platforms"
+            name="publisher_platforms"
+            selectArray={PublisherPlatforms}
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleChange}
           />
           <InputSelect
             defValue=""
-            placeholder="Select Ad Type"
-            name="ad_type"
-            selectArray={AdType}
+            placeholder="Select Media Type"
+            name="media_type"
+            selectArray={MediaType}
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleChange}
           />
