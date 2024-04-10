@@ -15,6 +15,7 @@ import InputDate from "../components/InputDate";
 import Loader from "../components/Loader";
 import { MediaType } from "../constant/MediaType";
 import { PublisherPlatforms } from "../constant/PublisherPlatforms";
+import InputMultiSelect from "../components/InputMultiSelect";
 export default function FileTaker() {
   const { setHeader, setFileData, fileChoser, fileData } =
     React.useContext(ExcelContext);
@@ -41,6 +42,12 @@ export default function FileTaker() {
   const [adsFetched, setAdsFetched] = React.useState<number>(0);
 
   function handleChange(type: string, value: string) {
+    setApiParams((prev: any) => {
+      return { ...prev, [type]: value };
+    });
+  }
+
+  function handleMultiSelect(type: string, value: string) {
     setApiParams((prev: any) => {
       return { ...prev, [type]: value };
     });
@@ -170,9 +177,6 @@ export default function FileTaker() {
     setLoading(false);
   }
 
-  React.useEffect(() => {
-    console.log("Loop Breaker", loopBreaker);
-  }, [loopBreaker]);
 
   async function getNumberofAds() {
     let param_Nextforward_cursor = apiParams.Nextforward_cursor;
@@ -190,6 +194,8 @@ export default function FileTaker() {
       .split("T")
       .join(" ")
       .split(".")[0];
+    
+      
 
     try {
       if (!currentProduct) {
@@ -311,13 +317,13 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleChange}
           />
-          <InputSelect
+          <InputMultiSelect
             defValue=""
             placeholder="Select Media Type"
             name="media_type"
             selectArray={MediaType}
             inputClassName={` w-[30%!important] mr-2`}
-            onChange={handleChange}
+            onChange={handleMultiSelect}
           />
           <InputSelect
             defValue=""
@@ -330,7 +336,15 @@ export default function FileTaker() {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <InputName
+          <InputMultiSelect 
+            defValue=""
+            placeholder="Select Call To Action"
+            name="call_to_action"
+            selectArray={CallToAction}
+            inputClassName={` w-[30%!important] mr-2`}
+            onChange={handleMultiSelect}
+          />
+          {/* <InputName
             defValue=""
             placeholder="Select Min/Max Likes"
             name="minMaxLikes"
@@ -365,7 +379,7 @@ export default function FileTaker() {
             onChangeHandler={(e) =>
               changeFilterParams("minMaxComments", e.target.value)
             }
-          />
+          /> */}
         </div>
 
         <div className="flex justify-center items-center w-full">
