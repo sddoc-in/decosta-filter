@@ -109,8 +109,9 @@ export default function FileTaker() {
               ad_status_type: apiParams.ad_status_type,
               ad_type: apiParams.ad_type,
               media_type: apiParams.media_type,
-              publisher_platforms: "all",
+              publisher_platforms: apiParams.publisher_platforms,
               page: (currentPage + i).toString(),
+              reach: apiParams.reach,
               Nextforward_cursor: param_Nextforward_cursor,
               Nextbackward_cursor: param_Nextbackward_cursor,
               Nextcollation_token: param_Nextcollation_token,
@@ -177,7 +178,6 @@ export default function FileTaker() {
     setLoading(false);
   }
 
-
   async function getNumberofAds() {
     let param_Nextforward_cursor = apiParams.Nextforward_cursor;
     let param_Nextbackward_cursor = apiParams.Nextbackward_cursor;
@@ -194,8 +194,6 @@ export default function FileTaker() {
       .split("T")
       .join(" ")
       .split(".")[0];
-    
-      
 
     try {
       if (!currentProduct) {
@@ -214,7 +212,8 @@ export default function FileTaker() {
             ad_status_type: apiParams.ad_status_type,
             ad_type: apiParams.ad_type,
             media_type: apiParams.media_type,
-            publisher_platforms: "all",
+            publisher_platforms: apiParams.publisher_platforms,
+            reach: apiParams.reach,
             page: "1",
             Nextforward_cursor: param_Nextforward_cursor,
             Nextbackward_cursor: param_Nextbackward_cursor,
@@ -336,7 +335,7 @@ export default function FileTaker() {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <InputMultiSelect 
+          <InputMultiSelect
             defValue=""
             placeholder="Select Call To Action"
             name="call_to_action"
@@ -344,15 +343,16 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleMultiSelect}
           />
-          {/* <InputName
+           <InputName
             defValue=""
-            placeholder="Select Min/Max Likes"
-            name="minMaxLikes"
+            placeholder="Reach"
+            name="reach"
             inputClassName={` w-[30%!important] mr-2`}
             onChangeHandler={(e) =>
-              changeFilterParams("minMaxLikes", e.target.value)
+              changeFilterParams("reach", e.target.value)
             }
           />
+          {/*
           <InputName
             defValue=""
             placeholder="Select Min/Max Shares"

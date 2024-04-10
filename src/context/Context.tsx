@@ -32,6 +32,7 @@ export default function ContextProvider({ children }: any) {
     filtterEnd_date:new Date(),
     querry:"",
     ad_status_type:"all",
+    reach:0,
     ad_type:"all",
     media_type:"all",
     publisher_platforms:"all",
