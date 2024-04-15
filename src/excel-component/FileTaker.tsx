@@ -74,7 +74,7 @@ export default function FileTaker() {
       .join(" ")
       .split(".")[0];
 
-    try {
+    try { 
       if (!currentProduct) {
         alert("Enter Query to search");
         return;
@@ -93,11 +93,7 @@ export default function FileTaker() {
       let i = 0;
       setLoading(true);
       // while (i < 1) {
-      while (currentAds < numberofAds) {
-        if (loopBreaker) {
-          console.log("Break");
-          break;
-        }
+        while (currentAds < numberofAds) {
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
@@ -343,14 +339,12 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleMultiSelect}
           />
-           <InputName
+          <InputName
             defValue=""
             placeholder="Reach"
             name="reach"
             inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("reach", e.target.value)
-            }
+            onChangeHandler={(e) => changeFilterParams("reach", e.target.value)}
           />
           {/*
           <InputName

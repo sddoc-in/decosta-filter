@@ -298,7 +298,13 @@ export default function ExcelComponent() {
                                   Link
                                 </a>
                               ) : valIndex === 10 ? (
-                                rowItem ? "Yes" : "No"
+                                rowItem ? (
+                                  "Yes"
+                                ) : (
+                                  "No"
+                                )
+                              ) : parseInt(rowItem as string) === 0 ? (
+                                rowItem
                               ) : rowItem ? (
                                 rowItem.toString().length > 20 ? (
                                   rowItem.toString().slice(0, 20) + "..."

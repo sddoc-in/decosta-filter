@@ -65,13 +65,13 @@ export default function InputMultiSelect(props: Input) {
       inputRef.current!.value = selectedName.join(", ");
     } else {
       setSelectedName([...selectedName, data.name]);
-      setSelectedValue([...selectedValue, data.name]);
+      setSelectedValue([...selectedValue, data.value]);
       inputRef.current!.value = [...selectedName, data.name].join(", ");
     }
 
     // setShow(false);
     if (props.onChange) {
-      props.onChange(props.name, [...selectedValue, data.name].join(","));
+      props.onChange(props.name, [...selectedValue, data.value].join(","));
     }
     setFilteredCountries(props.selectArray || []);
   }
