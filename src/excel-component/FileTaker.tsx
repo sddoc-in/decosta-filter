@@ -92,8 +92,8 @@ export default function FileTaker() {
 
       let i = 0;
       setLoading(true);
-      // while (i < 1) {
-        while (currentAds < numberofAds) {
+      while (i < 1) {
+        // while (currentAds < numberofAds) {
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
@@ -304,14 +304,14 @@ export default function FileTaker() {
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleChange}
           />
-          <InputSelect
+          {/* <InputSelect
             defValue=""
             placeholder="Select Publisher Platforms"
             name="publisher_platforms"
             selectArray={PublisherPlatforms}
             inputClassName={` w-[30%!important] mr-2`}
             onChange={handleChange}
-          />
+          /> */}
           <InputMultiSelect
             defValue=""
             placeholder="Select Media Type"
@@ -331,7 +331,7 @@ export default function FileTaker() {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <InputMultiSelect
+          {/* <InputMultiSelect
             defValue=""
             placeholder="Select Call To Action"
             name="call_to_action"
@@ -345,7 +345,7 @@ export default function FileTaker() {
             name="reach"
             inputClassName={` w-[30%!important] mr-2`}
             onChangeHandler={(e) => changeFilterParams("reach", e.target.value)}
-          />
+          /> */}
           {/*
           <InputName
             defValue=""
@@ -401,7 +401,7 @@ export default function FileTaker() {
               });
             }}
           />
-          <InputNumber
+          {/* <InputNumber
             defValue=""
             placeholder="Enter Page Number"
             label="Min Days Active"
@@ -412,7 +412,7 @@ export default function FileTaker() {
                 return { ...prev, minDaysActive: e.target.value };
               });
             }}
-          />
+          /> */}
           <InputName
             defValue={numberofAds.toString()}
             disabled={true}

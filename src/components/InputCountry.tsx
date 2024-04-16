@@ -38,7 +38,7 @@ export default function InputCountry(props: Input) {
 
     setShow(false);
     if (props.onChange) {
-      props.onChange(props.name, data.name);
+      props.onChange(props.name, data.code);
     }
     setFilteredCountries(AllCountriesData);
   }
