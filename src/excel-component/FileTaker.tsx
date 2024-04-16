@@ -73,14 +73,13 @@ export default function FileTaker() {
       .split("T")
       .join(" ")
       .split(".")[0];
-
+      let temp: any = [];
+      let header: any = [];
     try { 
       if (!currentProduct) {
         alert("Enter Query to search");
         return;
       }
-      let temp: any = [];
-      let header: any = [];
       if (fileData.length > 0) {
         temp = fileData;
       }
@@ -92,7 +91,7 @@ export default function FileTaker() {
 
       let i = 0;
       setLoading(true);
-      // while (i < 1) {
+      // while (i < 2) {
         while (currentAds < numberofAds) {
         let response = await fetch(
           BASE_API_URL +
@@ -162,16 +161,22 @@ export default function FileTaker() {
         setAdsFetched(currentAds);
         i++;
       }
+      // setHeader(header);
+      // setFileData(temp);
+      // setDupes(Duplicate);
+      // setCurrentPage(currentPage + 3);
+      // setState(1);
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong");
+    }finally{
+      setLoading(false);
       setHeader(header);
       setFileData(temp);
       setDupes(Duplicate);
       setCurrentPage(currentPage + 3);
       setState(1);
-    } catch (e) {
-      console.log(e);
-      alert("Something went wrong");
     }
-    setLoading(false);
   }
 
   async function getNumberofAds() {
