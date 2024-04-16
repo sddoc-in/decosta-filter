@@ -92,8 +92,8 @@ export default function FileTaker() {
 
       let i = 0;
       setLoading(true);
-      while (i < 1) {
-        // while (currentAds < numberofAds) {
+      // while (i < 1) {
+        while (currentAds < numberofAds) {
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
