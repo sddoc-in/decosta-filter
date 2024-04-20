@@ -62,6 +62,7 @@ export default function FileTaker() {
 
     let Duplicate = dupes;
 
+    let i = 0;
     // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
     let param_startDate = apiParams.filtterStart_date
       .toISOString()
@@ -73,9 +74,9 @@ export default function FileTaker() {
       .split("T")
       .join(" ")
       .split(".")[0];
-      let temp: any = [];
-      let header: any = [];
-    try { 
+    let temp: any = [];
+    let header: any = [];
+    try {
       if (!currentProduct) {
         alert("Enter Query to search");
         return;
@@ -89,10 +90,9 @@ export default function FileTaker() {
         return;
       }
 
-      let i = 0;
       setLoading(true);
       // while (i < 2) {
-        while (currentAds < numberofAds) {
+      while (currentAds < numberofAds) {
         let response = await fetch(
           BASE_API_URL +
             new URLSearchParams({
@@ -122,7 +122,7 @@ export default function FileTaker() {
         );
         let data = await response.json();
 
-        if (data.results.length === 0) {
+        if (data.results.length === 0 && i == 0) {
           alert("No Data Found");
           return;
         }
@@ -168,8 +168,10 @@ export default function FileTaker() {
       // setState(1);
     } catch (e) {
       console.log(e);
-      alert("Something went wrong");
-    }finally{
+      if (i === 0) {
+        alert("Something went wrong");
+      }
+    } finally {
       setLoading(false);
       setHeader(header);
       setFileData(temp);
