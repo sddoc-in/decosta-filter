@@ -33,13 +33,13 @@ export async function getAllResultsByUser(req: Request, res: Response) {
 
         let searches;
         // aggregate search results with search collection
-        if (searchId === undefined) {
+        if (searchId === undefined || searchId === "") {
             searches = await search.aggregate([
                 {
                     $lookup: {
                         from: "results",
                         localField: "searchId",
-                        foreignField: "SearchUid",
+                        foreignField: "SearchUid" ,
                         as: "results"
                     }
                 },

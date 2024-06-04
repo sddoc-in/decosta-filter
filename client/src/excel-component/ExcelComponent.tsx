@@ -287,6 +287,7 @@ export default function ExcelComponent() {
                               }}
                             >
                               {valIndex === 9 ||
+                              valIndex === 10 ||
                               valIndex === 3 ? (
                                 <a
                                   href={rowItem as string}

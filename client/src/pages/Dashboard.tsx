@@ -14,103 +14,39 @@ import axios from "axios";
 import { PublisherPlatforms } from "../constants/PublisherPlatforms";
 
 export default function Dashboard() {
-
-  const { apiParams, setApiParams, user,setLoading } = React.useContext(AppContext);
+  const { apiParams, setApiParams, user, setLoading } =
+    React.useContext(AppContext);
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
+  const [searchId, setSearchId] = React.useState<string>("");
 
   function handleChange(type: string, value: string) {
+    setSearchId("");
     setApiParams((prev: any) => {
       return { ...prev, [type]: value };
     });
   }
 
   function handleMultiSelect(type: string, value: string) {
+    setSearchId("");
     setApiParams((prev: any) => {
       return { ...prev, [type]: value };
     });
   }
 
   async function getNumberofAds() {
-    let param_Nextforward_cursor = apiParams.Nextforward_cursor;
-    let param_Nextbackward_cursor = apiParams.Nextbackward_cursor;
-    let param_Nextcollation_token = apiParams.Nextcollation_token;
-
-    // conver the date to 2021-10-11 12:30:00 this similar format and removing T and msZ
-    let param_startDate = apiParams.filtterStart_date
-      .toISOString()
-      .split("T")
-      .join(" ")
-      .split(".")[0];
-    let param_endDate = apiParams.filtterEnd_date
-      .toISOString()
-      .split("T")
-      .join(" ")
-      .split(".")[0];
-
     try {
       if (apiParams.querry === "") {
         alert("Please enter a Product");
         return;
       }
+      let data;
       setLoading(true);
-      let data = await fetch(
-        ADS_API_URL +
-          new URLSearchParams({
-            country: apiParams.country,
-            content_languages: apiParams.content_languages,
-            filtterStart_date: param_startDate,
-            filtterEnd_date: param_endDate,
-            querry: apiParams.querry,
-            ad_status_type: apiParams.ad_status_type,
-            ad_type: apiParams.ad_type,
-            media_type: apiParams.media_type,
-            publisher_platforms: apiParams.publisher_platforms,
-            reach: apiParams.reach,
-            page: "1",
-            Nextforward_cursor: param_Nextforward_cursor,
-            Nextbackward_cursor: param_Nextbackward_cursor,
-            Nextcollation_token: param_Nextcollation_token,
-          }),
-        {
-          method: "GET",
-          headers: {
-            "Access-Control-Allow-Methods": "*",
-            "Access-Control-Allow-Headers": "*",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      ).then((response) => response.json());
-
-      setNumberofAds(data.pageData.totalAdcount);
-    } catch (e) {
-      console.log(e);
-      alert("Something went wrong");
-    }
-    setLoading(false);
-  }
-
-  async function getQueryData() {
-    try {
-      setLoading(true);
-      let data = await axios
-        .post(API_URL + "/searches/store", {
-          ...apiParams,
-          publisher_platforms: apiParams.publisher_platforms.split(","),
-          media_type: apiParams.media_type.split(","),
-          content_languages: apiParams.content_languages.split(","),
-          uid: user.uid,
-          access_token: user.access_token,
-          session: user.session,
-        })
-        .then((response) => response.data)
-        .catch((err) => {
-          alert(err.response.data.message);
-          return;
-        });
-      if (data.message === "Search stored successfully") {
-        const res = await axios
-          .post(API_URL + "/searches/start", {
-            searchId: data.searchId,
+      if (!searchId) {
+        data = await axios
+          .post(API_URL + "/searches/store", {
+            ...apiParams,
+            publisher_platforms: apiParams.publisher_platforms.split(","),
+            content_languages: apiParams.content_languages.split(","),
             uid: user.uid,
             access_token: user.access_token,
             session: user.session,
@@ -121,11 +57,55 @@ export default function Dashboard() {
             return;
           });
 
-        if (res.message === "Search started successfully") {
-          alert("Search started successfully");
-        } else {
-          alert("Something went wrong");
+        if (data.message === "Search stored successfully") {
+          setSearchId(data.searchId);
+          const res = await axios
+            .get(ADS_API_URL + "total?SearchID=" + data.searchId)
+            .then((response) => response.data)
+            .catch((err) => {
+              alert(err.response.data.message);
+              return;
+            });
+          setNumberofAds(res.total);
         }
+      } else {
+        const res = await axios
+          .get(ADS_API_URL + "total?SearchID=" + searchId )
+          .then((response) => response.data)
+          .catch((err) => {
+            alert(err.response.data.message);
+            return;
+          });
+            setNumberofAds(res.total);
+      }
+    } catch (e) {
+      console.log(e);
+      alert("Something went wrong");
+    }
+    setLoading(false);
+  }
+
+  async function getQueryData() {
+    try {
+      setLoading(true);
+
+      const res = await axios
+        .post(API_URL + "/searches/start", {
+          searchId: searchId,
+          uid: user.uid,
+          access_token: user.access_token,
+          session: user.session,
+        })
+        .then((response) => response.data)
+        .catch((err) => {
+          alert(err.response.data.message);
+          return;
+        });
+
+      if (res.message === "Search started successfully") {
+        alert("Search started successfully");
+      } else {
+        alert("Something went wrong");
       }
       setLoading(false);
     } catch (e) {
@@ -178,7 +158,7 @@ export default function Dashboard() {
             inputClassName={` w-[32.3%!important] mr-2`}
             onChange={handleMultiSelect}
           />
-          <InputMultiSelect
+          <InputSelect
             defValue=""
             placeholder="Select Media Type"
             name="media_type"
@@ -282,7 +262,7 @@ export default function Dashboard() {
         </div>
         <div className="flex justify-center items-end w-full">
           <InputName
-            defValue={numberofAds.toString()}
+            defValue={numberofAds}
             disabled={true}
             label="Results Found"
             placeholder="Enter Page Size"

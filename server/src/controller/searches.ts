@@ -8,7 +8,7 @@ import axios from 'axios';
 
 export async function storeSearch(req: Request, res: Response) {
 
-    const { country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session } = req.body;
+    const { country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session, page } = req.body;
 
     try {
         if (country === undefined) {
@@ -77,10 +77,10 @@ export async function storeSearch(req: Request, res: Response) {
             uid: uid,
             country: country,
             content_languages: content_languages,
-            filtterStart_date: filtterStart_date,
-            filtterEnd_date: filtterEnd_date,
+            filtterStart_date: new Date(filtterStart_date),
+            filtterEnd_date: new Date(filtterEnd_date),
             querry: querry,
-            ad_status_type: ad_status_type,
+            ad_status_type: parseInt(ad_status_type),
             reach: reach,
             ad_type: ad_type,
             media_type: media_type,
@@ -88,7 +88,8 @@ export async function storeSearch(req: Request, res: Response) {
             Nextforward_cursor: Nextforward_cursor,
             Nextbackward_cursor: Nextbackward_cursor,
             Nextcollation_token: Nextcollation_token,
-            status: 0
+            page: page,
+            currentStatus: 0
         });
 
         return res.status(200).json({ message: "Search stored successfully", searchId: searchId });
@@ -168,7 +169,8 @@ export async function getSearchesByUser(req: Request, res: Response) {
                 "filtterStart_date": 1,
                 "filtterEnd_date": 1,
                 "querry": 1,
-                "status": 1
+                "currentStatus": 1,
+                "status":1
             }
         }).toArray();
 
@@ -205,7 +207,7 @@ export async function startSearching(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        await search.updateOne({ searchId: searchId }, { $set: { status: 1 } });
+        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: 1 } });
 
 
         axios.get("https://facebookads.onrender.com/ads?SearchID=" + searchId)
@@ -253,7 +255,7 @@ export async function stopSearch(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        await search.updateOne({ searchId: searchId }, { $set: { status: 2 } });
+        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: 2 } });
 
         return res.status(200).json({ message: "Search stopped successfully" });
 

@@ -1,10 +1,8 @@
 import React from "react";
-import { AppContext } from "../../../context/Context";
 import { SidebarData } from "../../../constants/Sidebar";
 import { Link } from "react-router-dom";
 
 export default function Sidebar() {
-  const { routerPath } = React.useContext(AppContext);
   return (
     <>
       <div className="hidden lg:block md:w-[40%] lg:w-[25%] absolute top-0 left-0 bg-[#002F53] h-full z-10">

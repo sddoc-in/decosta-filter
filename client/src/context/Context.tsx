@@ -30,6 +30,7 @@ export const AppProvider = ({ children }: any) => {
     Nextforward_cursor:"",
     Nextbackward_cursor:"",
     Nextcollation_token:"",
+    page:"1"
   })
 
 

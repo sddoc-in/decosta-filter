@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React  from "react";
 import { FaStop } from "react-icons/fa6";
 import { MdDelete, MdOutlineRestartAlt, MdDataArray } from "react-icons/md";
 import { AppContext } from "../../context/Context";
@@ -85,14 +85,17 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
             End Date: {new Date(user.filtterEnd_date).toDateString()}
           </p>
           <p className="text-gray-600">
+            Data fetched: {user.status || 0}
+          </p>
+          <p className="text-gray-600">
             Status:{" "}
-            {user.status === 1
+            {user.currentStatus === 1
               ? "Active"
-              : user.status === 0
+              : user.currentStatus === 0
               ? "Inactive"
-              : user.status === 2
+              : user.currentStatus === 2
               ? "Stopped"
-              : user.status === 3
+              : user.currentStatus === 3
               ? "Completed"
               : "Inactive"}
           </p>
@@ -104,7 +107,7 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
             onClick={navigateToResults}
           />
 
-          {user.status === 1 ? (
+          {user.currentStatus === 1 ? (
             <FaStop className="cursor-pointer text-red-500" size={24}
             onClick={stopSearch}
             />
