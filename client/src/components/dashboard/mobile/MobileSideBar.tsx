@@ -1,6 +1,5 @@
 import React from "react";
 import { SidebarData } from "../../../constants/Sidebar";
-import { AppContext } from "../../../context/Context";
 import { LuMenu } from "react-icons/lu";
 import { Link } from "react-router-dom";
 

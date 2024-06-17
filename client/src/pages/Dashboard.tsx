@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import InputName from "../components/input/InputName";
 import { AppContext } from "../context/Context";
 import InputSearch from "../components/input/InputSearch";
@@ -12,39 +12,12 @@ import InputDate from "../components/input/InputDate";
 import { MediaType } from "../constants/MediaType";
 import axios from "axios";
 import { PublisherPlatforms } from "../constants/PublisherPlatforms";
-import { useLocation } from "react-router-dom";
-import formatDate from "../functions/formatDate";
-
-
-
+import { useParams } from "react-router-dom";
 
 export default function Dashboard() {
-
-
-  interface SearchData {
-    country: string;
-    content_languages: string;
-    querry: string;
-    reach: string;
-    publisher_platforms: string;
-    ad_type: string;
-    media_type: string;
-    filterStart_date: string;
-    filterEnd_date: string;
-  }
-  
-  interface LocationState {
-  state: {
-    searchData: SearchData;
-  };
-  }
-
-
-
   const { apiParams, setApiParams, user, setLoading } =
     React.useContext(AppContext);
-    const location = useLocation()
-    const searchData = location.state?.searchData;
+  const { Id } = useParams();
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
   const [searchId, setSearchId] = React.useState<string>("");
 
@@ -55,23 +28,54 @@ export default function Dashboard() {
     });
   }
 
+  const getDetails = React.useRef(() => {});
 
-  useEffect(() => {
-    if (searchData) {
-      setApiParams({
-        country: searchData.country,
-        content_languages: searchData.content_languages,
-        querry: searchData.querry,
-        reach: searchData.reach,
-        publisher_platforms: searchData.publisher_platforms,
-        ad_type: searchData.ad_type,
-        media_type: searchData.media_type,
-        filterStart_date:formatDate(searchData.filterStart_date),
-        filterEnd_date: formatDate(searchData.filterEnd_date),
+  getDetails.current = async () => {
+    setLoading(true);
+    try {
+      let params = new URLSearchParams({
+        session: user.session,
+        uid: user.uid,
+        access_token: user.access_token,
+        searchId: Id as string,
       });
-      console.log(searchData);
+
+      const response = await axios
+        .get(API_URL + "/searches?" + params)
+        .then((response) => response.data)
+        .catch((err) => {
+          alert(err.response.data.message);
+          return;
+        });
+      const searchData = response.search;
+      if (searchData) {
+        setApiParams({
+          country: searchData.country,
+          content_languages: searchData.content_languages.join(","),
+          querry: searchData.querry,
+          reach: searchData.reach,
+          publisher_platforms: searchData.publisher_platforms.join(","),
+          ad_type: searchData.ad_type,
+          ad_status_type: searchData.ad_status_type,
+          media_type: searchData.media_type.join(","),
+          filtterStart_date: searchData.filtterStart_date.slice(0, 10),
+          filtterEnd_date: searchData.filtterEnd_date.slice(0, 10),
+        });
+      }
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-  }, [searchData, setApiParams]);
+  };
+
+  React.useEffect(() => {
+    console.log(Id);
+    if (Id) {
+      setSearchId(Id);
+      getDetails.current();
+    }
+  }, [Id]);
 
   function handleMultiSelect(type: string, value: string) {
     setSearchId("");
@@ -84,6 +88,10 @@ export default function Dashboard() {
     try {
       if (apiParams.querry === "") {
         alert("Please enter a Product");
+        return;
+      }
+      if (apiParams.name === "") {
+        alert("Please enter a Name to your search");
         return;
       }
       let data;
@@ -190,7 +198,6 @@ export default function Dashboard() {
                 return { ...prev, name: e.target.value };
               });
             }}
-            onClick={getNumberofAds}
           />
         </div>
         <div className="flex justify-center items-center w-full">
@@ -285,7 +292,7 @@ export default function Dashboard() {
 
         <div className="flex justify-center items-center w-full">
           <InputDate
-            defValue={apiParams.filterStart_date || ""}
+            defValue={apiParams.filtterStart_date || ""}
             placeholder="Start Date"
             label="Start Date"
             name="filtterStart_date"
@@ -297,7 +304,7 @@ export default function Dashboard() {
             }}
           />
           <InputDate
-            defValue={apiParams.filterEnd_date || ""}
+            defValue={apiParams.filtterEnd_date || ""}
             placeholder="End Date"
             label="End Date"
             name="filtterEnd_date"

@@ -1,12 +1,11 @@
 import React from "react";
-import { FaStop } from "react-icons/fa6";
-import { MdDelete, MdOutlineRestartAlt, MdDataArray } from "react-icons/md";
+import { MdDelete, MdDataArray } from "react-icons/md";
 import { AppContext } from "../../context/Context";
 import axios from "axios";
 import { API_URL } from "../../constants/data";
 import { useNavigate } from "react-router-dom";
 import { ExcelContext } from "../../context/ExcelContext";
-import { AiOutlineFileExcel, AiOutlineFileText } from "react-icons/ai";
+import { AiOutlineFileExcel, AiOutlineStop } from "react-icons/ai";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { FaRegClone } from "react-icons/fa";
 
@@ -18,8 +17,6 @@ interface Props {
 }
 const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
   const { setLoading: setLoad, user: CurrentUser } =
-    React.useContext(AppContext);
-  const { setSearchData } =
     React.useContext(AppContext);
   const { downloadAsCsv, downloadAsExcel } = React.useContext(ExcelContext);
   const navigate = useNavigate();
@@ -63,38 +60,30 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
     setLoad(false);
   }
 
-  async function startSearch() {
-    try {
+  // async function startSearch() {
+  //   try {
    
-      const data = await axios
-        .post(API_URL + "/searches/start", {
-          session: CurrentUser.session,
-          uid: CurrentUser.uid,
-          access_token: CurrentUser.access_token,
-          searchId: user.searchId,
-        })
-        .then((res) => res.data)
-        .catch((err) => {
-          alert(err.response.data.message);
-          setLoad(false);
-          return;
-        });
-      alert(data.message);
-      // console.log("this is data:"+ data +"this is a User" + user);
-      // console.log( data )
-      // console.log( user )
-
-      // await fetchSearchDataById(user.searchId);
-      // console.log("this is search data",fetchSearchDataById());
-      // navigate("/dashboard");
-    } catch (err: any) {
-      handleError(
-        err.response?.data?.message || "Error occurred while starting search"
-      );
-      // console.error("Error:", err);
-    }
-    setLoad(false);
-  }
+  //     const data = await axios
+  //       .post(API_URL + "/searches/start", {
+  //         session: CurrentUser.session,
+  //         uid: CurrentUser.uid,
+  //         access_token: CurrentUser.access_token,
+  //         searchId: user.searchId,
+  //       })
+  //       .then((res) => res.data)
+  //       .catch((err) => {
+  //         alert(err.response.data.message);
+  //         setLoad(false);
+  //         return;
+  //       });
+  //     alert(data.message);
+  //   } catch (err: any) {
+  //     handleError(
+  //       err.response?.data?.message || "Error occurred while starting search"
+  //     );
+  //   }
+  //   setLoad(false);
+  // }
 
 
   async function download(type:string){
@@ -136,32 +125,12 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
       setLoad(false);
   }
 
-  const handleClone = async () => {
-    setLoad(true);
-    try {
-      const response = 
-      await axios
-      .get(`${API_URL}/searches?searchId=${user.searchId}`);
-      const searchData = response.data.search;
-
-      console.log(searchData)
-        if (searchData) {
-          navigate('/dashboard', { state: { searchData } });
-        } else {
-          throw new Error('Search data not found');
-        }
-    } catch (error: any) {
-      console.error("Error fetching search data:", error);
-      alert(error.response?.data?.message || "Error fetching search data");
-    } finally {
-      setLoad(false);
-    }
-  };
 
   return (
     <>
       <div className="w-[30%] ml-2 h-1/4 p-4 mb-4 bg-white rounded-lg shadow-md">
         <div>
+          <p className="text-gray-600">Name: {user.name}</p>
           <p className="text-gray-600">Country: {user.country}</p>
           <p className="text-gray-600">
             Content Languages: {user.content_languages.join(", ")}
@@ -191,7 +160,7 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
         <FaRegClone
         className="cursor-pointer text-blue-500"
         size={24}
-        onClick={handleClone}
+        onClick={()=>navigate(`/dashboard/${user.searchId}`)}
       
         /> 
 
@@ -202,18 +171,13 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
           />
 
           {user.currentStatus === 1 ? (
-            <FaStop
+            <AiOutlineStop
               className="cursor-pointer text-red-500"
               size={24}
               onClick={stopSearch}
             />
           ) : 
-          // null
-          <MdOutlineRestartAlt
-            className="cursor-pointer text-green-500"
-            size={24}
-            onClick={startSearch}
-          />
+          null
           }
 
           <MdDelete

@@ -1,8 +1,6 @@
 import React from "react";
 import Loading from "../components/loader/Loading";
 import { useNavigate } from "react-router-dom";
-// import UserInterface from "../intrface/NewUser";
-import axios from "axios";
 
 export const AppContext = React.createContext<any>({});
 
@@ -18,6 +16,7 @@ export const AppProvider = ({ children }: any) => {
   });
 
   const [apiParams, setApiParams] = React.useState<any>({
+    name:"",
     country:"NL",
     content_languages:"en",
     filtterStart_date:new Date(),

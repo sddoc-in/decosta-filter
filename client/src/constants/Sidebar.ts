@@ -6,7 +6,6 @@ import Dashboard from "../pages/Dashboard";
 import Logout from "../pages/Logout";
 import Results from "../pages/Results";
 import Users from "../pages/Users";
-import { CreateUser } from "../pages/CreateUser";
 
 export const SidebarData = [
   {
@@ -23,20 +22,12 @@ export const SidebarData = [
     Icon: MdOutlineCampaign,
     Element: Users,
   },
-
-  {
-    title: "Users",
-    path: "/dashboard/user",
-    shortPath: "/user",
-    Icon: MdOutlineCampaign,
-    Element: CreateUser,
-  },
   {
     title: "All Results",
     path: "/dashboard/results",
-    shortPath: "/results", 
+    shortPath: "/results",
     Icon: MdOutlineAccountTree,
-    Element:Results,
+    Element: Results,
   },
   // {
   //   title: "Sessions",
@@ -61,3 +52,13 @@ export const SidebarData = [
   }
 ];
 
+
+export const FormWithDataRoutes = [
+  {
+    title: "Dashboard",
+    path: "/dashboard/:Id",
+    shortPath: "/dashboard",
+    Icon: IoHomeOutline,
+    Element: Dashboard,
+  },
+]

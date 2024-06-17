@@ -3,10 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Loading from "./components/loader/Loading";
 import Signin from "./pages/Signin";
-import AppProvider from "./context/Context";
-import { SidebarData } from "./constants/Sidebar";
+import { FormWithDataRoutes, SidebarData } from "./constants/Sidebar";
 import GlobalLayout from "./components/dashboard/GlobalLayout";
-// import { UserOptions } from "./constants/Users";
 import WrongUrl from "./pages/WrongUrl";
 import { ChakraProvider } from "@chakra-ui/react";
 import ContextProvider from "./context/ContextProvider";
@@ -43,22 +41,25 @@ function Router() {
               element={<ContextProvider children={<WrongUrl />} />}
             />
 
-            <Route
-              path="/dashboard/results/:id"
-              element={
-                <ContextProvider
-                  children={
-                    <GlobalLayout>
-                      <Results />
-                    </GlobalLayout>
+            {SidebarData.map((item, index) => {
+              return (
+                <Route
+                  key={index}
+                  path={item.path}
+                  element={
+                    <ContextProvider
+                      children={
+                        <GlobalLayout>
+                          <item.Element />
+                        </GlobalLayout>
+                      }
+                    />
                   }
                 />
-              }
-            />
+              );
+            })}
 
-            {SidebarData.map((item, index) => {
-              // if (item.title === "Users" && currentUser.role !== "admin")
-              //   return null;
+            {FormWithDataRoutes.map((item, index) => {
               return (
                 <Route
                   key={index}

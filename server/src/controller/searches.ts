@@ -125,8 +125,10 @@ export async function deleteSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
+        const result:Collection = db.collection("results");
 
         search.deleteOne({ searchId: searchId });
+        result.deleteMany({ SearchUid: searchId });
 
         return res.status(200).json({ message: "Search deleted successfully" });
     }
@@ -163,6 +165,7 @@ export async function getSearchesByUser(req: Request, res: Response) {
         let searches = await search.find({ uid: uid }, {
             projection: {
                 _id: 0,
+                "name": 1,
                 "searchId": 1,
                 "country": 1,
                 "content_languages": 1,

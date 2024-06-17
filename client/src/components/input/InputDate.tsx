@@ -9,6 +9,15 @@ export default function InputDate(props: Input) {
     }
   }
 
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+
+  React.useEffect(() => {
+    if (props.defValue) {
+      inputRef.current!.value = props.defValue as string;
+    }
+  }, [props.defValue]);
+
 
   return (
     <div className={"text-start px-2 my-1 " + props.inputClassName}>
@@ -22,6 +31,7 @@ export default function InputDate(props: Input) {
       )}
       <input
          type="date"
+         ref={inputRef}
         name={props.name ? props.name : "name"}
         disabled={props.disabled ? true : false}
         placeholder={props.placeholder ? props.placeholder : `Enter Name`}

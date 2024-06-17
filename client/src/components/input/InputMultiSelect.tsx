@@ -2,7 +2,6 @@ import React from "react";
 
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import Input from "../../interface/Input";
-import { Languages } from "../../constants/Languages";
 
 export default function InputMultiSelect(props: Input) {
   const [show, setShow] = React.useState(false);

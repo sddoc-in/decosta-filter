@@ -1,20 +1,16 @@
 import React, { useState } from "react";
-import UserCard from "../components/Users/UserCard"; 
+import UserCard from "../components/Users/UserCard";
 import axios from "axios";
 import { AppContext } from "../context/Context";
-import { ExcelContext } from "../context/ExcelContext";
 import { API_URL } from "../constants/data";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const { user ,setLoading} = React.useContext(AppContext);
+  const { user, setLoading } = React.useContext(AppContext);
 
+  const getSearches = React.useRef(() => {});
 
-  // const getSearches = React.useRef(() => {});
-
-
- const getSearches= async () => {
-    setLoading(true);
+  getSearches.current = async () => {
     try {
       const data = await axios
         .post(API_URL + "/searches/get", {
@@ -30,31 +26,22 @@ const Users: React.FC = () => {
 
       if (data.message === "Searches fetched successfully") {
         setUsers(data.searches);
-        setLoading(false);
       } else {
         alert(data.message);
-        setLoading(false);
         return;
       }
-    } catch (err) {
-      setLoading(false);
-    }
+    } catch (err) {}
   };
-
-  // React.useEffect(() => {
-  //   getSearches.current();
-  // }, []);
-
   React.useEffect(() => {
     const interval = setInterval(() => {
-      getSearches();
+      getSearches.current();
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
   React.useEffect(() => {
-    getSearches();
+    getSearches.current();
   }, []);
 
   const deleteUser = async (searchId: string) => {
@@ -78,7 +65,6 @@ const Users: React.FC = () => {
           return;
         });
 
-
       if (res.message === "Search deleted successfully") {
         const updatedUsers = users.filter((user) => user.searchId !== searchId);
         setUsers(updatedUsers);
@@ -98,14 +84,9 @@ const Users: React.FC = () => {
 
   return (
     <>
-      <h1 className="font-black text-3xl text-start text-black mb-3">Recent Searches</h1>
-      {/* <InputSearch
-        name="search"
-        defValue=""
-        placeholder="Search"
-        inputClassName="md:w-1/2 w-11/12 mx-auto"
-        // onChangeHandler={(e) => setQuery(e.target.value)}
-      /> */}
+      <h1 className="font-black text-3xl text-start text-black mb-3">
+        Recent Searches
+      </h1>
       <div className="flex flex-wrap">
         {users.length > 0 ? (
           users.map((user) => (
