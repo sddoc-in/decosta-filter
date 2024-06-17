@@ -267,3 +267,62 @@ export async function stopSearch(req: Request, res: Response) {
 }
 
 
+export async function getSearchBySearchId(req: Request, res: Response) {
+    const { searchId } = req.query;
+
+    try {
+        if (!searchId) {
+            return res.status(400).json({ message: "Search id required" });
+        }
+
+        // create connection
+        const connect: ConnectionRes = await connectToCluster();
+        if (typeof connect.conn === "string") {
+            return res.status(500).json(connect);
+        }
+
+        const conn = connect.conn;
+        const db: Db = conn.db("Master");
+        const search: Collection = db.collection("search");
+
+        const searchResult = await search.findOne({ searchId: searchId as string }, {
+            projection: {
+                _id: 0,
+                searchId: 1,
+                uid: 1,
+                country: 1,
+                content_languages: 1,
+                filtterStart_date: 1,
+                filtterEnd_date: 1,
+                querry: 1,
+                ad_status_type: 1,
+                reach: 1,
+                ad_type: 1,
+                media_type: 1,
+                publisher_platforms: 1,
+                Nextforward_cursor: 1,
+                Nextbackward_cursor: 1,
+                Nextcollation_token: 1,
+                page: 1,
+                currentStatus: 1
+            }
+        });
+
+        if (searchResult) {
+            // Modify the response to include all values of the arrays
+            const { publisher_platforms, media_type, content_languages, ...rest } = searchResult;
+            const response = {
+                ...rest,
+                publisher_platforms: publisher_platforms ? Array.isArray(publisher_platforms) ? publisher_platforms : [publisher_platforms] : [],
+                media_type: media_type ? Array.isArray(media_type) ? media_type : [media_type] : [],
+                content_languages: content_languages ? Array.isArray(content_languages) ? content_languages : [content_languages] : []
+            };
+            console.log(response);
+            return res.status(200).json({ search: response, message: "Search fetched successfully" });
+        } else {
+            return res.status(404).json({ message: "Search not found" });
+        }
+    } catch (err:any) {
+        return res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}

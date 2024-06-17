@@ -6,6 +6,7 @@ import Dashboard from "../pages/Dashboard";
 import Logout from "../pages/Logout";
 import Results from "../pages/Results";
 import Users from "../pages/Users";
+import { CreateUser } from "../pages/CreateUser";
 
 export const SidebarData = [
   {
@@ -23,6 +24,13 @@ export const SidebarData = [
     Element: Users,
   },
 
+  {
+    title: "Users",
+    path: "/dashboard/user",
+    shortPath: "/user",
+    Icon: MdOutlineCampaign,
+    Element: CreateUser,
+  },
   {
     title: "All Results",
     path: "/dashboard/results",

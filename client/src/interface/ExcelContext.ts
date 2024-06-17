@@ -7,8 +7,8 @@ interface ExcelContextInterface {
     setHeader: React.Dispatch<React.SetStateAction<any>>;
     selected: any[];
     setSelected: React.Dispatch<React.SetStateAction<any[]>>;
-    downloadAsExcel: () => void;
-    downloadAsCsv: () => void;
+    downloadAsExcel:(selectedData?:any,columnsHiddenData?:any,headerData?:any) => void;
+    downloadAsCsv: (selectedData?:any,columnsHiddenData?:any,headerData?:any) => void;
     columnsHidden: number[];
     setColumnsHidden: React.Dispatch<React.SetStateAction<number[]>>;
     url: string;

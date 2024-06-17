@@ -8,7 +8,7 @@ export default interface User {
     access_token?: string;
     session?: string;
     provider?: string;
-    role: string;
-    status: string;
+    role: 'admin' | 'user';
+    status?: string;
     created?: Date;
 }

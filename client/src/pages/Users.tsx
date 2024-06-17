@@ -2,16 +2,18 @@ import React, { useState } from "react";
 import UserCard from "../components/Users/UserCard"; 
 import axios from "axios";
 import { AppContext } from "../context/Context";
+import { ExcelContext } from "../context/ExcelContext";
 import { API_URL } from "../constants/data";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const { user ,setLoading} = React.useContext(AppContext);
 
-  const getSearches = React.useRef(() => {});
+
+  // const getSearches = React.useRef(() => {});
 
 
-  getSearches.current = async () => {
+ const getSearches= async () => {
     setLoading(true);
     try {
       const data = await axios
@@ -39,8 +41,20 @@ const Users: React.FC = () => {
     }
   };
 
+  // React.useEffect(() => {
+  //   getSearches.current();
+  // }, []);
+
   React.useEffect(() => {
-    getSearches.current();
+    const interval = setInterval(() => {
+      getSearches();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  React.useEffect(() => {
+    getSearches();
   }, []);
 
   const deleteUser = async (searchId: string) => {

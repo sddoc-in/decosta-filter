@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import InputName from "../components/input/InputName";
 import { AppContext } from "../context/Context";
 import InputSearch from "../components/input/InputSearch";
@@ -12,10 +12,39 @@ import InputDate from "../components/input/InputDate";
 import { MediaType } from "../constants/MediaType";
 import axios from "axios";
 import { PublisherPlatforms } from "../constants/PublisherPlatforms";
+import { useLocation } from "react-router-dom";
+import formatDate from "../functions/formatDate";
+
+
+
 
 export default function Dashboard() {
+
+
+  interface SearchData {
+    country: string;
+    content_languages: string;
+    querry: string;
+    reach: string;
+    publisher_platforms: string;
+    ad_type: string;
+    media_type: string;
+    filterStart_date: string;
+    filterEnd_date: string;
+  }
+  
+  interface LocationState {
+  state: {
+    searchData: SearchData;
+  };
+  }
+
+
+
   const { apiParams, setApiParams, user, setLoading } =
     React.useContext(AppContext);
+    const location = useLocation()
+    const searchData = location.state?.searchData;
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
   const [searchId, setSearchId] = React.useState<string>("");
 
@@ -25,6 +54,24 @@ export default function Dashboard() {
       return { ...prev, [type]: value };
     });
   }
+
+
+  useEffect(() => {
+    if (searchData) {
+      setApiParams({
+        country: searchData.country,
+        content_languages: searchData.content_languages,
+        querry: searchData.querry,
+        reach: searchData.reach,
+        publisher_platforms: searchData.publisher_platforms,
+        ad_type: searchData.ad_type,
+        media_type: searchData.media_type,
+        filterStart_date:formatDate(searchData.filterStart_date),
+        filterEnd_date: formatDate(searchData.filterEnd_date),
+      });
+      console.log(searchData);
+    }
+  }, [searchData, setApiParams]);
 
   function handleMultiSelect(type: string, value: string) {
     setSearchId("");
@@ -47,6 +94,7 @@ export default function Dashboard() {
             ...apiParams,
             publisher_platforms: apiParams.publisher_platforms.split(","),
             content_languages: apiParams.content_languages.split(","),
+            media_type: apiParams.media_type.split(","),
             uid: user.uid,
             access_token: user.access_token,
             session: user.session,
@@ -70,13 +118,13 @@ export default function Dashboard() {
         }
       } else {
         const res = await axios
-          .get(ADS_API_URL + "total?SearchID=" + searchId )
+          .get(ADS_API_URL + "total?SearchID=" + searchId)
           .then((response) => response.data)
           .catch((err) => {
             alert(err.response.data.message);
             return;
           });
-            setNumberofAds(res.total);
+        setNumberofAds(res.total);
       }
     } catch (e) {
       console.log(e);
@@ -88,7 +136,6 @@ export default function Dashboard() {
   async function getQueryData() {
     try {
       setLoading(true);
-
       const res = await axios
         .post(API_URL + "/searches/start", {
           searchId: searchId,
@@ -120,28 +167,42 @@ export default function Dashboard() {
         Enter Your Query
       </h1>
       <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
-        <InputSearch
-          defValue=""
-          placeholder="Enter Query"
-          name="querry"
-          inputClassName={` w-[50%!important] mr-2`}
-          onChangeHandler={(e) => {
-            setApiParams((prev: any) => {
-              return { ...prev, querry: e.target.value };
-            });
-          }}
-          onClick={getNumberofAds}
-        />
+        <div className="flex justify-center items-center w-full">
+          <InputSearch
+            defValue={apiParams.querry || ""}
+            placeholder="Enter Query"
+            name="querry"
+            inputClassName={` w-[50%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setApiParams((prev: any) => {
+                return { ...prev, querry: e.target.value };
+              });
+            }}
+            onClick={getNumberofAds}
+          />
+          <InputName
+            defValue={apiParams.name || ""}
+            placeholder="Enter Name"
+            name="name"
+            inputClassName={` w-[50%!important] mr-2`}
+            onChangeHandler={(e) => {
+              setApiParams((prev: any) => {
+                return { ...prev, name: e.target.value };
+              });
+            }}
+            onClick={getNumberofAds}
+          />
+        </div>
         <div className="flex justify-center items-center w-full">
           <InputCountry
-            defValue=""
+            defValue={apiParams.country || ""}
             placeholder="Select Country"
             name="country"
             onChange={handleChange}
             inputClassName={` w-[49%!important] mr-2`}
           />
           <InputMultiSelect
-            defValue=""
+            defValue={apiParams.content_languages || ""}
             placeholder="Select language"
             name="content_languages"
             selectArray={Languages}
@@ -151,15 +212,15 @@ export default function Dashboard() {
         </div>
         <div className="flex justify-center items-center w-full">
           <InputMultiSelect
-            defValue=""
+            defValue={apiParams.publisher_platforms || ""}
             placeholder="Select Publisher Platforms"
             name="publisher_platforms"
             selectArray={PublisherPlatforms}
             inputClassName={` w-[32.3%!important] mr-2`}
             onChange={handleMultiSelect}
           />
-          <InputSelect
-            defValue=""
+          <InputMultiSelect
+            defValue={apiParams.media_type || ""}
             placeholder="Select Media Type"
             name="media_type"
             selectArray={MediaType}
@@ -167,7 +228,7 @@ export default function Dashboard() {
             onChange={handleMultiSelect}
           />
           <InputSelect
-            defValue=""
+            defValue={apiParams.ad_status_type || ""}
             placeholder="Select Ad Status"
             name="ad_status_type"
             selectArray={AdStatus}
@@ -224,7 +285,7 @@ export default function Dashboard() {
 
         <div className="flex justify-center items-center w-full">
           <InputDate
-            defValue=""
+            defValue={apiParams.filterStart_date || ""}
             placeholder="Start Date"
             label="Start Date"
             name="filtterStart_date"
@@ -236,7 +297,7 @@ export default function Dashboard() {
             }}
           />
           <InputDate
-            defValue=""
+            defValue={apiParams.filterEnd_date || ""}
             placeholder="End Date"
             label="End Date"
             name="filtterEnd_date"

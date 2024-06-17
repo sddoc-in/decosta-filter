@@ -1,18 +1,27 @@
-import React  from "react";
+import React from "react";
 import { FaStop } from "react-icons/fa6";
 import { MdDelete, MdOutlineRestartAlt, MdDataArray } from "react-icons/md";
 import { AppContext } from "../../context/Context";
 import axios from "axios";
 import { API_URL } from "../../constants/data";
 import { useNavigate } from "react-router-dom";
+import { ExcelContext } from "../../context/ExcelContext";
+import { AiOutlineFileExcel, AiOutlineFileText } from "react-icons/ai";
+import { BsFiletypeCsv } from "react-icons/bs";
+import { FaRegClone } from "react-icons/fa";
+
+
 
 interface Props {
   user: any;
   onDeleteUser: (userId: string) => void;
 }
-
 const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
-  const { setLoading: setLoad,user:CurrentUser } = React.useContext(AppContext);
+  const { setLoading: setLoad, user: CurrentUser } =
+    React.useContext(AppContext);
+  const { setSearchData } =
+    React.useContext(AppContext);
+  const { downloadAsCsv, downloadAsExcel } = React.useContext(ExcelContext);
   const navigate = useNavigate();
 
   const handleDelete = () => {
@@ -20,10 +29,14 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
     setLoad(true);
   };
 
+  const handleError = (message: string) => {
+    alert(message);
+    setLoad(false);
+  };
+
   function navigateToResults() {
     navigate(`/dashboard/results/${user.searchId}`);
   }
-
 
   async function stopSearch() {
     try {
@@ -36,12 +49,15 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
         })
         .then((res) => res.data)
         .catch((err) => {
-          alert(err.response.data.message);
+          alert(err.response.data.messfage);
           setLoad(false);
           return;
         });
       alert(data.message);
-    } catch (err) {
+    } catch (err: any) {
+      handleError(
+        err.response?.data?.message || "Error occurred while stopping search"
+      );
       console.error("Error:", err);
     }
     setLoad(false);
@@ -49,6 +65,7 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
 
   async function startSearch() {
     try {
+   
       const data = await axios
         .post(API_URL + "/searches/start", {
           session: CurrentUser.session,
@@ -63,11 +80,83 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
           return;
         });
       alert(data.message);
-    } catch (err) {
-      console.error("Error:", err);
+      // console.log("this is data:"+ data +"this is a User" + user);
+      // console.log( data )
+      // console.log( user )
+
+      // await fetchSearchDataById(user.searchId);
+      // console.log("this is search data",fetchSearchDataById());
+      // navigate("/dashboard");
+    } catch (err: any) {
+      handleError(
+        err.response?.data?.message || "Error occurred while starting search"
+      );
+      // console.error("Error:", err);
     }
     setLoad(false);
   }
+
+
+  async function download(type:string){
+      setLoad(true);
+      try {
+        const data = await axios
+          .get(
+            API_URL +
+              "/results/all?" +
+              new URLSearchParams({
+                session: CurrentUser.session,
+                uid: CurrentUser.uid,
+                access_token: CurrentUser.access_token,
+                searchId: user.searchId || "",
+              })
+          )
+          .then((res) => res.data)
+          .catch((err) => {
+            alert(err.response.data.message);
+            setLoad(false);
+            return;
+          });
+  
+        let results = data.results.map((item: any) => {
+          return item.results;
+        });
+  
+        let headerData = Object.keys(results[0]);
+  
+        let mainData = results.map((item: any) => {
+          return Object.values(item);
+        });
+  
+        if(type === "EXCEL") downloadAsExcel(mainData,[0, 16, 17],headerData)
+        else downloadAsCsv(mainData,[0, 16, 17],headerData)
+      } catch (error) {
+        console.error("Error:", error);
+      }
+      setLoad(false);
+  }
+
+  const handleClone = async () => {
+    setLoad(true);
+    try {
+      const response = 
+      await axios
+      .get(`${API_URL}/searches?searchId=${user.searchId}`);
+      const searchData = response.data.search;
+
+      console.log(searchData)
+        if (searchData) {
+          navigate('/dashboard', { state: { searchData } });
+        } else {
+          throw new Error('Search data not found');
+        }
+    } catch (error: any) {
+      console.error("Error fetching search data:", error);
+      alert(error.response?.data?.message || "Error fetching search data");
+    } finally {
+      setLoad(false);
+    }
+  };
 
   return (
     <>
@@ -84,9 +173,7 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
           <p className="text-gray-600">
             End Date: {new Date(user.filtterEnd_date).toDateString()}
           </p>
-          <p className="text-gray-600">
-            Data fetched: {user.status || 0}
-          </p>
+          <p className="text-gray-600">Data fetched: {user.status || 0}</p>
           <p className="text-gray-600">
             Status:{" "}
             {user.currentStatus === 1
@@ -101,6 +188,13 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
           </p>
         </div>
         <div className="flex justify-between mt-2 items-center gap-1">
+        <FaRegClone
+        className="cursor-pointer text-blue-500"
+        size={24}
+        onClick={handleClone}
+      
+        /> 
+
           <MdDataArray
             className="cursor-pointer text-blue-500"
             size={24}
@@ -108,21 +202,32 @@ const UserCard: React.FC<Props> = ({ user, onDeleteUser }) => {
           />
 
           {user.currentStatus === 1 ? (
-            <FaStop className="cursor-pointer text-red-500" size={24}
-            onClick={stopSearch}
-            />
-          ) : (
-            <MdOutlineRestartAlt
-              className="cursor-pointer text-green-500"
+            <FaStop
+              className="cursor-pointer text-red-500"
               size={24}
-              onClick={startSearch}
+              onClick={stopSearch}
             />
-          )}
+          ) : 
+          // null
+          <MdOutlineRestartAlt
+            className="cursor-pointer text-green-500"
+            size={24}
+            onClick={startSearch}
+          />
+          }
 
           <MdDelete
             className="cursor-pointer text-red-500"
             size={24}
             onClick={handleDelete}
+          />
+          <BsFiletypeCsv
+            onClick={()=>download("CSV")}
+            className="text-[#000] text-[20px] mx-2 cursor-pointer"
+          />
+          <AiOutlineFileExcel
+            onClick={()=>download("EXCEL")}
+            className="text-[#000] text-[20px] mx-2 cursor-pointer"
           />
         </div>
       </div>

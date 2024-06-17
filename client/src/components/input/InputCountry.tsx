@@ -43,7 +43,13 @@ export default function InputCountry(props: Input) {
   }
 
   React.useEffect(() => {
-    inputRef.current!.value = props.defValue.toString() || "";
+    let defCountry:CountriesInterface[] = AllCountriesData.filter((item:CountriesInterface)=>{
+       return props.defValue.toString().toLowerCase().includes(item.code.toLowerCase())
+      
+    })
+
+
+    inputRef.current!.value =   defCountry[0].name || "";
   }, [props.defValue]);
 
   return (

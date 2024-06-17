@@ -3,7 +3,6 @@ import React from "react";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import Input from "../../interface/Input";
 
-
 export default function InputSelect(props: Input) {
   const [show, setShow] = React.useState(false);
   const [fileteredCountries, setFilteredCountries] = React.useState(
@@ -11,7 +10,6 @@ export default function InputSelect(props: Input) {
   );
 
   const inputRef = React.useRef<HTMLInputElement>(null);
-
 
   function Show() {
     if (!props.disabled) {
@@ -42,7 +40,20 @@ export default function InputSelect(props: Input) {
   }
 
   React.useEffect(() => {
-    inputRef.current!.value = props.defValue .toString()|| "";
+    let defLan =
+      props.selectArray !== undefined
+        ? props.selectArray.filter((item) => {
+            return props.defValue
+              .toString()
+              .toLowerCase()
+              .split(",")
+              .includes(item.value);
+          })
+        : [{ name: "", value: "" }];
+
+    let newdefLan = defLan.map((item) => item.name);
+
+    inputRef.current!.value = newdefLan.join(",") || "";
   }, [props.defValue]);
 
   React.useEffect(() => {

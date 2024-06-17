@@ -2,6 +2,7 @@ import React from "react";
 
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import Input from "../../interface/Input";
+import { Languages } from "../../constants/Languages";
 
 export default function InputMultiSelect(props: Input) {
   const [show, setShow] = React.useState(false);
@@ -41,14 +42,14 @@ export default function InputMultiSelect(props: Input) {
     let lastSelected = len > 0 ? selectedInput[len - 1] : "";
 
     let filtered = props.selectArray!.filter((data) => {
-        return data.name.toLowerCase().includes(lastSelected.toLowerCase());
+      return data.name.toLowerCase().includes(lastSelected.toLowerCase());
+    });
+    if (filtered.length === 0) {
+      filtered = props.selectArray!.filter((data) => {
+        return data.value!.toLowerCase().includes(lastSelected.toLowerCase());
       });
-      if (filtered.length === 0) {
-        filtered = props.selectArray!.filter((data) => {
-          return data.value!.toLowerCase().includes(lastSelected.toLowerCase());
-        });
-      }
-      setFilteredCountries(filtered);
+    }
+    setFilteredCountries(filtered);
   }
 
   function onCountryClick(data: any) {
@@ -76,7 +77,16 @@ export default function InputMultiSelect(props: Input) {
   }
 
   React.useEffect(() => {
-    inputRef.current!.value = props.defValue.toString() || "";
+    let defLan =
+      props.selectArray !== undefined
+        ? props.selectArray.filter((item) => {
+            return props.defValue.toString().toLowerCase().split(",").includes(item.value);
+          })
+        : [{ name: "", value: "" }];
+
+    let newdefLan = defLan.map((item) => item.name);
+
+    inputRef.current!.value = newdefLan.join(",") || "";
   }, [props.defValue]);
 
   React.useEffect(() => {
@@ -131,7 +141,8 @@ export default function InputMultiSelect(props: Input) {
             {fileteredCountries.map((data, i) => {
               let selected =
                 selectedName.filter(
-                  (data2:any) => data2.toLowerCase() === data.name.toLowerCase()
+                  (data2: any) =>
+                    data2.toLowerCase() === data.name.toLowerCase()
                 ).length > 0;
               return (
                 <div

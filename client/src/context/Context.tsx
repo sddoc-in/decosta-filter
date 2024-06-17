@@ -2,6 +2,7 @@ import React from "react";
 import Loading from "../components/loader/Loading";
 import { useNavigate } from "react-router-dom";
 // import UserInterface from "../intrface/NewUser";
+import axios from "axios";
 
 export const AppContext = React.createContext<any>({});
 
@@ -22,7 +23,7 @@ export const AppProvider = ({ children }: any) => {
     filtterStart_date:new Date(),
     filtterEnd_date:new Date(),
     querry:"",
-    ad_status_type:"all",
+    ad_status_type:"0",
     reach:0,
     ad_type:"all",
     media_type:"all",
@@ -195,6 +196,7 @@ export const AppProvider = ({ children }: any) => {
     fetchUserDetails();
   }, []);
 
+ const[searchData,setSearchData] = React.useState('')
 
   return (
     <AppContext.Provider
@@ -207,7 +209,9 @@ export const AppProvider = ({ children }: any) => {
         user,
         setUser,
         apiParams,
-        setApiParams  
+        setApiParams ,
+        searchData,
+        setSearchData,
       }}
     >
       {children}

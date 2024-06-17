@@ -131,18 +131,24 @@ export default function ExcelProvider({ children }: any) {
     }
   }
 
-  function downloadAsExcel() {
+  /**
+   * Download as Excel
+   * @param selectedData 
+   * @param columnsHiddenData 
+   * @param headerData 
+   */
+  function downloadAsExcel(selectedData:any = selected,columnsHiddenData:any = columnsHidden,headerData:any=header) {
     setLoading(true);
-    let data = selected.map((item: any) => {
+    let data = selectedData.map((item: any) => {
       item = item.map((item: any, idx: number) => {
-        if (columnsHidden.includes(idx)) return null;
+        if (columnsHiddenData.includes(idx)) return null;
         return item;
       });
       return item;
     });
 
-    const dummyHeader = header.map((item: any, idx: number) => {
-      if (columnsHidden.includes(idx)) return null;
+    const dummyHeader = headerData.map((item: any, idx: number) => {
+      if (columnsHiddenData.includes(idx)) return null;
       return item;
     });
     data.unshift(dummyHeader);
@@ -162,17 +168,24 @@ export default function ExcelProvider({ children }: any) {
     setLoading(false);
   }
 
-  function downloadAsCsv() {
+  /**
+   * Download as CSV
+   * @param selectedData 
+   * @param columnsHiddenData 
+   * @param headerData 
+   */
+  function downloadAsCsv(selectedData:any = selected,columnsHiddenData:any = columnsHidden,headerData:any=header) {
+   
     setLoading(true);
-    const data = selected.map((item: any) => {
+    const data = selectedData.map((item: any) => {
       item = item.map((item: any, idx: number) => {
-        if (columnsHidden.includes(idx)) return null;
+        if (columnsHiddenData.includes(idx)) return null;
         return item;
       });
       return item.join(",");
     });
-    const dummyHeader = header.map((item: any, idx: number) => {
-      if (columnsHidden.includes(idx)) return null;
+    const dummyHeader = headerData.map((item: any, idx: number) => {
+      if (columnsHiddenData.includes(idx)) return null;
       return item;
     });
     data.unshift(dummyHeader.join(","));
