@@ -13,11 +13,6 @@ export default function Signin() {
   const navigate = useNavigate();
   const { setDataForUser:setCookies,setLoading } = React.useContext(AppContext);
 
-  React.useEffect(() => {
-    if (localStorage.getItem("user")) {
-      window.location.href = "/dashboard";
-    }
-  }, []);
 
   const [user, setUser] = React.useState({
     password: "",

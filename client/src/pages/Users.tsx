@@ -1,106 +1,98 @@
-import React, { useState } from "react";
-import UserCard from "../components/Users/UserCard";
-import axios from "axios";
+import React from "react";
+import { IoMdAdd } from "react-icons/io";
 import { AppContext } from "../context/Context";
 import { API_URL } from "../constants/data";
+import axios from "axios";
+import InputSearch from "../components/input/InputSearch";
+import RolesEnum from "../constants/Roles";
+import Users from "../interface/Users";
+import CreateuserPopup from "../components/Users/CreateUserPopup";
+import Card from "../components/Users/UserCard";
 
-const Users: React.FC = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const { user, setLoading } = React.useContext(AppContext);
+export default function UsersPage() {
+  const { user: currentUser, setLoading } = React.useContext(AppContext);
+  const [data, setData] = React.useState<Users[]>([]);
+  const [isPopupOpen, setIsPopupOpen] = React.useState(false);
+  const [query, setQuery] = React.useState<string>("");
 
-  const getSearches = React.useRef(() => {});
-
-  getSearches.current = async () => {
-    try {
-      const data = await axios
-        .post(API_URL + "/searches/get", {
-          session: user.session,
-          uid: user.uid,
-          access_token: user.access_token,
-        })
-        .then((res) => res.data)
-        .catch((err) => {
-          alert(err.response.data.message);
-          return;
-        });
-
-      if (data.message === "Searches fetched successfully") {
-        setUsers(data.searches);
-      } else {
-        alert(data.message);
-        return;
-      }
-    } catch (err) {}
+  const openPopup = () => {
+    setIsPopupOpen(true);
   };
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      getSearches.current();
-    }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  const getAllUsers = React.useRef(() => {});
 
-  React.useEffect(() => {
-    getSearches.current();
-  }, []);
-
-  const deleteUser = async (searchId: string) => {
-    setLoading(true);
+  getAllUsers.current = async () => {
+    if (!currentUser.uid) {
+      return;
+    }
     try {
-      let res = await axios
-        .delete(
-          API_URL +
-            "/searches/delete?" +
-            new URLSearchParams({
-              session: user.session,
-              uid: user.uid,
-              access_token: user.access_token,
-              searchId: searchId,
-            })
-        )
+      setLoading(true);
+      const params = new URLSearchParams();
+      params.append("uid", currentUser.uid);
+      params.append("session", currentUser.session);
+      params.append("token", currentUser.access_token);
+
+      let apiCall = true;
+
+      const data = await axios
+        .get(API_URL + "/users/all?" + params)
         .then((res) => res.data)
         .catch((err) => {
           alert(err.response.data.message);
           setLoading(false);
           return;
         });
-
-      if (res.message === "Search deleted successfully") {
-        const updatedUsers = users.filter((user) => user.searchId !== searchId);
-        setUsers(updatedUsers);
-        setLoading(false);
-      } else {
-        alert(res.message);
-        setLoading(false);
-        return;
+      if (data) {
+        setData(data);
       }
       setLoading(false);
-    } catch (err) {
-      alert("Internal server error");
-      setLoading(false);
-    }
-    setLoading(false);
+    } catch (err) {}
   };
+
+  React.useEffect(() => {
+    getAllUsers.current();
+  }, [currentUser]);
 
   return (
     <>
-      <h1 className="font-black text-3xl text-start text-black mb-3">
-        Recent Searches
-      </h1>
-      <div className="flex flex-wrap">
-        {users.length > 0 ? (
-          users.map((user) => (
-            <UserCard
-              key={user.searchId}
-              user={user}
-              onDeleteUser={deleteUser}
-            />
-          ))
-        ) : (
-          <p className="text-center text-gray-600">No Search History found</p>
-        )}
-      </div>
+      <h1 className=" text-3xl text-start text-black ">Users</h1>
+      {currentUser.role === RolesEnum.ADMIN && (
+        <div
+          className="bg-[#002F53] text-white text-[16px] leading-[20px] rounded-md mt-4 flex justify-center items-center mb-2 w-fit px-4 py-2 cursor-pointer"
+          onClick={openPopup}
+        >
+          <IoMdAdd className="mr-2 text-[20px] " />
+          Create
+        </div>
+      )}
+      <InputSearch
+        name="search"
+        defValue=""
+        placeholder="Search"
+        inputClassName="md:w-1/2 w-11/12 mx-auto"
+        onChangeHandler={(e) => setQuery(e.target.value)}
+      />
+      {data.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2  gap-2 w-[95%] mx-auto">
+          {data
+            .filter((user: Users) =>
+              user.username!.toLowerCase().includes(query.toLowerCase())
+            )
+            .map((user, index) => {
+              return <Card key={index} data={user} canDelete={true} after={getAllUsers.current} />;
+            })}
+        </div>
+      ) : (
+        <p>No Users Found</p>
+      )}
+
+      <CreateuserPopup
+        isOpen={isPopupOpen}
+        onClose={() => {
+          setIsPopupOpen(false)
+          getAllUsers.current()
+        }}
+      />
     </>
   );
-};
-export default Users;
+}

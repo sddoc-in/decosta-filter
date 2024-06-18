@@ -5,7 +5,8 @@ import { CiLogout } from "react-icons/ci";
 import Dashboard from "../pages/Dashboard";
 import Logout from "../pages/Logout";
 import Results from "../pages/Results";
-import Users from "../pages/Users";
+import SearchHistory from "../pages/SearchHistory";
+import UsersPage from "../pages/Users";
 
 export const SidebarData = [
   {
@@ -20,7 +21,7 @@ export const SidebarData = [
     path: "/dashboard/searches",
     shortPath: "/searches",
     Icon: MdOutlineCampaign,
-    Element: Users,
+    Element: SearchHistory,
   },
   {
     title: "All Results",
@@ -28,6 +29,13 @@ export const SidebarData = [
     shortPath: "/results",
     Icon: MdOutlineAccountTree,
     Element: Results,
+  },
+  {
+    title: "Users",
+    path: "/dashboard/users",
+    shortPath: "/users",
+    Icon: MdOutlineCampaign,
+    Element: UsersPage,
   },
   // {
   //   title: "Sessions",

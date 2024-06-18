@@ -70,7 +70,6 @@ export default function Dashboard() {
   };
 
   React.useEffect(() => {
-    console.log(Id);
     if (Id) {
       setSearchId(Id);
       getDetails.current();

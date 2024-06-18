@@ -100,6 +100,8 @@ export async function login(req: Request, res: Response) {
     const tmpuser = {
       uid: newUser.uid,
       name: newUser.name,
+      username: newUser.username,
+      email: newUser.email,
       access_token: newUser.access_token,
       session: newUser.session,
       role: newUser.role,

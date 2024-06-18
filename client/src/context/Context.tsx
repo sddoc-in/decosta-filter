@@ -88,7 +88,8 @@ export const AppProvider = ({ children }: any) => {
     )}; expires=${date.toUTCString()}; path=/`;
   }
 
-  const fetchUserDetails = async () => {
+function fetchUserDetails() {
+  console.log("fetchUserDetails")
     setLoading(true);
     try {
       let user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -195,7 +196,6 @@ export const AppProvider = ({ children }: any) => {
     fetchUserDetails();
   }, []);
 
- const[searchData,setSearchData] = React.useState('')
 
   return (
     <AppContext.Provider
@@ -209,8 +209,6 @@ export const AppProvider = ({ children }: any) => {
         setUser,
         apiParams,
         setApiParams ,
-        searchData,
-        setSearchData,
       }}
     >
       {children}

@@ -41,6 +41,19 @@ function Router() {
               element={<ContextProvider children={<WrongUrl />} />}
             />
 
+            <Route
+              path="/dashboard/results/:id"
+              element={
+                <ContextProvider
+                  children={
+                    <GlobalLayout>
+                      <Results />
+                    </GlobalLayout>
+                  }
+                />
+              }
+            />
+
             {SidebarData.map((item, index) => {
               return (
                 <Route

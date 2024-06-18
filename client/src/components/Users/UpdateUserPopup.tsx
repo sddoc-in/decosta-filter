@@ -11,70 +11,72 @@ import {
 import React from "react";
 import InputSelect from "../input/InputSelect";
 import RolesEnum from "../../constants/Roles";
-import InputPass from "../input/InputPass";
 import InputEmail from "../input/InputEmail";
-import axios from "axios";
-import { AppContext } from "../../context/Context";
-import UserErrorInterface from "../../interface/Error";
-import Users from "../../interface/Users";
-import { API_URL } from "../../constants/data";
-import validateUser from "../../functions/validateUser";
 import InputName from "../input/InputName";
+import axios from "axios";
+import { API_URL } from "../../constants/data";
+import UserErrorInterface from "../../interface/Error";
+import validateUser from "../../functions/validateUser";
+import Users from "../../interface/Users";
+import toTitleCase from "../../functions/toTitle";
+import { AppContext } from "../../context/Context";
+import { UserClientStatus } from "../../constants/UserClientStatus";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  data: Users;
 }
 
-export default function CreateuserPopup(props: Props) {
-  const { user: currentUser,setLoading } = React.useContext(AppContext);
+export default function UpdateUserPopup(props: Props) {
+  const { user: currentUser, setLoading } = React.useContext(AppContext);
+  const [panelUser, setPanelUser] = React.useState<Users>(props.data);
 
   const [error, setError] = React.useState<UserErrorInterface>(
     {} as UserErrorInterface
   );
 
-  const [panelUser, setPanelUser] = React.useState<Users>({} as Users);
-
   async function onCreate() {
     if (!ValidateUser()) {
       return;
     }
-
-    if (currentUser.role !== RolesEnum.ADMIN && currentUser.uid) {
-      alert("You are not allowed to create a user");
+    if (
+      currentUser.role !== RolesEnum.ADMIN &&
+      currentUser.uid !== props.data.uid
+    ) {
+      alert("You are not allowed to update this user");
       return;
     }
 
     try {
       setLoading(true);
-      const params = {
+      const params = new URLSearchParams({
         uid: currentUser.uid,
         access_token: currentUser.access_token,
         session: currentUser.session,
-      };
+      });
 
       const data = await axios
-        .post(API_URL + "/users/create", { ...panelUser, ...params })
+        .put(API_URL + "/users/update?" + params, panelUser)
         .then((res) => res.data)
         .catch((err) => {
           let data = err.response.data;
           alert(data.message);
-          setLoading(false);
           return;
         });
-      if (data.message !== "User created successfully") {
+      if (data.message !== "User updated") {
         alert(data.message);
-      }
-      if (data.user.uid) {
-        alert("User created successfully");
-        props.onClose();
         setLoading(false);
+        return;
       }
+      alert("User updated successfully");
+      props.onClose();
+      setLoading(false);
     } catch (err) {}
   }
 
   function ValidateUser() {
-    let error: UserErrorInterface = validateUser(panelUser, "", true);
+    let error: UserErrorInterface = validateUser(panelUser, "", false);
     if (error.hasError) {
       setError(error);
       return false;
@@ -101,12 +103,12 @@ export default function CreateuserPopup(props: Props) {
       <Modal isOpen={props.isOpen} onClose={props.onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create User</ModalHeader>
+          <ModalHeader>Update Lawyer - {props.data.username}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <InputName
               name="name"
-              defValue=""
+              defValue={panelUser.name || ""}
               placeholder="Name"
               inputClassName="w-full"
               onChangeHandler={onChange}
@@ -116,8 +118,9 @@ export default function CreateuserPopup(props: Props) {
             />
             <InputName
               name="username"
-              defValue=""
+              defValue={panelUser.username || ""}
               placeholder="Username"
+              disabled={true}
               inputClassName="w-full"
               onChangeHandler={onChange}
               error={
@@ -128,7 +131,7 @@ export default function CreateuserPopup(props: Props) {
             />
             <InputEmail
               name="email"
-              defValue=""
+              defValue={panelUser.email || ""}
               placeholder="Email"
               inputClassName="w-full"
               onChangeHandler={onChange}
@@ -136,35 +139,31 @@ export default function CreateuserPopup(props: Props) {
                 error.hasError && error.field === "email" ? error.message : ""
               }
             />
-
-            <InputPass
-              name="password"
-              defValue=""
-              placeholder="Password"
-              inputClassName="w-full"
-              onChangeHandler={onChange}
-              error={
-                error.hasError && error.field === "password"
-                  ? error.message
-                  : ""
-              }
-            />
             <InputSelect
               name="role"
-              selectArray={
-                currentUser.role === RolesEnum.ADMIN
-                  ? [
-                      { name: "Admin", value: RolesEnum.ADMIN },
-                      { name: "User", value: RolesEnum.USER },
-                    ]
-                  : [{ name: "User", value: RolesEnum.USER }]
-              }
+              selectArray={Object.values(RolesEnum).map((item) => {
+                return {
+                  value: item,
+                  name: toTitleCase(item),
+                };
+              })}
               onChange={onRoleChange}
-              defValue=""
+              defValue={toTitleCase(panelUser.role || "")}
               placeholder="Select your role"
               inputClassName="w-full"
               error={
                 error.hasError && error.field === "role" ? error.message : ""
+              }
+            />
+            <InputSelect
+              name="status"
+              selectArray={UserClientStatus}
+              onChange={onRoleChange}
+              defValue={toTitleCase(panelUser.status || "")}
+              placeholder="Select your status"
+              inputClassName="w-full"
+              error={
+                error.hasError && error.field === "status" ? error.message : ""
               }
             />
           </ModalBody>
@@ -178,7 +177,7 @@ export default function CreateuserPopup(props: Props) {
               onClick={onCreate}
               className="bg-[#002F53] text-[white!important] capitalize hover:bg-[#002F53!important] "
             >
-              Create
+              Update
             </Button>
           </ModalFooter>
         </ModalContent>
