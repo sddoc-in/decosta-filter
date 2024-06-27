@@ -8,6 +8,7 @@ import Results from "../pages/Results";
 import UsersPage from "../pages/Users";
 import RolesEnum from "./Roles";
 import Searches from "../pages/Searches";
+import UserDetails from "../pages/UserDetails";
 
 export const SidebarData = [
   {
@@ -42,20 +43,6 @@ export const SidebarData = [
     Element: UsersPage,
     role: [RolesEnum.ADMIN]
   },
-  // {
-  //   title: "Sessions",
-  //   path: "/dashboard/sessions",
-  //   shortPath: "/sessions",
-  //   Icon: GoProjectTemplate,
-  //   Element: Sessions,
-  // },
-  // {
-  //   title: "MyAccount",
-  //   path: "/dashboard/myaccount",
-  //   shortPath: "/myaccount",
-  //   Icon: IoIosNotifications,
-  //   Element: MyAccount,
-  // },
   {
     title: "Logout",
     path: "/logout",
@@ -76,4 +63,9 @@ export const FormWithDataRoutes = [
     Element: Searches,
     role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
+  {
+    title: "Users",
+    path:"/dashboard/users/:id/details/",
+    Element:UserDetails
+  }
 ]

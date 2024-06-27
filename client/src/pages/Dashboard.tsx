@@ -211,19 +211,19 @@ export default function Dashboard() {
     if (dailysearch.length > 0 && user.uid && user.role !== RolesEnum.ADMIN) {
       drawGraph();
     }
-  }, [dailysearch, user.uid]);
+  }, [dailysearch, user.uid,user.role]);
 
   React.useEffect(() => {
     if (dailyResults.length > 0 && user.uid && user.role !== RolesEnum.ADMIN) {
       drawGraph1();
     }
-  }, [dailyResults, user.uid]);
+  }, [dailyResults, user.uid,user.role]);
 
   React.useEffect(() => {
     if (userSearch.length > 0 && user.uid && user.role === RolesEnum.ADMIN) {
       drawGraph2();
     }
-  }, [userSearch, user.uid]);
+  }, [userSearch, user.uid,user.role]);
 
   return (
     <>

@@ -54,7 +54,7 @@ export default function InputSelect(props: Input) {
     let newdefLan = defLan.map((item) => item.name);
 
     inputRef.current!.value = newdefLan.join(",") || "";
-  }, [props.defValue]);
+  }, [props.defValue,props.selectArray]);
 
   React.useEffect(() => {
     setFilteredCountries(props.selectArray || []);

@@ -32,7 +32,6 @@ export default function UsersPage() {
       params.append("session", currentUser.session);
       params.append("token", currentUser.access_token);
 
-      let apiCall = true;
 
       const data = await axios
         .get(API_URL + "/users/all?" + params)

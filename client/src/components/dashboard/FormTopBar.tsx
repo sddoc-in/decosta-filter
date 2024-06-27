@@ -1,7 +1,5 @@
 import React from "react";
-import { useDisclosure } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { FaAngleDown } from "react-icons/fa6";
 import { IoMdRefresh } from "react-icons/io";
 import { FaRegFileExcel, FaFileCsv } from "react-icons/fa";
 import FormTopBarInterface from "../../interface/FormTopBar";
@@ -22,8 +20,6 @@ export default function FormTopBar({
   const { user:CurrentUser, setLoading  } = React.useContext(AppContext);
   const { downloadAsCsv, downloadAsExcel,selected } = React.useContext(ExcelContext);
 
-  const { onClose } = useDisclosure();
-  const [drawer, setDrawer] = React.useState(false);
 
   const variants = {
     open: { height: "100px" },
@@ -85,7 +81,6 @@ export default function FormTopBar({
         }}
         variants={variants}
         initial="halfOpen"
-        animate={drawer ? "open" : "halfOpen"}
         transition={{ duration: 0.3 }}
       >
         <div className="flex justify-between items-center w-full ">

@@ -1,6 +1,5 @@
 import React from "react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
 import SearchHistory from "../components/Search/SearchHistory";
 import SearchStatus from "../constants/SearchStatus";
 import NewSearch from "../components/Search/NewSearch";
