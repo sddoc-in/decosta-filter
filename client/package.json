@@ -16,6 +16,7 @@
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
     "axios": "^1.6.8",
+    "chart.js": "^4.4.3",
     "daisyui": "^4.6.0",
     "framer-motion": "^11.0.24",
     "papaparse": "^5.4.1",
@@ -57,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "@types/papaparse": "^5.3.14",
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",

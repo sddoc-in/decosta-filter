@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import ConnectionRes from '../interface/ConnectionRes';
 import connectToCluster from '../connection/connect';
 import { Db, Collection } from 'mongodb';
+import { closeConn } from '../connection/closeConn';
 
 
 
@@ -29,7 +30,6 @@ export async function getAllResultsByUser(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
-        const results: Collection = db.collection("results");
 
         let searches;
         // aggregate search results with search collection
@@ -39,7 +39,7 @@ export async function getAllResultsByUser(req: Request, res: Response) {
                     $lookup: {
                         from: "results",
                         localField: "searchId",
-                        foreignField: "SearchUid" ,
+                        foreignField: "SearchUid",
                         as: "results"
                     }
                 },
@@ -95,6 +95,7 @@ export async function getAllResultsByUser(req: Request, res: Response) {
             ]).toArray();
         }
 
+        closeConn(conn);
 
         return res.status(200).json({ results: searches });
     }

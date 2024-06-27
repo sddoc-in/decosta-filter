@@ -268,6 +268,7 @@ export async function updateUser(req: Request, res: Response) {
         },
       }
     );
+    closeConn(conn);
 
     return res.status(200).json({ message: "User updated" });
   } catch (error) {

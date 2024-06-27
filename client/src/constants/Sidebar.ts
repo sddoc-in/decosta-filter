@@ -5,8 +5,9 @@ import { CiLogout } from "react-icons/ci";
 import Dashboard from "../pages/Dashboard";
 import Logout from "../pages/Logout";
 import Results from "../pages/Results";
-import SearchHistory from "../pages/SearchHistory";
 import UsersPage from "../pages/Users";
+import RolesEnum from "./Roles";
+import Searches from "../pages/Searches";
 
 export const SidebarData = [
   {
@@ -15,13 +16,15 @@ export const SidebarData = [
     shortPath: "/dashboard",
     Icon: IoHomeOutline,
     Element: Dashboard,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
   {
-    title: "Search History",
+    title: "Search",
     path: "/dashboard/searches",
     shortPath: "/searches",
     Icon: MdOutlineCampaign,
-    Element: SearchHistory,
+    Element: Searches,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
   {
     title: "All Results",
@@ -29,6 +32,7 @@ export const SidebarData = [
     shortPath: "/results",
     Icon: MdOutlineAccountTree,
     Element: Results,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
   {
     title: "Users",
@@ -36,6 +40,7 @@ export const SidebarData = [
     shortPath: "/users",
     Icon: MdOutlineCampaign,
     Element: UsersPage,
+    role: [RolesEnum.ADMIN]
   },
   // {
   //   title: "Sessions",
@@ -57,6 +62,7 @@ export const SidebarData = [
     shortPath: "/logout",
     Icon: CiLogout,
     Element: Logout,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
   }
 ];
 
@@ -67,6 +73,7 @@ export const FormWithDataRoutes = [
     path: "/dashboard/:Id",
     shortPath: "/dashboard",
     Icon: IoHomeOutline,
-    Element: Dashboard,
+    Element: Searches,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
 ]

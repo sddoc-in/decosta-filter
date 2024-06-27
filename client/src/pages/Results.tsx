@@ -9,11 +9,11 @@ import { AiOutlineFileExcel } from "react-icons/ai";
 import { useParams } from "react-router-dom";
 
 export default function Results() {
-  const { user, setLoading } = React.useContext(AppContext);
+  const { user, setLoading,raiseToast } = React.useContext(AppContext);
   const {
-    setHeader,
     setFileData,
     header,
+    setHeader,
     setColumnsHidden,
     downloadAsCsv,
     downloadAsExcel,
@@ -21,10 +21,11 @@ export default function Results() {
   const getAllResults = React.useRef(() => {});
 
   const { id } = useParams();
-  console.log(id);
 
   getAllResults.current = async () => {
     setLoading(true);
+    setHeader([]);
+    setFileData([]);
     try {
       const data = await axios
         .get(
@@ -39,7 +40,7 @@ export default function Results() {
         )
         .then((res) => res.data)
         .catch((err) => {
-          alert(err.response.data.message);
+          raiseToast(err.response.data.message, "error")
           setLoading(false);
           return;
         });
@@ -59,13 +60,14 @@ export default function Results() {
       setColumnsHidden([0, 16, 17]);
     } catch (error) {
       console.error("Error:", error);
+      raiseToast("Error occurred while fetching data", "error")
     }
     setLoading(false);
   };
 
   React.useEffect(() => {
     getAllResults.current();
-  }, []);
+  }, [user]);
 
   return (
     <>

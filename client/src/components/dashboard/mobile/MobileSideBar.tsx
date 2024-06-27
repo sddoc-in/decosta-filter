@@ -2,8 +2,10 @@ import React from "react";
 import { SidebarData } from "../../../constants/Sidebar";
 import { LuMenu } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import { AppContext } from "../../../context/Context";
 
 export default function MobileSideBar(props: { children: React.ReactNode }) {
+  const { user: CurrentUser } = React.useContext(AppContext);
   return (
     <>
       <div className="drawer">
@@ -47,8 +49,11 @@ export default function MobileSideBar(props: { children: React.ReactNode }) {
                   </span> */}
                 </h1>
                 <div className="mt-6 pl-4">
-                  {SidebarData.map((item, index) => {
-                    const highlight = item.title.toLowerCase() === "/"+window.location.pathname.split("/").pop();
+                  {SidebarData.map((item, index: number) => {
+                    if (!item.role.includes(CurrentUser.role)) return null;
+                    const highlight =
+                      item.title.toLowerCase() ===
+                      "/" + window.location.pathname.split("/").pop();
                     return (
                       <div
                         key={index}

@@ -1,11 +1,13 @@
 import React from "react";
 import Loading from "../components/loader/Loading";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
 
 export const AppContext = React.createContext<any>({});
 
 export const AppProvider = ({ children }: any) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const [user, setUser] = React.useState({
     username: "",
@@ -16,27 +18,24 @@ export const AppProvider = ({ children }: any) => {
   });
 
   const [apiParams, setApiParams] = React.useState<any>({
-    name:"",
-    country:"NL",
-    content_languages:"en",
-    filtterStart_date:new Date(),
-    filtterEnd_date:new Date(),
-    querry:"",
-    ad_status_type:"0",
-    reach:0,
-    ad_type:"all",
-    media_type:"all",
-    publisher_platforms:"all",
-    Nextforward_cursor:"",
-    Nextbackward_cursor:"",
-    Nextcollation_token:"",
-    page:"1"
-  })
-
-
+    name: "",
+    country: "NL",
+    content_languages: "en",
+    filtterStart_date: new Date(),
+    filtterEnd_date: new Date(),
+    querry: "",
+    ad_status_type: "0",
+    reach: 0,
+    ad_type: "all",
+    media_type: "all",
+    publisher_platforms: "all",
+    Nextforward_cursor: "",
+    Nextbackward_cursor: "",
+    Nextcollation_token: "",
+    page: "1",
+  });
 
   const [loading, setLoading] = React.useState<boolean>(false);
-
 
   function setData(data: any) {
     setDataForUser({
@@ -48,7 +47,6 @@ export const AppProvider = ({ children }: any) => {
       role: data.role,
     });
   }
-  
 
   function setDataForUser(data: any) {
     setUser({
@@ -88,8 +86,18 @@ export const AppProvider = ({ children }: any) => {
     )}; expires=${date.toUTCString()}; path=/`;
   }
 
-function fetchUserDetails() {
-  console.log("fetchUserDetails")
+  function raiseToast(title: string, status: string, message?: string) {
+    toast({
+      title: title,
+      description: message || "",
+      status: status as any,
+      duration: 5000,
+      isClosable: true,
+      position: "bottom-left",
+    });
+  }
+
+  function fetchUserDetails() {
     setLoading(true);
     try {
       let user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -153,11 +161,11 @@ function fetchUserDetails() {
 
       setDataForUser(user);
 
-
       if (!user.uid) {
         setLoading(false);
         let currentUrl = window.location.pathname;
-        if (currentUrl === "/mi/default"  || currentUrl === "/") navigate("/mi/default");
+        if (currentUrl === "/mi/default" || currentUrl === "/")
+          navigate("/mi/default");
         else navigate(currentUrl);
       }
     } catch (err) {
@@ -166,9 +174,7 @@ function fetchUserDetails() {
     }
 
     setLoading(false);
-  };
-
-  
+  }
 
   function Logout() {
     document.cookie = "uid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -191,11 +197,9 @@ function fetchUserDetails() {
     });
   }
 
-
   React.useEffect(() => {
     fetchUserDetails();
   }, []);
-
 
   return (
     <AppContext.Provider
@@ -208,7 +212,8 @@ function fetchUserDetails() {
         user,
         setUser,
         apiParams,
-        setApiParams ,
+        setApiParams,
+        raiseToast
       }}
     >
       {children}

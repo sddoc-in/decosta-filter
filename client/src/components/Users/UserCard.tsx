@@ -13,6 +13,7 @@ import RolesEnum from "../../constants/Roles";
 import UserClientStatusEnum from "../../constants/UserClientStatus";
 import UpdateUserPopup from "./UpdateUserPopup";
 import Delete from "./Delete";
+import { Link } from "react-router-dom";
 
 export default function Card(props: {
   data: Users;
@@ -115,13 +116,13 @@ export default function Card(props: {
             <>
               <hr className="w-full h-1 " />
               <div className="flex justify-evenly items-center mt-2">
-                {/* <Link
+                <Link
                   to={
-                    "/dashboard/lawyer/" + props.data.uid + "/details/"
+                    "/dashboard/users/" + props.data.uid + "/details/"
                   }
                 >
                   <FaRegEye className="text-2xl mt-1.5" />
-                </Link> */}
+                </Link>
                 <CiEdit
                   onClick={() => setUpdatePopup(true)}
                   className="text-2xl mt-1.5 cursor-pointer"

@@ -4,13 +4,18 @@ import connectToCluster from '../connection/connect';
 import { Db, Collection } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { closeConn } from '../connection/closeConn';
+import SearchStatus from '../config/SearchStatus';
 
 
 export async function storeSearch(req: Request, res: Response) {
 
-    const { country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session, page } = req.body;
+    const { name, country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session, page } = req.body;
 
     try {
+        if (name === undefined) {
+            return res.status(400).json({ message: "Name required" });
+        }
         if (country === undefined) {
             return res.status(400).json({ message: "Country required" });
         }
@@ -89,8 +94,11 @@ export async function storeSearch(req: Request, res: Response) {
             Nextbackward_cursor: Nextbackward_cursor,
             Nextcollation_token: Nextcollation_token,
             page: page,
-            currentStatus: 0
+            currentStatus: SearchStatus.Created,
+            name: name,
+            CreatedDate: new Date().toLocaleDateString()
         });
+        closeConn(conn);
 
         return res.status(200).json({ message: "Search stored successfully", searchId: searchId });
     }
@@ -125,11 +133,11 @@ export async function deleteSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
-        const result:Collection = db.collection("results");
+        const result: Collection = db.collection("results");
 
         search.deleteOne({ searchId: searchId });
         result.deleteMany({ SearchUid: searchId });
-
+        
         return res.status(200).json({ message: "Search deleted successfully" });
     }
     catch (err) {
@@ -137,9 +145,8 @@ export async function deleteSearch(req: Request, res: Response) {
     }
 }
 
-
 export async function getSearchesByUser(req: Request, res: Response) {
-    const { uid, access_token, session } = req.body;
+    const { uid, access_token, session,status } = req.body;
 
     try {
         if (uid === undefined) {
@@ -150,6 +157,9 @@ export async function getSearchesByUser(req: Request, res: Response) {
         }
         if (session === undefined) {
             return res.status(400).json({ message: "Session required" });
+        }
+        if(status === undefined){
+            return res.status(400).json({ message: "Status required" });
         }
 
         // create connection
@@ -162,7 +172,7 @@ export async function getSearchesByUser(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        let searches = await search.find({ uid: uid }, {
+        let searches = await search.find({ uid: uid,currentStatus:status }, {
             projection: {
                 _id: 0,
                 "name": 1,
@@ -172,10 +182,11 @@ export async function getSearchesByUser(req: Request, res: Response) {
                 "filtterStart_date": 1,
                 "filtterEnd_date": 1,
                 "querry": 1,
-                "currentStatus": 1,
-                "status":1
+                "status": 1,
+                "CreatedDate": 1
             }
         }).toArray();
+        closeConn(conn);
 
         return res.status(200).json({ searches: searches, message: "Searches fetched successfully" });
     }
@@ -184,7 +195,6 @@ export async function getSearchesByUser(req: Request, res: Response) {
     }
 
 }
-
 
 export async function startSearching(req: Request, res: Response) {
     const { uid, access_token, session, searchId } = req.body;
@@ -210,7 +220,7 @@ export async function startSearching(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: 1 } });
+        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: SearchStatus.InProgress } });
 
 
         axios.get("https://facebookads.onrender.com/ads?SearchID=" + searchId)
@@ -223,6 +233,7 @@ export async function startSearching(req: Request, res: Response) {
 
         return res.status(200).json({ message: "Search started successfully" });
 
+        closeConn(conn);
 
 
     }
@@ -231,8 +242,6 @@ export async function startSearching(req: Request, res: Response) {
     }
 
 }
-
-
 
 export async function stopSearch(req: Request, res: Response) {
     const { uid, access_token, session, searchId } = req.body;
@@ -258,7 +267,8 @@ export async function stopSearch(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: 2 } });
+        await search.updateOne({ searchId: searchId }, { $set: { currentStatus: SearchStatus.Stopped } });
+        closeConn(conn);
 
         return res.status(200).json({ message: "Search stopped successfully" });
 
@@ -268,7 +278,6 @@ export async function stopSearch(req: Request, res: Response) {
     }
 
 }
-
 
 export async function getSearchBySearchId(req: Request, res: Response) {
     const { searchId } = req.query;
@@ -320,12 +329,13 @@ export async function getSearchBySearchId(req: Request, res: Response) {
                 media_type: media_type ? Array.isArray(media_type) ? media_type : [media_type] : [],
                 content_languages: content_languages ? Array.isArray(content_languages) ? content_languages : [content_languages] : []
             };
-            console.log(response);
+            closeConn(conn);
+
             return res.status(200).json({ search: response, message: "Search fetched successfully" });
         } else {
             return res.status(404).json({ message: "Search not found" });
         }
-    } catch (err:any) {
+    } catch (err: any) {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 }

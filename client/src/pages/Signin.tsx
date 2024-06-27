@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const navigate = useNavigate();
-  const { setDataForUser:setCookies,setLoading } = React.useContext(AppContext);
+  const { setDataForUser:setCookies,setLoading,raiseToast } = React.useContext(AppContext);
 
 
   const [user, setUser] = React.useState({
@@ -48,15 +48,16 @@ export default function Signin() {
 
       if (data.message === "User logged in successfully") {
         setCookies(data.user);
+        raiseToast("Logged in successfully", "success");
         navigate("/dashboard");
-        setLoading(false)
-
+        
       } else {
-        alert(data.message);
-        setLoading(false)
-        return;
+        raiseToast(data.message, "error");
       }
-    } catch (err) {}
+      setLoading(false)
+    } catch (err) {
+      raiseToast("Something went wrong!", "error");
+    }
   }
   return (
     <div className="relative w-full h-auto md:h-[100vh] overflow-hidden">

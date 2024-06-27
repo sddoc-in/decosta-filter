@@ -3,7 +3,6 @@ import ExcelContextInterface from "../interface/ExcelContext";
 import axios from "axios";
 import { AppContext } from "./Context";
 
-//@ts-ignore
 import * as XLSX from "xlsx";
 //@ts-ignore
 import  Papa  from "papaparse";
@@ -200,6 +199,8 @@ export default function ExcelProvider({ children }: any) {
     document.body.removeChild(link);
     setLoading(false);
   }
+
+ 
 
   return (
     <ExcelContext.Provider

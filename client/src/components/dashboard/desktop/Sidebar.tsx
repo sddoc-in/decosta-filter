@@ -1,8 +1,10 @@
 import React from "react";
 import { SidebarData } from "../../../constants/Sidebar";
 import { Link } from "react-router-dom";
+import { AppContext } from "../../../context/Context";
 
 export default function Sidebar() {
+  const { user: CurrentUser } = React.useContext(AppContext);
   return (
     <>
       <div className="hidden lg:block md:w-[40%] lg:w-[25%] absolute top-0 left-0 bg-[#002F53] h-full z-10">
@@ -15,7 +17,10 @@ export default function Sidebar() {
           </h1>
           <div className="mt-6 pl-4">
             {SidebarData.map((item, index) => {
-              const highlight = item.shortPath.toLowerCase() === "/"+window.location.pathname.split("/").pop()
+              if (!item.role.includes(CurrentUser.role)) return null;
+              const highlight =
+                item.shortPath.toLowerCase() ===
+                "/" + window.location.pathname.split("/").pop();
               return (
                 <div
                   key={index}

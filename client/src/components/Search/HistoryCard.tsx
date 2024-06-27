@@ -8,6 +8,7 @@ import { ExcelContext } from "../../context/ExcelContext";
 import { AiOutlineFileExcel, AiOutlineStop } from "react-icons/ai";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { FaRegClone } from "react-icons/fa";
+import SearchStatus from "../../constants/SearchStatus";
 
 interface Props {
   user: any;
@@ -124,7 +125,7 @@ export default function HistoryCard({ user, onDeleteUser }: Props) {
 
   return (
     <>
-      <div className="w-[30%] ml-2 h-1/4 p-4 mb-4 bg-white rounded-lg shadow-md">
+      <div className="w-[30%] ml-2 h-1/4 p-4 mb-4 bg-white rounded-lg shadow-md text-start">
         <div>
           <p className="text-gray-600">Name: {user.name}</p>
           <p className="text-gray-600">Country: {user.country}</p>
@@ -139,18 +140,6 @@ export default function HistoryCard({ user, onDeleteUser }: Props) {
             End Date: {new Date(user.filtterEnd_date).toDateString()}
           </p>
           <p className="text-gray-600">Data fetched: {user.status || 0}</p>
-          <p className="text-gray-600">
-            Status:{" "}
-            {user.currentStatus === 1
-              ? "Active"
-              : user.currentStatus === 0
-              ? "Inactive"
-              : user.currentStatus === 2
-              ? "Stopped"
-              : user.currentStatus === 3
-              ? "Completed"
-              : "Inactive"}
-          </p>
         </div>
         <div className="flex justify-between mt-2 items-center gap-1">
           <FaRegClone

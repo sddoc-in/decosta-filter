@@ -5,6 +5,7 @@ import ConnectionRes from "../interface/ConnectionRes";
 import { comparePassword, createSession } from "../functions/hash";
 import { createBearer } from "../functions/bearer";
 import User from "../interface/User";
+import { closeConn } from "../connection/closeConn";
 
 export async function login(req: Request, res: Response) {
 
@@ -107,6 +108,8 @@ export async function login(req: Request, res: Response) {
       role: newUser.role,
       status: newUser.status,
     };
+
+    closeConn(conn);
 
     res
       .status(200)

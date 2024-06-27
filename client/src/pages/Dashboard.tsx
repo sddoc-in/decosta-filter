@@ -1,349 +1,249 @@
 import React from "react";
-import InputName from "../components/input/InputName";
 import { AppContext } from "../context/Context";
-import InputSearch from "../components/input/InputSearch";
-import { ADS_API_URL, API_URL } from "../constants/data";
-import InputCountry from "../components/input/InputCountry";
-import InputSelect from "../components/input/InputSelect";
-import { Languages } from "../constants/Languages";
-import InputMultiSelect from "../components/input/InputMultiSelect";
-import { AdStatus } from "../constants/AdStatus";
-import InputDate from "../components/input/InputDate";
-import { MediaType } from "../constants/MediaType";
+import { API_URL } from "../constants/data";
 import axios from "axios";
-import { PublisherPlatforms } from "../constants/PublisherPlatforms";
-import { useParams } from "react-router-dom";
+import RolesEnum from "../constants/Roles";
+import Chart from "chart.js/auto";
 
 export default function Dashboard() {
-  const { apiParams, setApiParams, user, setLoading } =
-    React.useContext(AppContext);
-  const { Id } = useParams();
-  const [numberofAds, setNumberofAds] = React.useState<number>(0);
-  const [searchId, setSearchId] = React.useState<string>("");
+  const { user, setLoading, raiseToast } = React.useContext(AppContext);
 
-  function handleChange(type: string, value: string) {
-    setSearchId("");
-    setApiParams((prev: any) => {
-      return { ...prev, [type]: value };
+  const [dailysearch, setDailysearch] = React.useState<any>([
+    { _id: "", count: 0 },
+  ]);
+  const [dailyResults, setDailyResults] = React.useState<any>([
+    { _id: "", count: 0 },
+  ]);
+  const [userSearch, setUserSearch] = React.useState<any>([]);
+
+  let myChart: Chart | undefined,
+    myChart1: Chart | undefined,
+    myChart2: Chart | undefined;
+
+  const getDailySearches = React.useRef(() => {});
+  const getUserSearches = React.useRef(() => {});
+  const getDailyResults = React.useRef(() => {});
+
+  getDailyResults.current = async () => {
+    const param = new URLSearchParams({
+      uid: user.uid,
+      session: user.session,
+      access_token: user.access_token,
     });
-  }
 
-  const getDetails = React.useRef(() => {});
-
-  getDetails.current = async () => {
     setLoading(true);
     try {
-      let params = new URLSearchParams({
-        session: user.session,
-        uid: user.uid,
-        access_token: user.access_token,
-        searchId: Id as string,
-      });
-
       const response = await axios
-        .get(API_URL + "/searches?" + params)
+        .get(API_URL + "/analytics/results/daily?" + param)
         .then((response) => response.data)
-        .catch((err) => {
-          alert(err.response.data.message);
-          return;
+        .catch((error) => {
+          raiseToast("Error fetching data", "error");
         });
-      const searchData = response.search;
-      if (searchData) {
-        setApiParams({
-          country: searchData.country,
-          content_languages: searchData.content_languages.join(","),
-          querry: searchData.querry,
-          reach: searchData.reach,
-          publisher_platforms: searchData.publisher_platforms.join(","),
-          ad_type: searchData.ad_type,
-          ad_status_type: searchData.ad_status_type,
-          media_type: searchData.media_type.join(","),
-          filtterStart_date: searchData.filtterStart_date.slice(0, 10),
-          filtterEnd_date: searchData.filtterEnd_date.slice(0, 10),
-        });
+      if (response.data) {
+        setDailyResults(response.data);
       }
-    } catch (error: any) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      raiseToast("Error fetching data", "error");
     }
+    setLoading(false);
+  };
+
+  getDailySearches.current = async () => {
+    const param = new URLSearchParams({
+      uid: user.uid,
+      session: user.session,
+      access_token: user.access_token,
+    });
+
+    setLoading(true);
+    try {
+      const response = await axios
+        .get(API_URL + "/analytics/search/daily?" + param)
+        .then((response) => response.data)
+        .catch((error) => {
+          raiseToast("Error fetching data", "error");
+        });
+      if (response.data) {
+        setDailysearch(response.data);
+      }
+    } catch (error) {
+      raiseToast("Error fetching data", "error");
+    }
+    setLoading(false);
+  };
+
+  getUserSearches.current = async () => {
+    const param = new URLSearchParams({
+      uid: user.uid,
+      session: user.session,
+      access_token: user.access_token,
+    });
+
+    setLoading(true);
+    try {
+      const response = await axios
+        .get(API_URL + "/analytics/user/searches?" + param)
+        .then((response) => response.data)
+        .catch((error) => {
+          raiseToast("Error fetching data", "error");
+        });
+      if (response.data) {
+        setUserSearch(response.data);
+      }
+    } catch (error) {
+      raiseToast("Error fetching data", "error");
+    }
+    setLoading(false);
   };
 
   React.useEffect(() => {
-    if (Id) {
-      setSearchId(Id);
-      getDetails.current();
+    if (user.uid && user.role !== RolesEnum.ADMIN) {
+      getDailySearches.current();
+      getDailyResults.current();
+    } else if (user.uid && user.role === RolesEnum.ADMIN) {
+      getUserSearches.current();
     }
-  }, [Id]);
+  }, [user.uid, user.role]);
 
-  function handleMultiSelect(type: string, value: string) {
-    setSearchId("");
-    setApiParams((prev: any) => {
-      return { ...prev, [type]: value };
+  const drawGraph = () => {
+    if (myChart !== undefined) {
+      myChart.destroy();
+    }
+    Chart.getChart("myChart")?.destroy();
+    const ctx = document.getElementById("myChart") as HTMLCanvasElement;
+    myChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: dailysearch.map((item: any) => item._id),
+        datasets: [
+          {
+            label: dailysearch.length > 0 ? "Daily Searches" : "No Data Found",
+            data: dailysearch.map((item: any) => item.count),
+            backgroundColor: ["rgba(255, 99, 132, 0.2)"],
+            borderColor: ["rgba(255, 99, 132, 1)"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
     });
-  }
+  };
 
-  async function getNumberofAds() {
-    try {
-      if (apiParams.querry === "") {
-        alert("Please enter a Product");
-        return;
-      }
-      if (apiParams.name === "") {
-        alert("Please enter a Name to your search");
-        return;
-      }
-      let data;
-      setLoading(true);
-      if (!searchId) {
-        data = await axios
-          .post(API_URL + "/searches/store", {
-            ...apiParams,
-            publisher_platforms: apiParams.publisher_platforms.split(","),
-            content_languages: apiParams.content_languages.split(","),
-            media_type: apiParams.media_type.split(","),
-            uid: user.uid,
-            access_token: user.access_token,
-            session: user.session,
-          })
-          .then((response) => response.data)
-          .catch((err) => {
-            alert(err.response.data.message);
-            return;
-          });
-
-        if (data.message === "Search stored successfully") {
-          setSearchId(data.searchId);
-          const res = await axios
-            .get(ADS_API_URL + "total?SearchID=" + data.searchId)
-            .then((response) => response.data)
-            .catch((err) => {
-              alert(err.response.data.message);
-              return;
-            });
-          setNumberofAds(res.total);
-        }
-      } else {
-        const res = await axios
-          .get(ADS_API_URL + "total?SearchID=" + searchId)
-          .then((response) => response.data)
-          .catch((err) => {
-            alert(err.response.data.message);
-            return;
-          });
-        setNumberofAds(res.total);
-      }
-    } catch (e) {
-      console.log(e);
-      alert("Something went wrong");
+  const drawGraph1 = () => {
+    if (myChart1 !== undefined) {
+      myChart1.destroy();
     }
-    setLoading(false);
-  }
+    Chart.getChart("myChart1")?.destroy();
+    const ctx = document.getElementById("myChart1") as HTMLCanvasElement;
+    myChart1 = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels:
+          dailyResults.length > 0
+            ? dailyResults.map((item: any) => item._id)
+            : ["No Data Found"],
+        datasets: [
+          {
+            label: dailyResults.length > 0 ? "Daily Results" : "No Data Found",
+            data:
+              dailyResults.length > 0
+                ? dailyResults.map((item: any) => item.count)
+                : [0],
+            backgroundColor: ["rgba(255, 99, 132, 0.2)"],
+            borderColor: ["rgba(255, 99, 132, 1)"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  };
 
-  async function getQueryData() {
-    try {
-      setLoading(true);
-      const res = await axios
-        .post(API_URL + "/searches/start", {
-          searchId: searchId,
-          uid: user.uid,
-          access_token: user.access_token,
-          session: user.session,
-        })
-        .then((response) => response.data)
-        .catch((err) => {
-          alert(err.response.data.message);
-          return;
-        });
-
-      if (res.message === "Search started successfully") {
-        alert("Search started successfully");
-      } else {
-        alert("Something went wrong");
-      }
-      setLoading(false);
-    } catch (e) {
-      console.log(e);
-      alert("Something went wrong");
+  const drawGraph2 = () => {
+    if (myChart2 !== undefined) {
+      myChart2.destroy();
     }
-  }
+    Chart.getChart("myChart2")?.destroy();
+    const ctx = document.getElementById("myChart2") as HTMLCanvasElement;
+    myChart2 = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels:
+          userSearch.length > 0
+            ? userSearch.map((item: any) => item._id)
+            : ["No Data Found"],
+        datasets: [
+          {
+            label: userSearch.length > 0 ? "User Searches" : "No Data Found",
+            data:
+              userSearch.length > 0
+                ? userSearch.map((item: any) => item.count)
+                : [],
+            backgroundColor: ["rgba(255, 99, 132, 0.2)"],
+            borderColor: ["rgba(255, 99, 132, 1)"],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  };
+
+  React.useEffect(() => {
+    if (dailysearch.length > 0 && user.uid && user.role !== RolesEnum.ADMIN) {
+      drawGraph();
+    }
+  }, [dailysearch, user.uid]);
+
+  React.useEffect(() => {
+    if (dailyResults.length > 0 && user.uid && user.role !== RolesEnum.ADMIN) {
+      drawGraph1();
+    }
+  }, [dailyResults, user.uid]);
+
+  React.useEffect(() => {
+    if (userSearch.length > 0 && user.uid && user.role === RolesEnum.ADMIN) {
+      drawGraph2();
+    }
+  }, [userSearch, user.uid]);
 
   return (
     <>
-      <h1 className="text-black font-bold text-[32px] mt-4 mb-5">
-        Enter Your Query
-      </h1>
-      <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
-        <div className="flex justify-center items-center w-full">
-          <InputSearch
-            defValue={apiParams.querry || ""}
-            placeholder="Enter Query"
-            name="querry"
-            inputClassName={` w-[50%!important] mr-2`}
-            onChangeHandler={(e) => {
-              setApiParams((prev: any) => {
-                return { ...prev, querry: e.target.value };
-              });
-            }}
-            onClick={getNumberofAds}
-          />
-          <InputName
-            defValue={apiParams.name || ""}
-            placeholder="Enter Name"
-            name="name"
-            inputClassName={` w-[50%!important] mr-2`}
-            onChangeHandler={(e) => {
-              setApiParams((prev: any) => {
-                return { ...prev, name: e.target.value };
-              });
-            }}
-          />
+      <h1 className=" text-3xl text-start text-black ">Dashboard</h1>
+      {user.role === RolesEnum.ADMIN ? (
+        <div className="flex flex-col items-center">
+          <div className="w-11/12 h-96 bg-white rounded-lg shadow-lg mt-10">
+            <canvas id="myChart2"></canvas>
+          </div>
         </div>
-        <div className="flex justify-center items-center w-full">
-          <InputCountry
-            defValue={apiParams.country || ""}
-            placeholder="Select Country"
-            name="country"
-            onChange={handleChange}
-            inputClassName={` w-[49%!important] mr-2`}
-          />
-          <InputMultiSelect
-            defValue={apiParams.content_languages || ""}
-            placeholder="Select language"
-            name="content_languages"
-            selectArray={Languages}
-            inputClassName={` w-[49%!important]`}
-            onChange={handleMultiSelect}
-          />
+      ) : (
+        <div className="flex flex-col items-center">
+          <div className="w-11/12 h-96 bg-white rounded-lg shadow-lg mt-10">
+            <canvas id="myChart"></canvas>
+          </div>
+          <div className="w-11/12 h-96 bg-white rounded-lg shadow-lg mt-10">
+            <canvas id="myChart1"></canvas>
+          </div>
         </div>
-        <div className="flex justify-center items-center w-full">
-          <InputMultiSelect
-            defValue={apiParams.publisher_platforms || ""}
-            placeholder="Select Publisher Platforms"
-            name="publisher_platforms"
-            selectArray={PublisherPlatforms}
-            inputClassName={` w-[32.3%!important] mr-2`}
-            onChange={handleMultiSelect}
-          />
-          <InputMultiSelect
-            defValue={apiParams.media_type || ""}
-            placeholder="Select Media Type"
-            name="media_type"
-            selectArray={MediaType}
-            inputClassName={` w-[32.3%!important] mr-2`}
-            onChange={handleMultiSelect}
-          />
-          <InputSelect
-            defValue={apiParams.ad_status_type || ""}
-            placeholder="Select Ad Status"
-            name="ad_status_type"
-            selectArray={AdStatus}
-            inputClassName={` w-[32.3%!important]`}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="flex justify-center items-center w-full">
-          {/* <InputMultiSelect
-            defValue=""
-            placeholder="Select Call To Action"
-            name="call_to_action"
-            selectArray={CallToAction}
-            inputClassName={` w-[30%!important] mr-2`}
-            onChange={handleMultiSelect}
-          />
-          <InputName
-            defValue=""
-            placeholder="Reach"
-            name="reach"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) => changeFilterParams("reach", e.target.value)}
-          /> */}
-          {/*
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Shares"
-            name="minMaxShares"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxShares", e.target.value)
-            }
-          />
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Reach"
-            name="minMaxReach"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxReach", e.target.value)
-            }
-          />
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Comments"
-            name="minMaxComments"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxComments", e.target.value)
-            }
-          /> */}
-        </div>
-
-        <div className="flex justify-center items-center w-full">
-          <InputDate
-            defValue={apiParams.filtterStart_date || ""}
-            placeholder="Start Date"
-            label="Start Date"
-            name="filtterStart_date"
-            inputClassName={` w-[49%!important] mr-2`}
-            onChangeHandler={(e: any) => {
-              setApiParams((prev: any) => {
-                return { ...prev, filtterStart_date: new Date(e.target.value) };
-              });
-            }}
-          />
-          <InputDate
-            defValue={apiParams.filtterEnd_date || ""}
-            placeholder="End Date"
-            label="End Date"
-            name="filtterEnd_date"
-            inputClassName={` w-[49%!important]`}
-            onChangeHandler={(e: any) => {
-              setApiParams((prev: any) => {
-                return { ...prev, filtterEnd_date: new Date(e.target.value) };
-              });
-            }}
-          />
-          {/* <InputNumber
-            defValue=""
-            placeholder="Enter Page Number"
-            label="Min Days Active"
-            name="query"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) => {
-              setFilterParams((prev: any) => {
-                return { ...prev, minDaysActive: e.target.value };
-              });
-            }}
-          /> */}
-        </div>
-        <div className="flex justify-center items-end w-full">
-          <InputName
-            defValue={numberofAds}
-            disabled={true}
-            label="Results Found"
-            placeholder="Enter Page Size"
-            name="query"
-            inputClassName={` w-[30%!important] mr-2`}
-          />
-          <button
-            className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4"
-            onClick={getQueryData}
-          >
-            Find results
-          </button>
-        </div>
-      </div>
+      )}
     </>
   );
 }
