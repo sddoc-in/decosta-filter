@@ -8,6 +8,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import FormTopBarInterface from "../../interface/FormTopBar";
 import FormTopBar from "../dashboard/FormTopBar";
 import { ExcelContext } from "../../context/ExcelContext";
+import { FaPause, FaPlay } from "react-icons/fa";
 
 export default function SearchHistory(props: {
   status: SearchStatus;
@@ -22,8 +23,8 @@ export default function SearchHistory(props: {
   const getAfterDetails = React.useRef(() => {});
 
   getSearches.current = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
@@ -33,9 +34,7 @@ export default function SearchHistory(props: {
         })
         .then((res) => res.data)
         .catch((err) => {
-          raiseToast(err.response.data.message, "error");
-          setLoading(false);
-          return;
+          return err.response.data
         });
 
       if (data.message === "Searches fetched successfully") {
@@ -43,11 +42,10 @@ export default function SearchHistory(props: {
       } else {
         raiseToast(data.message, "error");
       }
-      setLoading(false);
     } catch (err) {
-      console.log(err);
       raiseToast("Internal server error", "error");
     }
+    setLoading(false);
   };
 
   getAfterDetails.current = async () => {
@@ -61,8 +59,7 @@ export default function SearchHistory(props: {
         })
         .then((res) => res.data)
         .catch((err) => {
-          raiseToast(err.response.data.message, "error");
-          return;
+          return err.response.data
         });
 
       if (data.message === "Searches fetched successfully") {
@@ -109,9 +106,7 @@ export default function SearchHistory(props: {
           )
           .then((res) => res.data)
           .catch((err) => {
-            alert(err.response.data.message);
-            setLoading(false);
-            return;
+            return err.response.data
           });
 
         if (res.message === "Search deleted successfully") {
@@ -119,11 +114,8 @@ export default function SearchHistory(props: {
             (user) => user.searchId !== searchId
           );
           setUsers(updatedUsers);
-          setLoading(false);
         } else {
           raiseToast(res.message, "error");
-          setLoading(false);
-          return;
         }
       } catch (err) {
         console.log(err);
@@ -133,13 +125,99 @@ export default function SearchHistory(props: {
     setLoading(false);
   };
 
-  const options: FormTopBarInterface[] = [
-    // {
-    //   name: "Edit",
-    //   Icon: MdOutlineEdit,
-    //   Object() {},
-    // },
+  const Start = async () => {
 
+    if(selected.length === 0) {
+      raiseToast("Please select a search to start", "error");
+      return;
+    }
+
+    setLoading(true);
+
+    selected.forEach(async (element) => {
+      try {
+        const searchId = users[element].searchId;
+        
+        let res = await axios
+          .post(
+            API_URL +
+              "/searches/start" ,
+              {
+                session: user.session,
+                uid: user.uid,
+                access_token: user.access_token,
+                searchId: searchId,
+              }
+          )
+          .then((res) => res.data)
+          .catch((err) => {
+            return err.response.data
+          });
+
+        if (res.message === "Search started successfully") {
+          const updatedUsers = users.filter(
+            (user) => user.searchId !== searchId
+          );
+          setUsers(updatedUsers);
+          raiseToast(res.message, "success");
+        } else {
+          raiseToast(res.message, "error");
+        }
+      } catch (err) {
+        console.log(err);
+        raiseToast("Internal server error", "error");
+      }
+    });
+    setLoading(false);
+  }
+
+  const Stop = async () => {
+
+    if(selected.length === 0) {
+      raiseToast("Please select a search to stop", "error");
+      return;
+    }
+
+    setLoading(true);
+
+    selected.forEach(async (element) => {
+      try {
+        const searchId = users[element].searchId;
+        
+        let res = await axios
+          .post(
+            API_URL +
+              "/searches/stop" ,
+              {
+                session: user.session,
+                uid: user.uid,
+                access_token: user.access_token,
+                searchId: searchId,
+              }
+          )
+          .then((res) => res.data)
+          .catch((err) => {
+            return err.response.data
+          });
+
+        if (res.message === "Search stopped successfully") {
+          const updatedUsers = users.filter(
+            (user) => user.searchId !== searchId
+          );
+          setUsers(updatedUsers);
+          raiseToast(res.message, "success");
+        } else {
+          raiseToast(res.message, "error");
+        }
+      } catch (err) {
+        console.log(err);
+        raiseToast("Internal server error", "error");
+      }
+    });
+    setLoading(false);
+  }
+
+  const options: FormTopBarInterface[] = [
     {
       name: "Delete",
       Icon: MdDeleteOutline,
@@ -147,6 +225,20 @@ export default function SearchHistory(props: {
         Delete();
       },
     },
+    {
+      name:"Start",
+      Icon:FaPlay,
+      Object() {
+        Start();
+      },
+    },
+    {
+      name:"Stop",
+      Icon:FaPause,
+      Object() {
+        Stop();
+      },
+    }
   ];
 
   return (

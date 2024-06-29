@@ -5,6 +5,7 @@ import { deleteSearch, getSearchBySearchId, getSearchesByUser, startSearching, s
 import { getAllResultsByUser } from "../controller/results";
 import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
 import { getNumberOfResultsOnDailyBasis, getNumberOfSearchesPerUser, getSearchCountOnDailyBasis } from "../controller/getGraphs";
+import { getSettings, updateSettings } from "../controller/admin";
 const router = express.Router();
 
 router.post("/api/register", register);
@@ -33,5 +34,10 @@ router.post("/api/users/create", register);
 router.get("/api/analytics/search/daily",getSearchCountOnDailyBasis)
 router.get("/api/analytics/results/daily",getNumberOfResultsOnDailyBasis)
 router.get("/api/analytics/user/searches",getNumberOfSearchesPerUser)
+
+// admin settings
+router.put("/api/admin/settings",updateSettings)
+router.get("/api/admin/settings",getSettings)
+
 
 export default router;

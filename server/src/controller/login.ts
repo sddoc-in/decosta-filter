@@ -12,7 +12,6 @@ export async function login(req: Request, res: Response) {
   let user = req.query.user as string;
   let password = req.query.password as string;
  
-  console.log(user,password)
   try {
     if (user === undefined) {
       return res.status(400).json({ message: "Username or email required" });

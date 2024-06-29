@@ -1,5 +1,5 @@
 import { IoHomeOutline } from "react-icons/io5";
-import { MdOutlineCampaign } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineCampaign } from "react-icons/md";
 import { MdOutlineAccountTree } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import Dashboard from "../pages/Dashboard";
@@ -9,6 +9,7 @@ import UsersPage from "../pages/Users";
 import RolesEnum from "./Roles";
 import Searches from "../pages/Searches";
 import UserDetails from "../pages/UserDetails";
+import Admin from "../pages/Admin";
 
 export const SidebarData = [
   {
@@ -44,6 +45,14 @@ export const SidebarData = [
     role: [RolesEnum.ADMIN]
   },
   {
+    title: "Admin Settings",
+    path: "/dashboard/admin",
+    shortPath: "/admin",
+    Icon: MdAdminPanelSettings,
+    Element: Admin,
+    role: [RolesEnum.ADMIN]
+  },
+  {
     title: "Logout",
     path: "/logout",
     shortPath: "/logout",
@@ -65,7 +74,7 @@ export const FormWithDataRoutes = [
   },
   {
     title: "Users",
-    path:"/dashboard/users/:id/details/",
-    Element:UserDetails
+    path: "/dashboard/users/:id/details/",
+    Element: UserDetails
   }
 ]

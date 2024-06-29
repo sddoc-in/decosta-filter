@@ -92,7 +92,7 @@ export default function FormTopBar({
                     onClick={() => onMenuClick(option)}
                     className="flex items-center cursor-pointer mr-2 text-blue-500"
                   >
-                    {option.Icon && <option.Icon className="text-[16px]" />}
+                    {option.Icon && <option.Icon className="text-[16px] mr-1" />}
                     <p className=" text-sm">{option.name}</p>
                   </div>
                 </div>

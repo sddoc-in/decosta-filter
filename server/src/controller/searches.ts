@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { closeConn } from '../connection/closeConn';
 import SearchStatus from '../config/SearchStatus';
+import RolesEnum from '../config/Roles';
 
 
 export async function storeSearch(req: Request, res: Response) {
@@ -74,10 +75,28 @@ export async function storeSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
+        const admin: Collection = db.collection("admin");
+
+        // check user if admin or not
+        let user = await admin.findOne({ uid: uid, role: RolesEnum.ADMIN });
+        if(!user){
+            let adminSettings = await admin.findOne({});
+   
+            let totalSearches = await search.find({ uid: uid },{projection: { _id: 0, searchId: 1 }}).toArray();
+            if (totalSearches.length > adminSettings!.SearchPerUser) {
+                return res.status(400).json({ message: "You have reached the maximum number of searches" });
+            }
+
+            let today = new Date().toLocaleDateString();
+            totalSearches = await search.find({ CreatedDate: today },{projection: { _id: 0, searchId: 1 }}).toArray();
+            if (totalSearches.length > adminSettings!.DailySearches) {
+                return res.status(400).json({ message: "You have reached the maximum number of searches for today" });
+            }
+        }
 
         let searchId = uuidv4()
 
-        search.insertOne({
+       await search.insertOne({
             searchId: searchId,
             uid: uid,
             country: country,
