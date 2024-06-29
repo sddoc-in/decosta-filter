@@ -3,7 +3,7 @@ import { register } from "../controller/register";
 import { login } from "../controller/login";
 import { deleteSearch, getSearchBySearchId, getSearchesByUser, startSearching, stopSearch, storeSearch } from "../controller/searches";
 import { getAllResultsByUser } from "../controller/results";
-import { deleteUser, getAllAdmins, getAllUsers, updateUser } from "../controller/users";
+import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
 import { getNumberOfResultsOnDailyBasis, getNumberOfSearchesPerUser, getSearchCountOnDailyBasis } from "../controller/getGraphs";
 const router = express.Router();
 
@@ -23,6 +23,7 @@ router.get("/api/results/all", getAllResultsByUser);
 
 // user routes
 router.get("/api/users/all", getAllUsers);
+router.get("/api/users/", getUser);
 router.get("/api/users/admins", getAllAdmins);
 router.put("/api/users/update", updateUser);
 router.delete("/api/users/delete", deleteUser);

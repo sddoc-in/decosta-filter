@@ -22,6 +22,7 @@ export default async function connectToCluster() {
       conn: mongoClient,
     };
   } catch (error) {
+    console.error("Error connecting to MongoDB Atlas", error);
     if (
       error instanceof MongoServerSelectionError ||
       error instanceof MongoNetworkError ||

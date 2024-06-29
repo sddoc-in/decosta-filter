@@ -98,7 +98,6 @@ export async function storeSearch(req: Request, res: Response) {
             name: name,
             CreatedDate: new Date().toLocaleDateString()
         });
-        closeConn(conn);
 
         return res.status(200).json({ message: "Search stored successfully", searchId: searchId });
     }

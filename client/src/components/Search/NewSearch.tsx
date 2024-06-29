@@ -15,7 +15,7 @@ import { PublisherPlatforms } from "../../constants/PublisherPlatforms";
 import { useParams } from "react-router-dom";
 
 export default function NewSearch() {
-  const { apiParams, setApiParams, user, setLoading } =
+  const { apiParams, setApiParams, user, setLoading,raiseToast } =
     React.useContext(AppContext);
   const { Id } = useParams();
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
@@ -108,7 +108,7 @@ export default function NewSearch() {
           })
           .then((response) => response.data)
           .catch((err) => {
-            alert(err.response.data.message);
+            raiseToast(err.response.data.message, "error");
             return;
           });
 
@@ -118,7 +118,7 @@ export default function NewSearch() {
             .get(ADS_API_URL + "total?SearchID=" + data.searchId)
             .then((response) => response.data)
             .catch((err) => {
-              alert(err.response.data.message);
+              raiseToast(err.response.data.message, "error");
               return;
             });
           setNumberofAds(res.total);
@@ -128,14 +128,14 @@ export default function NewSearch() {
           .get(ADS_API_URL + "total?SearchID=" + searchId)
           .then((response) => response.data)
           .catch((err) => {
-            alert(err.response.data.message);
+            raiseToast(err.response.data.message, "error")
             return;
           });
         setNumberofAds(res.total);
       }
     } catch (e) {
       console.log(e);
-      alert("Something went wrong");
+      raiseToast("Something went wrong", "error")
     }
     setLoading(false);
   }
@@ -152,7 +152,7 @@ export default function NewSearch() {
         })
         .then((response) => response.data)
         .catch((err) => {
-          alert(err.response.data.message);
+          raiseToast(err.response.data.message, "error")
           return;
         });
 
@@ -164,7 +164,7 @@ export default function NewSearch() {
       setLoading(false);
     } catch (e) {
       console.log(e);
-      alert("Something went wrong");
+      raiseToast("Something went wrong", "error")
     }
   }
 
@@ -291,7 +291,8 @@ export default function NewSearch() {
 
         <div className="flex justify-center items-center w-full">
           <InputDate
-            defValue={apiParams.filtterStart_date || ""}
+            // defValue={apiParams.filtterStart_date || ""}
+            defValue={""}
             placeholder="Start Date"
             label="Start Date"
             name="filtterStart_date"
@@ -303,7 +304,8 @@ export default function NewSearch() {
             }}
           />
           <InputDate
-            defValue={apiParams.filtterEnd_date || ""}
+            // defValue={apiParams.filtterEnd_date || ""}
+            defValue={""}
             placeholder="End Date"
             label="End Date"
             name="filtterEnd_date"

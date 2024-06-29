@@ -4,10 +4,11 @@ import { API_URL } from "../constants/data";
 import { Chart } from "chart.js";
 import { AppContext } from "../context/Context";
 import { useParams } from "react-router-dom";
+import Searches from "./Searches";
 
 export default function UserDetails() {
   const { user, setLoading, raiseToast } = React.useContext(AppContext);
-  const {id} = useParams()
+  const { id } = useParams();
 
   const [dailysearch, setDailysearch] = React.useState<any>([
     { _id: "", count: 0 },
@@ -15,11 +16,38 @@ export default function UserDetails() {
   const [dailyResults, setDailyResults] = React.useState<any>([
     { _id: "", count: 0 },
   ]);
+  const [userDetails, setUserDetails] = React.useState<any>({});
 
   let myChart: Chart | undefined, myChart1: Chart | undefined;
 
   const getDailySearches = React.useRef(() => {});
   const getDailyResults = React.useRef(() => {});
+  const getUserDetails = React.useRef(() => {});
+
+  getUserDetails.current = async () => {
+    const param = new URLSearchParams({
+      uid: user.uid,
+      user_id: id || "",
+      session: user.session,
+      access_token: user.access_token,
+    });
+
+    setLoading(true);
+    try {
+      const response = await axios
+        .get(API_URL + "/users/?" + param)
+        .then((response) => response.data)
+        .catch((error) => {
+          raiseToast("Error fetching data", "error");
+        });
+      if (response.data) {
+        setUserDetails(response.data);
+      }
+    } catch (error) {
+      raiseToast("Error fetching data", "error");
+    }
+    setLoading(false);
+  };
 
   getDailyResults.current = async () => {
     const param = new URLSearchParams({
@@ -70,6 +98,7 @@ export default function UserDetails() {
   };
 
   React.useEffect(() => {
+    getUserDetails.current();
     getDailySearches.current();
     getDailyResults.current();
   }, [user.uid, user.role]);
@@ -156,14 +185,25 @@ export default function UserDetails() {
     <>
       <h1 className=" text-3xl text-start text-black ">Users</h1>
 
+      {/* user details */}
+      <div className="w-[49%] mx-1">
+        <div className="p-4">
+          <p className="text-md">Name: {userDetails.name}</p>
+          <p className="text-md">Email: {userDetails.email}</p>
+          <p className="text-md">Role: {userDetails.role}</p>
+        </div>
+      </div>
+
       <div className="flex items-center">
-        <div className="w-[49%] mx-1 bg-white rounded-lg shadow-lg mt-10">
+        <div className="w-[49%] mx-1 bg-white rounded-lg shadow-lg">
           <canvas id="myChart"></canvas>
         </div>
-        <div className="w-[49%] mx-1 bg-white rounded-lg shadow-lg mt-10">
+        <div className="w-[49%] mx-1 bg-white rounded-lg shadow-lg">
           <canvas id="myChart1"></canvas>
         </div>
       </div>
+      <br />
+      <Searches newCVal={false} user={{uid:id}} />
     </>
   );
 }

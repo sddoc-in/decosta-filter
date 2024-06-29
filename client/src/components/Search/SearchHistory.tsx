@@ -4,7 +4,7 @@ import { AppContext } from "../../context/Context";
 import { API_URL } from "../../constants/data";
 import SearchStatus from "../../constants/SearchStatus";
 import TableComponent from "../common/TableComponent";
-import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
 import FormTopBarInterface from "../../interface/FormTopBar";
 import FormTopBar from "../dashboard/FormTopBar";
 import { ExcelContext } from "../../context/ExcelContext";
@@ -12,6 +12,7 @@ import { ExcelContext } from "../../context/ExcelContext";
 export default function SearchHistory(props: {
   status: SearchStatus;
   recur: boolean;
+  user?: any;
 }) {
   const [users, setUsers] = useState<any[]>([]);
   const { user, setLoading, raiseToast } = React.useContext(AppContext);
@@ -26,7 +27,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: user.uid,
+          uid: props.user.uid || user.uid,
           access_token: user.access_token,
           status: props.status,
         })
@@ -53,7 +54,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: user.uid,
+          uid: props.user.uid || user.uid,
           access_token: user.access_token,
           status: props.status,
         })
