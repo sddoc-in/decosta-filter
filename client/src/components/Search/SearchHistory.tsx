@@ -27,7 +27,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: props.user.uid || user.uid,
+          uid: props.user === undefined ? user.uid :props.user.uid,
           access_token: user.access_token,
           status: props.status,
         })
@@ -45,6 +45,7 @@ export default function SearchHistory(props: {
       }
       setLoading(false);
     } catch (err) {
+      console.log(err);
       raiseToast("Internal server error", "error");
     }
   };
@@ -54,7 +55,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: props.user.uid || user.uid,
+          uid: props.user === undefined ? user.uid :props.user.uid,
           access_token: user.access_token,
           status: props.status,
         })
