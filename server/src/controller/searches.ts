@@ -75,7 +75,7 @@ export async function storeSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
-        const admin: Collection = db.collection("admin");
+        const admin: Collection = db.collection("users");
 
         // check user if admin or not
         let user = await admin.findOne({ uid: uid, role: RolesEnum.ADMIN });
