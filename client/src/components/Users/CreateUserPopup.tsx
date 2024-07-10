@@ -24,10 +24,12 @@ import InputName from "../input/InputName";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  allUsers: Users[];
+  after: (data: Users[]) => void;
 }
 
 export default function CreateuserPopup(props: Props) {
-  const { user: currentUser,setLoading } = React.useContext(AppContext);
+  const { user: currentUser,setLoading,raiseToast } = React.useContext(AppContext);
 
   const [error, setError] = React.useState<UserErrorInterface>(
     {} as UserErrorInterface
@@ -63,11 +65,12 @@ export default function CreateuserPopup(props: Props) {
           return;
         });
       if (data.message !== "User created successfully") {
-        alert(data.message);
+        raiseToast(data.errors.message || data.message, "error");
       }
       if (data.user.uid) {
-        alert("User created successfully");
+        raiseToast("User created successfully", "success");
         props.onClose();
+        props.after([...props.allUsers, {...panelUser, uid: data.user.uid}]);
         setLoading(false);
       }
     } catch (err) {}

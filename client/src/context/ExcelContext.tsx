@@ -17,8 +17,8 @@ export default function ExcelProvider({ children }: any) {
 
   const [url, setUrl] = React.useState<string>("");
 
-  const [fileData, setFileData] = React.useState<any>({});
-  const [header, setHeader] = React.useState<any>({});
+  const [fileData, setFileData] = React.useState<any>([]);
+  const [header, setHeader] = React.useState<any>([]);
   const [selected, setSelected] = React.useState<any>([]);
   const [columnsHidden, setColumnsHidden] = React.useState<number[]>([]);
 

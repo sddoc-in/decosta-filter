@@ -13,19 +13,19 @@ import Admin from "../pages/Admin";
 
 export const SidebarData = [
   {
-    title: "Dashboard",
-    path: "/dashboard",
-    shortPath: "/dashboard",
-    Icon: IoHomeOutline,
-    Element: Dashboard,
-    role: [RolesEnum.ADMIN, RolesEnum.USER]
-  },
-  {
     title: "Search",
     path: "/dashboard/searches",
     shortPath: "/searches",
     Icon: MdOutlineCampaign,
     Element: Searches,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
+  },
+  {
+    title: "Graphs",
+    path: "/dashboard/graphs",
+    shortPath: "/graphs",
+    Icon: IoHomeOutline,
+    Element: Dashboard,
     role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
   {

@@ -49,7 +49,7 @@ export default function Signin() {
       if (data.message === "User logged in successfully") {
         setCookies(data.user);
         raiseToast("Logged in successfully", "success");
-        navigate("/dashboard");
+        navigate("/dashboard/searches");
         
       } else {
         raiseToast(data.message, "error");

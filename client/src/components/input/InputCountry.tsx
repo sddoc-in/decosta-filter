@@ -43,13 +43,17 @@ export default function InputCountry(props: Input) {
   }
 
   React.useEffect(() => {
-    let defCountry:CountriesInterface[] = AllCountriesData.filter((item:CountriesInterface)=>{
-       return props.defValue.toString().toLowerCase().includes(item.code.toLowerCase())
-      
+    let defCountry: CountriesInterface[] = AllCountriesData.filter((item: CountriesInterface) => {
+      return props.defValue.toString().toLowerCase().includes(item.code.toLowerCase())
+
     })
+    if (defCountry.length === 0) {
+      return
+    }
 
 
-    inputRef.current!.value =   defCountry[0].name || "";
+
+    inputRef.current!.value = defCountry[0].name || "";
   }, [props.defValue]);
 
   return (
@@ -93,9 +97,8 @@ export default function InputCountry(props: Input) {
             <p className="text-[12px] text-red-500">{props.error}</p>
           )}
           <div
-            className={`absolute z-50 mt-2 top-full left-0 w-full bg-white rounded-lg shadow-md border border-gray-200 h-fit  max-h-[200px] overflow-y-scroll scroll-hide ${
-              show ? "block" : "hidden"
-            }`}
+            className={`absolute z-50 mt-2 top-full left-0 w-full bg-white rounded-lg shadow-md border border-gray-200 h-fit  max-h-[200px] overflow-y-scroll scroll-hide ${show ? "block" : "hidden"
+              }`}
           >
             {" "}
             {fileteredCountries.map((data: CountriesInterface, i) => (

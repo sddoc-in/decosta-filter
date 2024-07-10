@@ -18,9 +18,10 @@ import { Link } from "react-router-dom";
 export default function Card(props: {
   data: Users;
   canDelete: boolean;
-  after: () => void;
+  after: any;
+  allUsers: Users[];
 }) {
-  const { user: currentUser, setLoading } = React.useContext(AppContext);
+  const { user: currentUser, setLoading,raiseToast } = React.useContext(AppContext);
 
   const [open, setOpen] = React.useState(false);
   const [updatePopup, setUpdatePopup] = React.useState(false);
@@ -47,7 +48,7 @@ export default function Card(props: {
       });
 
       const data = await axios
-        .delete(API_URL + "/lawyer/delete?" + params)
+        .delete(API_URL + "/users/delete?" + params)
         .then((res) => res.data)
         .catch((err) => {
           alert(err.response.data.message);
@@ -55,11 +56,13 @@ export default function Card(props: {
           return;
         });
 
-      if (data.message !== "User deleted successfully") alert(data.message);
-      else alert("User deleted successfully");
+      if (data.message !== "User deleted successfully") raiseToast(data.message, "error")
+      else raiseToast(data.message, "success")
       setOpen(false);
       setLoading(false);
-      props.after();
+      props.after(
+        props.allUsers.filter((item) => item.uid !== props.data.uid)
+      )
     } catch (err) {}
   }
 

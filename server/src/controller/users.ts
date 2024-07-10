@@ -402,7 +402,7 @@ export async function deleteUser(req: Request, res: Response) {
     await usersCollection.deleteOne({ uid: user_id });
     closeConn(conn);
 
-    return res.status(200).json({ message: "Lawyer deleted successfully" });
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Unknown error" });

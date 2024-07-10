@@ -15,7 +15,7 @@ import { PublisherPlatforms } from "../../constants/PublisherPlatforms";
 import { useParams } from "react-router-dom";
 
 export default function NewSearch() {
-  const { apiParams, setApiParams, user, setLoading,raiseToast } =
+  const { apiParams, setApiParams, user, setLoading, raiseToast } =
     React.useContext(AppContext);
   const { Id } = useParams();
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
@@ -28,7 +28,7 @@ export default function NewSearch() {
     });
   }
 
-  const getDetails = React.useRef(() => {});
+  const getDetails = React.useRef(() => { });
 
   getDetails.current = async () => {
     setLoading(true);
@@ -177,7 +177,7 @@ export default function NewSearch() {
         <div className="flex justify-center items-center w-full">
           <InputSearch
             defValue={apiParams.querry || ""}
-            placeholder="Enter Query"
+            placeholder="Search Query"
             name="querry"
             inputClassName={` w-[50%!important] mr-2`}
             onChangeHandler={(e) => {
@@ -189,7 +189,7 @@ export default function NewSearch() {
           />
           <InputName
             defValue={apiParams.name || ""}
-            placeholder="Enter Name"
+            placeholder="Save search as"
             name="name"
             inputClassName={` w-[50%!important] mr-2`}
             onChangeHandler={(e) => {
@@ -217,28 +217,30 @@ export default function NewSearch() {
           />
         </div>
         <div className="flex justify-center items-center w-full">
-          <InputMultiSelect
+          {/* <InputMultiSelect
             defValue={apiParams.publisher_platforms || ""}
             placeholder="Select Publisher Platforms"
             name="publisher_platforms"
             selectArray={PublisherPlatforms}
-            inputClassName={` w-[32.3%!important] mr-2`}
+            inputClassName={` w-[49%!important] mr-2`}
             onChange={handleMultiSelect}
-          />
+          /> */}
           <InputMultiSelect
             defValue={apiParams.media_type || ""}
+            label="Media Type"
             placeholder="Select Media Type"
             name="media_type"
             selectArray={MediaType}
-            inputClassName={` w-[32.3%!important] mr-2`}
+            inputClassName={` w-[49%!important] mr-2`}
             onChange={handleMultiSelect}
           />
           <InputSelect
             defValue={apiParams.ad_status_type || ""}
             placeholder="Select Ad Status"
+            label="Ad Status"
             name="ad_status_type"
             selectArray={AdStatus}
-            inputClassName={` w-[32.3%!important]`}
+            inputClassName={` w-[49%!important]`}
             onChange={handleChange}
           />
         </div>
@@ -290,7 +292,7 @@ export default function NewSearch() {
         </div>
 
         <div className="flex justify-center items-center w-full">
-          <InputDate
+          {/* <InputDate
             // defValue={apiParams.filtterStart_date || ""}
             defValue={""}
             placeholder="Start Date"
@@ -302,8 +304,8 @@ export default function NewSearch() {
                 return { ...prev, filtterStart_date: new Date(e.target.value) };
               });
             }}
-          />
-          <InputDate
+          /> */}
+          {/* <InputDate
             // defValue={apiParams.filtterEnd_date || ""}
             defValue={""}
             placeholder="End Date"
@@ -315,7 +317,7 @@ export default function NewSearch() {
                 return { ...prev, filtterEnd_date: new Date(e.target.value) };
               });
             }}
-          />
+          /> */}
           {/* <InputNumber
             defValue=""
             placeholder="Enter Page Number"
@@ -342,7 +344,7 @@ export default function NewSearch() {
             className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4"
             onClick={getQueryData}
           >
-            Find results
+            Fetch Results
           </button>
         </div>
       </div>

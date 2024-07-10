@@ -7,6 +7,6 @@ export const API_URL = 'http://localhost:8000/api';
 
 
 
-export const PRICE  = 1
-export const RATING  =11
-export const TOTAL_REVIEW  = 14
+export const PRICE  = 2
+export const RATING  =12
+export const TOTAL_REVIEW  = 15

@@ -9,6 +9,8 @@ export const AppProvider = ({ children }: any) => {
   const navigate = useNavigate();
   const toast = useToast();
 
+  const [show, setShow] = React.useState(1)
+
   const [user, setUser] = React.useState({
     username: "",
     session: "",
@@ -19,12 +21,12 @@ export const AppProvider = ({ children }: any) => {
 
   const [apiParams, setApiParams] = React.useState<any>({
     name: "",
-    country: "NL",
-    content_languages: "en",
-    filtterStart_date: new Date(),
+    country: "",
+    content_languages: "",
+    filtrestart_date: new Date("01/01/2024"),
     filtterEnd_date: new Date(),
     querry: "",
-    ad_status_type: "0",
+    ad_status_type: "1",
     reach: 0,
     ad_type: "all",
     media_type: "all",
@@ -213,7 +215,8 @@ export const AppProvider = ({ children }: any) => {
         setUser,
         apiParams,
         setApiParams,
-        raiseToast
+        raiseToast,
+        show, setShow
       }}
     >
       {children}

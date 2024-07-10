@@ -3,9 +3,10 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import SearchHistory from "../components/Search/SearchHistory";
 import SearchStatus from "../constants/SearchStatus";
 import NewSearch from "../components/Search/NewSearch";
+import { AppContext } from "../context/Context";
 
 export default function Searches(props: { user?: any; newCVal?: boolean }) {
-  const [show, setShow] = React.useState(1);
+  const {show, setShow} = React.useContext(AppContext);
   const [newVal, setNew] = React.useState(true);
   React.useEffect(() => {
     setNew(props.newCVal !== undefined ? props.newCVal : true);

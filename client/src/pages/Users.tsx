@@ -19,7 +19,7 @@ export default function UsersPage() {
     setIsPopupOpen(true);
   };
 
-  const getAllUsers = React.useRef(() => {});
+  const getAllUsers = React.useRef(() => { });
 
   getAllUsers.current = async () => {
     if (!currentUser.uid) {
@@ -45,7 +45,7 @@ export default function UsersPage() {
         setData(data);
       }
       setLoading(false);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   React.useEffect(() => {
@@ -78,7 +78,7 @@ export default function UsersPage() {
               user.username!.toLowerCase().includes(query.toLowerCase())
             )
             .map((user, index) => {
-              return <Card key={index} data={user} canDelete={true} after={getAllUsers.current} />;
+              return <Card key={index} data={user} canDelete={true} after={setData} allUsers={data} />;
             })}
         </div>
       ) : (
@@ -87,10 +87,11 @@ export default function UsersPage() {
 
       <CreateuserPopup
         isOpen={isPopupOpen}
+        allUsers={data}
         onClose={() => {
           setIsPopupOpen(false)
-          getAllUsers.current()
         }}
+        after={setData}
       />
     </>
   );
