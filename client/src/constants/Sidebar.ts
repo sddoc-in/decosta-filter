@@ -28,14 +28,14 @@ export const SidebarData = [
     Element: Dashboard,
     role: [RolesEnum.ADMIN, RolesEnum.USER]
   },
-  {
-    title: "All Results",
-    path: "/dashboard/results",
-    shortPath: "/results",
-    Icon: MdOutlineAccountTree,
-    Element: Results,
-    role: [RolesEnum.ADMIN, RolesEnum.USER]
-  },
+  // {
+  //   title: "All Results",
+  //   path: "/dashboard/results",
+  //   shortPath: "/results",
+  //   Icon: MdOutlineAccountTree,
+  //   Element: Results,
+  //   role: [RolesEnum.ADMIN, RolesEnum.USER]
+  // },
   {
     title: "Users",
     path: "/dashboard/users",
@@ -76,5 +76,13 @@ export const FormWithDataRoutes = [
     title: "Users",
     path: "/dashboard/users/:id/details/",
     Element: UserDetails
-  }
+  },
+  {
+    title: "Results",
+    path: "/dashboard/results",
+    shortPath: "/results",
+    Icon: MdOutlineAccountTree,
+    Element: Results,
+    role: [RolesEnum.ADMIN, RolesEnum.USER]
+  },
 ]

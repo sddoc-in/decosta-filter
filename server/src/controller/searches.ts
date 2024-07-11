@@ -79,16 +79,16 @@ export async function storeSearch(req: Request, res: Response) {
 
         // check user if admin or not
         let user = await admin.findOne({ uid: uid, role: RolesEnum.ADMIN });
-        if(!user){
+        if (!user) {
             let adminSettings = await admin.findOne({});
-   
-            let totalSearches = await search.find({ uid: uid },{projection: { _id: 0, searchId: 1 }}).toArray();
+
+            let totalSearches = await search.find({ uid: uid }, { projection: { _id: 0, searchId: 1 } }).toArray();
             if (totalSearches.length > adminSettings!.SearchPerUser) {
                 return res.status(400).json({ message: "You have reached the maximum number of searches" });
             }
 
             let today = new Date().toLocaleDateString();
-            totalSearches = await search.find({ CreatedDate: today },{projection: { _id: 0, searchId: 1 }}).toArray();
+            totalSearches = await search.find({ CreatedDate: today }, { projection: { _id: 0, searchId: 1 } }).toArray();
             if (totalSearches.length > adminSettings!.DailySearches) {
                 return res.status(400).json({ message: "You have reached the maximum number of searches for today" });
             }
@@ -96,7 +96,7 @@ export async function storeSearch(req: Request, res: Response) {
 
         let searchId = uuidv4()
 
-       await search.insertOne({
+        await search.insertOne({
             searchId: searchId,
             uid: uid,
             country: country,
@@ -155,7 +155,7 @@ export async function deleteSearch(req: Request, res: Response) {
 
         search.deleteOne({ searchId: searchId });
         result.deleteMany({ SearchUid: searchId });
-        
+
         return res.status(200).json({ message: "Search deleted successfully" });
     }
     catch (err) {
@@ -164,7 +164,7 @@ export async function deleteSearch(req: Request, res: Response) {
 }
 
 export async function getSearchesByUser(req: Request, res: Response) {
-    const { uid, access_token, session,status } = req.body;
+    const { uid, access_token, session, status } = req.body;
 
     try {
         if (uid === undefined) {
@@ -176,7 +176,7 @@ export async function getSearchesByUser(req: Request, res: Response) {
         if (session === undefined) {
             return res.status(400).json({ message: "Session required" });
         }
-        if(status === undefined){
+        if (status === undefined) {
             return res.status(400).json({ message: "Status required" });
         }
 
@@ -190,20 +190,40 @@ export async function getSearchesByUser(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("search");
 
-        let searches = await search.find({ uid: uid,currentStatus:status }, {
-            projection: {
-                _id: 0,
-                "name": 1,
-                "searchId": 1,
-                "country": 1,
-                "content_languages": 1,
-                "filtterStart_date": 1,
-                "filtterEnd_date": 1,
-                "querry": 1,
-                "status": 1,
-                "CreatedDate": 1
-            }
-        }).toArray();
+        let searches;
+        let projections = {
+            _id: 0,
+            "name": 1,
+            "searchId": 1,
+            "country": 1,
+            "content_languages": 1,
+            "filtterStart_date": 1,
+            "filtterEnd_date": 1,
+            "querry": 1,
+            "status": 1,
+            "CreatedDate": 1,
+            "currentStatus": 1
+        }
+
+        if (Array.isArray(status)) {
+
+            searches = await search.find({
+                uid: uid,
+                currentStatus: {
+                    $in: status
+                }
+            }, {
+                projection: projections
+            }).toArray();
+        }
+        else {
+            searches = await search.find({
+                uid: uid,
+                currentStatus: status
+            }, {
+                projection: projections
+            }).toArray();
+        }
         closeConn(conn);
 
         return res.status(200).json({ searches: searches, message: "Searches fetched successfully" });

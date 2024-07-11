@@ -17,10 +17,8 @@ export default function Searches(props: { user?: any; newCVal?: boolean }) {
       <Tabs variant="enclosed" align="center">
         <TabList>
           {newVal && <Tab onClick={() => setShow(1)}>New</Tab>}
-          <Tab onClick={() => setShow(2)}>Created</Tab>
-          <Tab onClick={() => setShow(3)}>In Progress</Tab>
-          <Tab onClick={() => setShow(4)}>Stopped</Tab>
-          <Tab onClick={() => setShow(5)}>Completed</Tab>
+          <Tab onClick={() => setShow(2)}>In Progress</Tab>
+          <Tab onClick={() => setShow(3)}>History</Tab>
         </TabList>
 
         <TabPanels>
@@ -33,7 +31,7 @@ export default function Searches(props: { user?: any; newCVal?: boolean }) {
             {show === 2 && (
               <SearchHistory
                 user={props.user}
-                status={SearchStatus.Created}
+                status={SearchStatus.InProgress}
                 recur={false}
               />
             )}
@@ -42,25 +40,7 @@ export default function Searches(props: { user?: any; newCVal?: boolean }) {
             {show === 3 && (
               <SearchHistory
                 user={props.user}
-                status={SearchStatus.InProgress}
-                recur={false}
-              />
-            )}
-          </TabPanel>
-          <TabPanel>
-            {show === 4 && (
-              <SearchHistory
-                user={props.user}
-                status={SearchStatus.Stopped}
-                recur={false}
-              />
-            )}
-          </TabPanel>
-          <TabPanel>
-            {show === 5 && (
-              <SearchHistory
-                user={props.user}
-                status={SearchStatus.Completed}
+                status={[SearchStatus.Created, SearchStatus.Completed, SearchStatus.Stopped]}
                 recur={false}
               />
             )}

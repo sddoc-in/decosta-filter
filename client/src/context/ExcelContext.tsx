@@ -18,9 +18,24 @@ export default function ExcelProvider({ children }: any) {
   const [url, setUrl] = React.useState<string>("");
 
   const [fileData, setFileData] = React.useState<any>([]);
+  const [mainData, setMainData] = React.useState<any>([]); 
   const [header, setHeader] = React.useState<any>([]);
   const [selected, setSelected] = React.useState<any>([]);
   const [columnsHidden, setColumnsHidden] = React.useState<number[]>([]);
+
+  const [likesRange, setLikesRange] = React.useState<number[]>([0, 0]);
+  const [reachRange, setReachRange] = React.useState<number[]>([0, 0]);
+
+  function changeFileData(data:any) {
+    setMainData(data);
+    setFileData(data);
+  }
+
+  function clearAll(){
+    setFileData(mainData);
+    setLikesRange([0,0]);
+    setReachRange([0,0]);
+  }
 
   function getCSVFileData(file: any) {
     setLoading(true);
@@ -141,6 +156,8 @@ export default function ExcelProvider({ children }: any) {
     let data = selectedData.map((item: any) => {
       item = item.map((item: any, idx: number) => {
         if (columnsHiddenData.includes(idx)) return null;
+        // slice to 300 char description text
+        if(idx === 4) return item.length > 600 ? item.slice(0,600) : item;
         return item;
       });
       return item;
@@ -179,6 +196,7 @@ export default function ExcelProvider({ children }: any) {
     const data = selectedData.map((item: any) => {
       item = item.map((item: any, idx: number) => {
         if (columnsHiddenData.includes(idx)) return null;
+        if(idx === 4) return item.length > 600 ? item.slice(0,600) : item;
         return item;
       });
       return item.join(",");
@@ -219,6 +237,14 @@ export default function ExcelProvider({ children }: any) {
         onlineFileChoser,
         url,
         setUrl,
+        likesRange,
+        setLikesRange,
+        reachRange,
+        setReachRange,
+        changeFileData,
+        clearAll,
+        mainData,
+        setMainData
       }}
     >
       {children}

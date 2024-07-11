@@ -4,23 +4,25 @@ import { AppContext } from "../../context/Context";
 import { API_URL } from "../../constants/data";
 import SearchStatus from "../../constants/SearchStatus";
 import TableComponent from "../common/TableComponent";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdCalendarViewWeek, MdDeleteOutline } from "react-icons/md";
 import FormTopBarInterface from "../../interface/FormTopBar";
 import FormTopBar from "../dashboard/FormTopBar";
 import { ExcelContext } from "../../context/ExcelContext";
 import { FaPause, FaPlay } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchHistory(props: {
-  status: SearchStatus;
+  status: SearchStatus | SearchStatus[];
   recur: boolean;
   user?: any;
 }) {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<any[]>([]);
   const { user, setLoading, raiseToast } = React.useContext(AppContext);
-  const { selected } = React.useContext(ExcelContext);
+  const { selected, setSelected, changeFileData, setHeader, setColumnsHidden } = React.useContext(ExcelContext);
 
-  const getSearches = React.useRef(() => {});
-  const getAfterDetails = React.useRef(() => {});
+  const getSearches = React.useRef(() => { });
+  const getAfterDetails = React.useRef(() => { });
 
   getSearches.current = async () => {
     setLoading(true);
@@ -28,7 +30,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: props.user === undefined ? user.uid :props.user.uid,
+          uid: props.user === undefined ? user.uid : props.user.uid,
           access_token: user.access_token,
           status: props.status,
         })
@@ -53,7 +55,7 @@ export default function SearchHistory(props: {
       const data = await axios
         .post(API_URL + "/searches/get", {
           session: user.session,
-          uid: props.user === undefined ? user.uid :props.user.uid,
+          uid: props.user === undefined ? user.uid : props.user.uid,
           access_token: user.access_token,
           status: props.status,
         })
@@ -89,20 +91,19 @@ export default function SearchHistory(props: {
   const Delete = async () => {
     setLoading(true);
 
-    selected.forEach(async (element) => {
+    for (let i = 0; i < selected.length; i++) {
+      const searchId = users[selected[i]].searchId;
       try {
-        const searchId = users[element].searchId;
-        
         let res = await axios
           .delete(
             API_URL +
-              "/searches/delete?" +
-              new URLSearchParams({
-                session: user.session,
-                uid: user.uid,
-                access_token: user.access_token,
-                searchId: searchId,
-              })
+            "/searches/delete?" +
+            new URLSearchParams({
+              session: user.session,
+              uid: user.uid,
+              access_token: user.access_token,
+              searchId: searchId,
+            })
           )
           .then((res) => res.data)
           .catch((err) => {
@@ -121,33 +122,33 @@ export default function SearchHistory(props: {
         console.log(err);
         raiseToast("Internal server error", "error");
       }
-    });
+    }
+    setSelected([]);
     setLoading(false);
   };
 
   const Start = async () => {
 
-    if(selected.length === 0) {
+    if (selected.length === 0) {
       raiseToast("Please select a search to start", "error");
       return;
     }
 
     setLoading(true);
-
     selected.forEach(async (element) => {
       try {
         const searchId = users[element].searchId;
-        
+
         let res = await axios
           .post(
             API_URL +
-              "/searches/start" ,
-              {
-                session: user.session,
-                uid: user.uid,
-                access_token: user.access_token,
-                searchId: searchId,
-              }
+            "/searches/start",
+            {
+              session: user.session,
+              uid: user.uid,
+              access_token: user.access_token,
+              searchId: searchId,
+            }
           )
           .then((res) => res.data)
           .catch((err) => {
@@ -168,32 +169,32 @@ export default function SearchHistory(props: {
         raiseToast("Internal server error", "error");
       }
     });
+    setSelected([]);
     setLoading(false);
   }
 
   const Stop = async () => {
 
-    if(selected.length === 0) {
+    if (selected.length === 0) {
       raiseToast("Please select a search to stop", "error");
       return;
     }
 
     setLoading(true);
-
     selected.forEach(async (element) => {
       try {
         const searchId = users[element].searchId;
-        
+
         let res = await axios
           .post(
             API_URL +
-              "/searches/stop" ,
-              {
-                session: user.session,
-                uid: user.uid,
-                access_token: user.access_token,
-                searchId: searchId,
-              }
+            "/searches/stop",
+            {
+              session: user.session,
+              uid: user.uid,
+              access_token: user.access_token,
+              searchId: searchId,
+            }
           )
           .then((res) => res.data)
           .catch((err) => {
@@ -214,7 +215,61 @@ export default function SearchHistory(props: {
         raiseToast("Internal server error", "error");
       }
     });
+    setSelected([]);
     setLoading(false);
+  }
+
+  async function viewDetails() {
+    if (selected.length === 0) {
+      raiseToast("Please select a search to view", "error");
+      return;
+    }
+
+    setLoading(true);
+    let headers, data :any[]= [];
+
+    for (let i = 0; i < selected.length; i++) {
+      const searchId = users[selected[i]].searchId;
+      try {
+        let res = await axios
+          .get(
+            API_URL +
+            "/results/all?" +
+            new URLSearchParams({
+              session: user.session,
+              uid: user.uid,
+              access_token: user.access_token,
+              searchId: searchId,
+            })
+          )
+          .then((res) => res.data)
+          .catch((err) => {
+            return err.response.data
+          });
+
+        let results = res.results.map((item: any) => {
+          return item.results;
+        });
+        if (i === 0) {
+          headers = Object.keys(results[0]);
+        }
+        let mainData = results.map((item: any) => {
+          return Object.values(item);
+        });
+
+        data = data.concat(mainData);
+      } catch (err) {
+        console.log(err);
+        raiseToast("Internal server error", "error");
+      }
+    }
+    setLoading(false);
+    if (headers) {
+      setHeader(headers);
+      changeFileData(data);
+      setColumnsHidden([0, 16, 17]);
+      navigate("/dashboard/results")
+    }
   }
 
   const options: FormTopBarInterface[] = [
@@ -226,17 +281,24 @@ export default function SearchHistory(props: {
       },
     },
     {
-      name:"Start",
-      Icon:FaPlay,
+      name: "Start",
+      Icon: FaPlay,
       Object() {
         Start();
       },
     },
     {
-      name:"Stop",
-      Icon:FaPause,
+      name: "Stop",
+      Icon: FaPause,
       Object() {
         Stop();
+      },
+    },
+    {
+      name: "View",
+      Icon: MdCalendarViewWeek,
+      Object() {
+        viewDetails();
       },
     }
   ];
@@ -255,7 +317,7 @@ export default function SearchHistory(props: {
           "End Date",
           "Data fetched",
           "Created Date",
-          "View Results"
+          "Status",
         ]}
         body={users.map((user) => [
           user.name,
@@ -266,14 +328,13 @@ export default function SearchHistory(props: {
           new Date(user.filtterEnd_date).toDateString(),
           user.status || 0,
           user.CreatedDate ? new Date(user.CreatedDate).toDateString() : "",
-          user.searchId,
-          "View Details"
+          SearchStatus[user.currentStatus],
         ])}
-        hidden={[8]}
+        hidden={[9]}
         link={[{
-          index: 9,
+          index: 10,
           form: "results",
-          key:8
+          key: 9
         }]}
       />
     </>

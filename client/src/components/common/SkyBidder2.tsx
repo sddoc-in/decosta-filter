@@ -14,7 +14,7 @@ export default function SkyBidder2() {
       />
       <div className="p-10 z-40 relative">
         <h1>
-          <span className="text-white text-[40px] font-[900]">Facebook</span>
+          <span className="text-white text-[40px] font-[900]">ADinsight</span>
             <span className="text-[#FFC107] text-[40px] font-[900]">
               {/* Task */}
             </span>

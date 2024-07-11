@@ -8,13 +8,17 @@ import { PRICE, RATING, TOTAL_REVIEW } from "../constants/data";
 
 export default function ExcelComponent() {
   const {
-    fileData,
     header,
     setHeader,
     selected,
     setSelected,
     columnsHidden,
     setColumnsHidden,
+    likesRange,
+    reachRange,
+    fileData,
+    setFileData,
+    mainData
   } = React.useContext(ExcelContext);
 
   const { setLoading } = React.useContext(AppContext);
@@ -115,7 +119,7 @@ export default function ExcelComponent() {
   function hideColumn(index: number) {
     setColumnsHidden([...columnsHidden, index]);
   }
-  function clear(index: number) {
+  function clear() {
     // const newData = data.filter((item: any, index: number) => {
     //     return item[where].includes(search)
     // })
@@ -159,9 +163,42 @@ export default function ExcelComponent() {
     });
   }
 
+  const rangeFilter = React.useMemo(() => {
+    return (where: number, range: number[]) => {
+      console.log("rangeFilter", where, range);
+      setLoading(true);
+      let newData = mainData;
+      newData = newData.filter((item: any, index: number) => {
+        if (range[0] === 0 && range[1] === 0) return true;
+        if (parseInt(item[where]) >= range[0] && parseInt(item[where]) <= range[1]) {
+          return true;
+        }
+        return false;
+      });
+      console.log("newData", newData);
+      setFileData(newData);
+      setLoading(false);
+    }
+  }, [fileData]);
+
+  React.useEffect(() => {
+    setData(fileData);
+  }, [fileData]);
+
+  React.useEffect(() => {
+    rangeFilter(2, likesRange)
+  }, [likesRange]);
+
+  React.useEffect(() => {
+    rangeFilter(12, reachRange)
+  }, [reachRange]);
+
+
+
   const classes = " w-[99%] h-[80vh] mx-auto";
   return (
     <>
+    
       <div
         id="scroll-hide"
         className={` overflow-scroll shadow-lg ${classes}`}
@@ -193,9 +230,8 @@ export default function ExcelComponent() {
                       isChanging.header
                     ) ? (
                       <div
-                        className={`dropdown ${
-                          columnsHidden.includes(index) ? "hidden" : "block"
-                        }`}
+                        className={`dropdown ${columnsHidden.includes(index) ? "hidden" : "block"
+                          }`}
                         key={index}
                       >
                         <label
@@ -243,9 +279,8 @@ export default function ExcelComponent() {
               return (
                 <div
                   key={rowIndex}
-                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8]  ${
-                    flag ? "bg-blue-200" : ""
-                  }`}
+                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8]  ${flag ? "bg-blue-200" : ""
+                    }`}
                 >
                   {!flag ? (
                     <TiTickOutline
@@ -270,11 +305,10 @@ export default function ExcelComponent() {
                           ) ? (
                             <div
                               key={valIndex}
-                              className={`w-[250px!important] text-start mx-2 overflow-hidden ${
-                                columnsHidden.includes(valIndex)
+                              className={`w-[250px!important] text-start mx-2 overflow-hidden ${columnsHidden.includes(valIndex)
                                   ? "hidden"
                                   : "block"
-                              }`}
+                                }`}
                               onClick={() => {
                                 if (valIndex === 7) return;
                                 setIsChanging({
@@ -287,8 +321,8 @@ export default function ExcelComponent() {
                               }}
                             >
                               {valIndex === 9 ||
-                              valIndex === 10 ||
-                              valIndex === 3 ? (
+                                valIndex === 10 ||
+                                valIndex === 3 ? (
                                 <a
                                   href={rowItem as string}
                                   target="_blank"

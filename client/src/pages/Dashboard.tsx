@@ -60,9 +60,6 @@ export default function Dashboard() {
       const response = await axios
         .get(API_URL + "/analytics/search/daily?" + param)
         .then((response) => response.data)
-        .catch((error) => {
-          raiseToast("Error fetching data", "error");
-        });
       if (response.data) {
         setDailysearch(response.data);
       }
