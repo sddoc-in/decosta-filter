@@ -17,10 +17,10 @@ export async function storeSearch(req: Request, res: Response) {
         if (name === undefined) {
             return res.status(400).json({ message: "Name required" });
         }
-        if (country === undefined) {
+        if (country === undefined || country === "") {
             return res.status(400).json({ message: "Country required" });
         }
-        if (content_languages === undefined) {
+        if (content_languages === undefined || content_languages.length === 0) {
             return res.status(400).json({ message: "Content languages required" });
         }
         if (filtterStart_date === undefined) {

@@ -23,7 +23,7 @@ export const AppProvider = ({ children }: any) => {
     name: "",
     country: "",
     content_languages: "",
-    filtrestart_date: new Date("01/01/2024"),
+    filtterStart_date: new Date("01/02/2024"),
     filtterEnd_date: new Date(),
     querry: "",
     ad_status_type: "1",
