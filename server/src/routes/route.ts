@@ -1,5 +1,5 @@
 import express from "express";
-import { register } from "../controller/register";
+import { register, registerAdmin } from "../controller/register";
 import { login } from "../controller/login";
 import { deleteSearch, getSearchBySearchId, getSearchesByUser, startSearching, stopSearch, storeSearch } from "../controller/searches";
 import { getAllResultsByUser } from "../controller/results";
@@ -9,6 +9,7 @@ import { getSettings, updateSettings } from "../controller/admin";
 const router = express.Router();
 
 router.post("/api/register", register);
+// router.post("/api/admin", registerAdmin);
 router.get("/api/login", login);
 
 // searches routes
