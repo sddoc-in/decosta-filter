@@ -128,7 +128,7 @@ export default function NewSearch() {
           .get(ADS_API_URL + "total?SearchID=" + searchId)
           .then((response) => response.data)
           .catch((err) => {
-            raiseToast(err.response.data.message, "error")
+            raiseToast(err.response.error, "error")
             return;
           });
         setNumberofAds(res.total);
