@@ -1,5 +1,5 @@
 import React from "react";
-import { API_URL, PRICE, RATING, TOTAL_REVIEW } from "../constants/data";
+import {  PRICE, RATING, TOTAL_REVIEW } from "../constants/data";
 import { ExcelContext } from "../context/ExcelContext";
 import ExcelComponent from "../excel-component/ExcelComponent";
 import { BsFiletypeCsv } from "react-icons/bs";
@@ -9,11 +9,8 @@ import InputSelect from "../components/input/InputSelect";
 import InputNumber from "../components/input/InputNumber";
 
 export default function Results() {
-  // const { user, setLoading,raiseToast } = React.useContext(AppContext);
   const {
-    // setFileData,
     header,
-    // setHeader,
     setColumnsHidden,
     columnsHidden,
     fileData,
@@ -29,55 +26,6 @@ export default function Results() {
 
   const [filterIndex, setFilterIndex] = React.useState(0);
 
-  // const getAllResults = React.useRef(() => {});
-
-  // const { id } = useParams();
-
-  // getAllResults.current = async () => {
-  //   setLoading(true);
-  //   setHeader([]);
-  //   setFileData([]);
-  //   try {
-  //     const data = await axios
-  //       .get(
-  //         API_URL +
-  //           "/results/all?" +
-  //           new URLSearchParams({
-  //             session: user.session,
-  //             uid: user.uid,
-  //             access_token: user.access_token,
-  //             searchId: id || "",
-  //           })
-  //       )
-  //       .then((res) => res.data)
-  //       .catch((err) => {
-  //         raiseToast(err.response.data.message, "error")
-  //         setLoading(false);
-  //         return;
-  //       });
-
-  //     let results = data.results.map((item: any) => {
-  //       return item.results;
-  //     });
-
-  //     let headerData 
-
-  //     let mainData = results.map((item: any) => {
-  //       return Object.values(item);
-  //     });
-
-  //     setHeader(headerData);
-  //     setFileData(mainData);
-  //     setColumnsHidden([0, 16, 17]);
-  //   } catch (error) {
-  //     raiseToast("Error occurred while fetching data", "error")
-  //   }
-  //   setLoading(false);
-  // };
-
-  // React.useEffect(() => {
-  //   getAllResults.current();
-  // }, [user]);
 
   function hideUnhideColumns(index: number) {
     if (header.length === 0) return;

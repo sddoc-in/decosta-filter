@@ -8,11 +8,11 @@ import InputSelect from "../input/InputSelect";
 import { Languages } from "../../constants/Languages";
 import InputMultiSelect from "../input/InputMultiSelect";
 import { AdStatus } from "../../constants/AdStatus";
-import InputDate from "../input/InputDate";
 import { MediaType } from "../../constants/MediaType";
 import axios from "axios";
-import { PublisherPlatforms } from "../../constants/PublisherPlatforms";
 import { useParams } from "react-router-dom";
+import Recurrence from "../../constants/Recurrence";
+import ScheduleDialog from "./ScheduleDialog";
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
@@ -20,6 +20,12 @@ export default function NewSearch() {
   const { Id } = useParams();
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
   const [searchId, setSearchId] = React.useState<string>("");
+  const [Schedule, setSchedule] = React.useState<any>({
+    open: false,
+    date: "",
+    time: "",
+    recurrence: Recurrence.DAILY,
+  });
 
   function handleChange(type: string, value: string) {
     setSearchId("");
@@ -157,9 +163,43 @@ export default function NewSearch() {
         });
 
       if (res.message === "Search started successfully") {
-        alert("Search started successfully");
+        raiseToast("Search started successfully", "success");
       } else {
-        alert("Something went wrong");
+        raiseToast("Something went wrong", "error");
+      }
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+      raiseToast("Something went wrong", "error")
+    }
+  }
+
+  async function ScheduleSearch() {
+    try {
+      setLoading(true);
+      const res = await axios
+        .post(API_URL + "/searches/schedule", {
+          ...apiParams,
+          publisher_platforms: apiParams.publisher_platforms.split(","),
+          content_languages: apiParams.content_languages.split(","),
+          media_type: apiParams.media_type.split(","),
+          uid: user.uid,
+          access_token: user.access_token,
+          session: user.session,
+          recurrence : Schedule.recurrence,
+          date : new Date(Schedule.date + " " + Schedule.time).getTime(),
+          
+        })
+        .then((response) => response.data)
+        .catch((err) => {
+          raiseToast(err.response.data.message, "error")
+          return;
+        });
+
+      if (res.message === "Search scheduled successfully") {
+        raiseToast("Search scheduled successfully", "success");
+      } else {
+        raiseToast("Something went wrong", "error");
       }
       setLoading(false);
     } catch (e) {
@@ -217,14 +257,6 @@ export default function NewSearch() {
           />
         </div>
         <div className="flex justify-center items-center w-full">
-          {/* <InputMultiSelect
-            defValue={apiParams.publisher_platforms || ""}
-            placeholder="Select Publisher Platforms"
-            name="publisher_platforms"
-            selectArray={PublisherPlatforms}
-            inputClassName={` w-[49%!important] mr-2`}
-            onChange={handleMultiSelect}
-          /> */}
           <InputMultiSelect
             defValue={apiParams.media_type || ""}
             label="Media Type"
@@ -243,95 +275,6 @@ export default function NewSearch() {
             inputClassName={` w-[49%!important]`}
             onChange={handleChange}
           />
-        </div>
-
-        <div className="flex justify-center items-center w-full">
-          {/* <InputMultiSelect
-            defValue=""
-            placeholder="Select Call To Action"
-            name="call_to_action"
-            selectArray={CallToAction}
-            inputClassName={` w-[30%!important] mr-2`}
-            onChange={handleMultiSelect}
-          />
-          <InputName
-            defValue=""
-            placeholder="Reach"
-            name="reach"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) => changeFilterParams("reach", e.target.value)}
-          /> */}
-          {/*
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Shares"
-            name="minMaxShares"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxShares", e.target.value)
-            }
-          />
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Reach"
-            name="minMaxReach"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxReach", e.target.value)
-            }
-          />
-          <InputName
-            defValue=""
-            placeholder="Select Min/Max Comments"
-            name="minMaxComments"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) =>
-              changeFilterParams("minMaxComments", e.target.value)
-            }
-          /> */}
-        </div>
-
-        <div className="flex justify-center items-center w-full">
-          {/* <InputDate
-            // defValue={apiParams.filtterStart_date || ""}
-            defValue={""}
-            placeholder="Start Date"
-            label="Start Date"
-            name="filtterStart_date"
-            inputClassName={` w-[49%!important] mr-2`}
-            onChangeHandler={(e: any) => {
-              setApiParams((prev: any) => {
-                return { ...prev, filtterStart_date: new Date(e.target.value) };
-              });
-            }}
-          /> */}
-          {/* <InputDate
-            // defValue={apiParams.filtterEnd_date || ""}
-            defValue={""}
-            placeholder="End Date"
-            label="End Date"
-            name="filtterEnd_date"
-            inputClassName={` w-[49%!important]`}
-            onChangeHandler={(e: any) => {
-              setApiParams((prev: any) => {
-                return { ...prev, filtterEnd_date: new Date(e.target.value) };
-              });
-            }}
-          /> */}
-          {/* <InputNumber
-            defValue=""
-            placeholder="Enter Page Number"
-            label="Min Days Active"
-            name="query"
-            inputClassName={` w-[30%!important] mr-2`}
-            onChangeHandler={(e) => {
-              setFilterParams((prev: any) => {
-                return { ...prev, minDaysActive: e.target.value };
-              });
-            }}
-          /> */}
-        </div>
-        <div className="flex justify-center items-end w-full">
           <InputName
             defValue={numberofAds}
             disabled={true}
@@ -340,14 +283,36 @@ export default function NewSearch() {
             name="query"
             inputClassName={` w-[30%!important] mr-2`}
           />
+        </div>
+
+
+        <div className="flex justify-center items-end w-full">
+
           <button
-            className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4"
+            className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4 mx-2 my-1"
             onClick={getQueryData}
           >
             Fetch Results
           </button>
+
+
+          <button
+            className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4 mx-2 my-1"
+            onClick={() => setSchedule({ ...Schedule, open: true })}
+          >
+            Schedule
+          </button>
+
         </div>
       </div>
+      <ScheduleDialog
+        open={Schedule.open}
+        setOpen={setSchedule}
+        date={Schedule.date}
+        time={Schedule.time}
+        recurrence={Schedule.recurrence}
+        onMethod={ScheduleSearch}
+      />
     </>
   );
 }

@@ -1,7 +1,7 @@
 import express from "express";
 import { register, registerAdmin } from "../controller/register";
 import { login } from "../controller/login";
-import { deleteSearch, getSearchBySearchId, getSearchesByUser, startSearching, stopSearch, storeSearch } from "../controller/searches";
+import { deleteSearch, getSearchBySearchId, getSearchesByUser, scheduleJob, startSearching, stopSearch, storeSearch } from "../controller/searches";
 import { getAllResultsByUser } from "../controller/results";
 import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
 import { getNumberOfResultsOnDailyBasis, getNumberOfSearchesPerUser, getSearchCountOnDailyBasis } from "../controller/getGraphs";
@@ -19,6 +19,7 @@ router.post("/api/searches/stop", stopSearch);
 router.post("/api/searches/get", getSearchesByUser);
 router.get("/api/searches", getSearchBySearchId);
 router.delete("/api/searches/delete", deleteSearch);
+router.post("/api/searches/schedule", scheduleJob);
 
 // results routes
 router.get("/api/results/all", getAllResultsByUser);

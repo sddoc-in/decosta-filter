@@ -2,123 +2,22 @@ import { Request, Response } from 'express';
 import ConnectionRes from '../interface/ConnectionRes';
 import connectToCluster from '../connection/connect';
 import { Db, Collection } from 'mongodb';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { closeConn } from '../connection/closeConn';
 import SearchStatus from '../config/SearchStatus';
-import RolesEnum from '../config/Roles';
+import schedule from 'node-schedule';
+import store from '../functions/utills/store';
+import Recurrence from '../config/Recurrence';
 
 
-export async function storeSearch(req: Request, res: Response) {
-
-    const { name, country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session, page } = req.body;
-
+export async function storeSearch(req: Request | any, res: Response) {
     try {
-        if (name === undefined) {
-            return res.status(400).json({ message: "Name required" });
-        }
-        if (country === undefined || country === "") {
-            return res.status(400).json({ message: "Country required" });
-        }
-        if (content_languages === undefined || content_languages.length === 0) {
-            return res.status(400).json({ message: "Content languages required" });
-        }
-        if (filtterStart_date === undefined) {
-            return res.status(400).json({ message: "Start date required" });
-        }
-        if (filtterEnd_date === undefined) {
-            return res.status(400).json({ message: "End date required" });
-        }
-        if (querry === undefined) {
-            return res.status(400).json({ message: "Querry required" });
-        }
-        if (ad_status_type === undefined) {
-            return res.status(400).json({ message: "Ad status type required" });
-        }
-        if (reach === undefined) {
-            return res.status(400).json({ message: "Reach required" });
-        }
-        if (ad_type === undefined) {
-            return res.status(400).json({ message: "Ad type required" });
-        }
-        if (media_type === undefined) {
-            return res.status(400).json({ message: "Media type required" });
-        }
-        if (publisher_platforms === undefined) {
-            return res.status(400).json({ message: "Publisher platforms required" });
-        }
-        if (Nextforward_cursor === undefined) {
-            return res.status(400).json({ message: "Nextforward cursor required" });
-        }
-        if (Nextbackward_cursor === undefined) {
-            return res.status(400).json({ message: "Nextbackward cursor required" });
-        }
-        if (Nextcollation_token === undefined) {
-            return res.status(400).json({ message: "Nextcollation token required" });
-        }
-        if (uid === undefined) {
-            return res.status(400).json({ message: "User id required" });
-        }
-        if (access_token === undefined) {
-            return res.status(400).json({ message: "Access token required" });
-        }
-        if (session === undefined) {
-            return res.status(400).json({ message: "Session required" });
+        let details = await store(req.body);
+        if (typeof details === "string") {
+            return res.status(400).json({ message: details });
         }
 
-        // create connection
-        const connect: ConnectionRes = await connectToCluster();
-        if (typeof connect.conn === "string") {
-            return res.status(500).json(connect);
-        }
-
-        const conn = connect.conn;
-        const db: Db = conn.db("Master");
-        const search: Collection = db.collection("search");
-        const admin: Collection = db.collection("users");
-
-        // check user if admin or not
-        let user = await admin.findOne({ uid: uid, role: RolesEnum.ADMIN });
-        if (!user) {
-            let adminSettings = await admin.findOne({});
-
-            let totalSearches = await search.find({ uid: uid }, { projection: { _id: 0, searchId: 1 } }).toArray();
-            if (totalSearches.length > adminSettings!.SearchPerUser) {
-                return res.status(400).json({ message: "You have reached the maximum number of searches" });
-            }
-
-            let today = new Date().toLocaleDateString();
-            totalSearches = await search.find({ CreatedDate: today }, { projection: { _id: 0, searchId: 1 } }).toArray();
-            if (totalSearches.length > adminSettings!.DailySearches) {
-                return res.status(400).json({ message: "You have reached the maximum number of searches for today" });
-            }
-        }
-
-        let searchId = uuidv4()
-
-        await search.insertOne({
-            searchId: searchId,
-            uid: uid,
-            country: country,
-            content_languages: content_languages,
-            filtterStart_date: new Date(filtterStart_date),
-            filtterEnd_date: new Date(filtterEnd_date),
-            querry: querry,
-            ad_status_type: parseInt(ad_status_type),
-            reach: reach,
-            ad_type: ad_type,
-            media_type: media_type,
-            publisher_platforms: publisher_platforms,
-            Nextforward_cursor: Nextforward_cursor,
-            Nextbackward_cursor: Nextbackward_cursor,
-            Nextcollation_token: Nextcollation_token,
-            page: page,
-            currentStatus: SearchStatus.Created,
-            name: name,
-            CreatedDate: new Date().toLocaleDateString()
-        });
-
-        return res.status(200).json({ message: "Search stored successfully", searchId: searchId });
+        return res.status(200).json({ message: "Search stored successfully", searchId: details.searchId });
     }
     catch (err) {
         return res.status(500).json({ message: "Internal server error" });
@@ -234,7 +133,7 @@ export async function getSearchesByUser(req: Request, res: Response) {
 
 }
 
-export async function startSearching(req: Request, res: Response) {
+export async function startSearching(req: Request | any, res: Response) {
     const { uid, access_token, session, searchId } = req.body;
 
     try {
@@ -269,9 +168,9 @@ export async function startSearching(req: Request, res: Response) {
                 console.log(error);
             });
 
+        closeConn(conn);
         return res.status(200).json({ message: "Search started successfully" });
 
-        closeConn(conn);
 
 
     }
@@ -376,4 +275,196 @@ export async function getSearchBySearchId(req: Request, res: Response) {
     } catch (err: any) {
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
+}
+
+
+export async function scheduleJob(req: Request, res: Response) {
+    try {
+        const { name, country, content_languages, filtterStart_date, filtterEnd_date, querry, ad_status_type, reach, ad_type, media_type, publisher_platforms, Nextforward_cursor, Nextbackward_cursor, Nextcollation_token, uid, access_token, session, page } = req.body;
+
+        if (name === undefined) {
+            return res.status(400).json({ message: "Name required" });
+        }
+        if (country === undefined || country === "") {
+            return res.status(400).json({ message: "Country required" });
+        }
+        if (content_languages === undefined || content_languages.length === 0) {
+            return res.status(400).json({ message: "Content languages required" });
+        }
+        if (filtterStart_date === undefined) {
+            return res.status(400).json({ message: "Start date required" });
+        }
+        // if (filtterEnd_date === undefined) {
+        //     return res.status(400).json({ message: "End date required" });
+        // }
+        if (querry === undefined) {
+            return res.status(400).json({ message: "Querry required" });
+        }
+        if (ad_status_type === undefined) {
+            return res.status(400).json({ message: "Ad status type required" });
+        }
+        if (reach === undefined) {
+            return res.status(400).json({ message: "Reach required" });
+        }
+        if (ad_type === undefined) {
+            return res.status(400).json({ message: "Ad type required" });
+        }
+        if (media_type === undefined) {
+            return res.status(400).json({ message: "Media type required" });
+        }
+        if (publisher_platforms === undefined) {
+            return res.status(400).json({ message: "Publisher platforms required" });
+        }
+        if (Nextforward_cursor === undefined) {
+            return res.status(400).json({ message: "Nextforward cursor required" });
+        }
+        if (Nextbackward_cursor === undefined) {
+            return res.status(400).json({ message: "Nextbackward cursor required" });
+        }
+        if (Nextcollation_token === undefined) {
+            return res.status(400).json({ message: "Nextcollation token required" });
+        }
+        if (uid === undefined) {
+            return res.status(400).json({ message: "User id required" });
+        }
+        if (access_token === undefined) {
+            return res.status(400).json({ message: "Access token required" });
+        }
+        if (session === undefined) {
+            return res.status(400).json({ message: "Session required" });
+        }
+        const time = new Date(req.body.time); // 1721041604763
+        const recurrence = req.body.recurrence;
+        const conn = await connectToCluster();
+        if (typeof conn.conn === "string") {
+            return res.status(500).json(conn);
+        }
+        const db = conn.conn.db("Master");
+        const searchCol = db.collection("search");
+        const recurrenceCol = db.collection("recurrence");
+
+        await recurrenceCol.insertOne({
+            name: name,
+            country: country,
+            content_languages: content_languages,
+            filtterStart_date: filtterStart_date,
+            filtterEnd_date: filtterEnd_date,
+            querry: querry,
+            ad_status_type: ad_status_type,
+            reach: reach,
+            ad_type: ad_type,
+            media_type: media_type,
+            publisher_platforms: publisher_platforms,
+            Nextforward_cursor: Nextforward_cursor,
+            Nextbackward_cursor: Nextbackward_cursor,
+            Nextcollation_token: Nextcollation_token,
+            uid: uid,
+            access_token: access_token,
+            session: session,
+            page: page,
+            time: time,
+            recurrence: recurrence
+        });
+
+        const rule = new schedule.RecurrenceRule();
+
+        switch (recurrence) {
+            case Recurrence.NONE:
+                break;
+            case Recurrence.HOURLY:
+                rule.hour = [0, new schedule.Range(0, 23),1];
+                break;
+            case Recurrence.DAILY:
+                rule.hour = time.getHours();
+                rule.minute = time.getMinutes();
+                rule.dayOfWeek = [0, new schedule.Range(0, 6),1];
+                break;
+            case Recurrence.WEEKLY:
+                rule.hour = time.getHours();
+                rule.minute = time.getMinutes();
+                rule.dayOfWeek = new Date().getDay();
+                break;
+            case Recurrence.MONTHLY:
+                rule.hour = time.getHours();
+                rule.minute = time.getMinutes();
+                rule.date = time.getDate();
+                rule.month = [0, new schedule.Range(0, 11)];
+                break;
+            case Recurrence.YEARLY:
+                rule.hour = time.getHours();
+                rule.minute = time.getMinutes();
+                rule.date = time.getDate();
+                rule.month = time.getMonth();
+                rule.year = new Date().getFullYear();
+                break;
+        }
+
+
+
+        const job = schedule.scheduleJob(rule, async () => {
+            let searchData = {
+                name: name,
+                country: country,
+                content_languages: content_languages,
+                filtterStart_date: filtterStart_date,
+                filtterEnd_date: new Date(),
+                querry: querry,
+                ad_status_type: ad_status_type,
+                reach: reach,
+                ad_type: ad_type,
+                media_type: media_type,
+                publisher_platforms: publisher_platforms,
+                Nextforward_cursor: Nextforward_cursor,
+                Nextbackward_cursor: Nextbackward_cursor,
+                Nextcollation_token: Nextcollation_token,
+                uid: uid,
+                access_token: access_token,
+                session: session,
+                page: page
+            }
+
+            let res2 = await store(searchData);
+
+            if (typeof res2 === "string") {
+                return res.status(400).json({ message: res2 });
+            }
+
+            // call start search function
+            let searchId = res2.searchId;
+            await searchCol.updateOne({
+                searchId: searchId
+            }, {
+                $set: {
+                    currentStatus: SearchStatus.InProgress
+                }
+            });
+
+            await axios.get("https://facebookads.onrender.com/ads?SearchID=" + searchId)
+                .then((response) => {
+                    console.log(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        });
+
+        // job.addListener('scheduled', function (fireDate) {
+        //     console.log('Job scheduled at', fireDate);
+        // }
+        // );
+        // job.addListener('run', function () {
+        //     console.log('Job was run');
+        // }
+        // );
+        // job.addListener('canceled', function () {
+        //     console.log('Job was canceled');
+        // }
+        // );
+
+        return res.status(200).json({ message: "Job scheduled successfully" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
 }
