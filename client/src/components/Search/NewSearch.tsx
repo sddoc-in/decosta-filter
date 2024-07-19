@@ -24,7 +24,7 @@ export default function NewSearch() {
     open: false,
     date: "",
     time: "",
-    recurrence: Recurrence.DAILY,
+    recurrence: Recurrence.NONE,
   });
 
   function handleChange(type: string, value: string) {
@@ -176,6 +176,11 @@ export default function NewSearch() {
 
   async function ScheduleSearch() {
     try {
+      if(Schedule.date === "" || Schedule.time === "") {
+        raiseToast("Please select Date and Time", "error")
+        return;
+      }
+
       setLoading(true);
       const res = await axios
         .post(API_URL + "/searches/schedule", {
@@ -187,7 +192,7 @@ export default function NewSearch() {
           access_token: user.access_token,
           session: user.session,
           recurrence : Schedule.recurrence,
-          date : new Date(Schedule.date + " " + Schedule.time).getTime(),
+          time : new Date(Schedule.date + " " + Schedule.time).getTime(),
           
         })
         .then((response) => response.data)
@@ -196,8 +201,9 @@ export default function NewSearch() {
           return;
         });
 
-      if (res.message === "Search scheduled successfully") {
+      if (res.message === "Job scheduled successfully") {
         raiseToast("Search scheduled successfully", "success");
+        setSchedule({ ...Schedule, open: false });
       } else {
         raiseToast("Something went wrong", "error");
       }

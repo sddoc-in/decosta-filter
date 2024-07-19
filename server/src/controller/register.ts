@@ -9,7 +9,6 @@ import User from "../interface/User";
 import { createSession, hash, validateSession } from "../functions/hash";
 import { createBearer, validateToken } from "../functions/bearer";
 import { closeConn } from "../connection/closeConn";
-import RolesEnum from "../config/Roles";
 
 export async function register(req: Request, res: Response) {
   const { name, username, email, password, role, access_token, session, uid } =

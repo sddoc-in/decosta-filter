@@ -9,6 +9,10 @@ import schedule from 'node-schedule';
 import store from '../functions/utills/store';
 import Recurrence from '../config/Recurrence';
 
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../data.env" });
+
 
 export async function storeSearch(req: Request | any, res: Response) {
     try {
@@ -160,7 +164,7 @@ export async function startSearching(req: Request | any, res: Response) {
         await search.updateOne({ searchId: searchId }, { $set: { currentStatus: SearchStatus.InProgress } });
 
 
-        axios.get("https://facebookads.onrender.com/ads?SearchID=" + searchId)
+        axios.get(process.env.AUTOMATION_URL + "ads?SearchID=" + searchId)
             .then((response) => {
                 console.log(response.data);
             })
@@ -377,12 +381,12 @@ export async function scheduleJob(req: Request, res: Response) {
                 rule.year = new Date().getFullYear();
                 break;
             case Recurrence.HOURLY:
-                rule.hour = [0, new schedule.Range(0, 23),1];
+                rule.hour = [0, new schedule.Range(0, 23), 1];
                 break;
             case Recurrence.DAILY:
                 rule.hour = time.getHours();
                 rule.minute = time.getMinutes();
-                rule.dayOfWeek = [0, new schedule.Range(0, 6),1];
+                rule.dayOfWeek = [0, new schedule.Range(0, 6), 1];
                 break;
             case Recurrence.WEEKLY:
                 rule.hour = time.getHours();
@@ -404,9 +408,8 @@ export async function scheduleJob(req: Request, res: Response) {
                 break;
         }
 
-
-
         const job = schedule.scheduleJob(rule, async () => {
+            console.log('Job running');
             let searchData = {
                 name: name,
                 country: country,
@@ -427,8 +430,9 @@ export async function scheduleJob(req: Request, res: Response) {
                 session: session,
                 page: page
             }
-
             let res2 = await store(searchData);
+
+            console.log(res2);
 
             if (typeof res2 === "string") {
                 return res.status(400).json({ message: res2 });
@@ -444,7 +448,7 @@ export async function scheduleJob(req: Request, res: Response) {
                 }
             });
 
-            await axios.get("https://facebookads.onrender.com/ads?SearchID=" + searchId)
+            await axios.get(process.env.AUTOMATION_URL + "ads?SearchID=" + searchId)
                 .then((response) => {
                     console.log(response.data);
                 })
