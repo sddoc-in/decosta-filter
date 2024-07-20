@@ -195,7 +195,7 @@ export default function ExcelComponent() {
 
 
 
-  const classes = " w-[99%] h-[80vh] mx-auto";
+  const classes = " w-[99%] h-[55vh] mx-auto";
   return (
     <>
     
