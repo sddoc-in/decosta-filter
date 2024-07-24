@@ -18,7 +18,7 @@ export default function ExcelComponent() {
     reachRange,
     fileData,
     setFileData,
-    mainData
+    mainData,
   } = React.useContext(ExcelContext);
 
   const { setLoading } = React.useContext(AppContext);
@@ -197,11 +197,11 @@ export default function ExcelComponent() {
   }, [fileData]);
 
   React.useEffect(() => {
-    rangeFilter(2, likesRange)
+    rangeFilter(2, likesRange);
   }, [likesRange]);
 
   React.useEffect(() => {
-    rangeFilter(12, reachRange)
+    rangeFilter(12, reachRange);
   }, [reachRange]);
 
   const classes = " w-[99%] h-[55vh] mx-auto";
@@ -213,10 +213,10 @@ export default function ExcelComponent() {
       >
         <div className="flex justify-start items-start ">
           <div>
-            <div style={{ position: 'sticky', top: 0, }} className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-200">
+            <div style={{ position: 'sticky', top: 0, zIndex:5}} className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-300">
               <TiTick
                 onClick={selectAll}
-                className="text-green-400 text-[20px] mx-2 cursor-pointer"
+                className="text-green-500 text-[20px] mx-2 cursor-pointer"
               />
               {header && header.map((item: any, index: number) => {
                 return (
@@ -254,7 +254,7 @@ export default function ExcelComponent() {
                       <input
                         autoFocus
                         type="text"
-                        className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                        className="w-[250px] mx-2 border-2 px-2 border-green-900 focus:outline-none"
                         defaultValue={item}
                         onChange={(e) =>
                           setIsChanging({
@@ -270,68 +270,72 @@ export default function ExcelComponent() {
               })}
             </div>
             {data && data.map((item: any, rowIndex: number) => {
-              let flag = selected.includes(item);
+              const flag = selected.includes(item);
               return (
                 <div
                   key={rowIndex}
-                  className={`flex text-start justify-start items-center w-fit mx-auto py-1 border-b-[1px] border-[#bebbb8] ${rowIndex % 2 === 0 && "bg-blue-50"
-                    }`}
+                  className={`w-full border-b-[1px] border-[#bebbb8] hover:bg-blue-100 ${flag ? "bg-blue-200" : "bg-blue-0"}`}
                 >
-                  <div
-                    className={`mx-2 ${isChanging.rowIndex === rowIndex ? "hidden" : "block"
-                      }`}
-                  >
+                  <div className="flex text-start justify-start items-center">
                     {!flag ? (
                       <TiTickOutline
                         onClick={() => selectItem(item)}
-                        className={`text-green-300 text-[20px] cursor-pointer`}
+                        className="text-green-500 text-[20px] mx-2 cursor-pointer"
                       />
                     ) : (
                       <TiTick
                         onClick={() => selectItem(item)}
-                        className="text-green-400 text-[20px] cursor-pointer"
+                        className="text-green-500 text-[20px] mx-2 cursor-pointer"
                       />
                     )}
+                    {item && item.map((value: any, columnIndex: number) => {
+                      return (
+                        <div
+                          key={columnIndex}
+                          className={`dropdown mx-2 w-[250px] overflow-hidden ${columnsHidden.includes(columnIndex) ? "hidden" : "block"
+                            }`}
+                        >
+                          {!(
+                            isChanging.status &&
+                            isChanging.columnIndex === columnIndex &&
+                            isChanging.rowIndex === rowIndex
+                          ) ? (
+                            <label
+                              tabIndex={columnIndex}
+                              onClick={() =>
+                                setIsChanging({
+                                  status: true,
+                                  header: false,
+                                  rowIndex: rowIndex,
+                                  columnIndex: columnIndex,
+                                  value: value,
+                                })
+                              }
+                              className="block cursor-pointer w-full border-green-900 hover:outline-none overflow-hidden"
+                            >
+                              {value && value.length > 20
+                                ? value.slice(0, 20) + "..."
+                                : value}
+                            </label>
+                          ) : (
+                            <input
+                              autoFocus
+                              type="text"
+                              className="w-[250px] mx-2 px-2 border-2 border-green-900 bg-transparent focus:outline-none"
+                              defaultValue={value}
+                              onChange={(e) =>
+                                setIsChanging({
+                                  ...isChanging,
+                                  value: e.target.value,
+                                })
+                              }
+                              onClick={changeCell}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                  {item.map((val: any, columnIndex: number) => {
-                    return (
-                      <>
-                        {!(isChanging.status && isChanging.rowIndex === rowIndex && isChanging.columnIndex === columnIndex) ? (
-                          <p
-                            key={columnIndex}
-                            onDoubleClick={() =>
-                              setIsChanging({
-                                status: true,
-                                header: false,
-                                rowIndex: rowIndex,
-                                columnIndex: columnIndex,
-                                value: val,
-                              })
-                            }
-                            className={`w-[250px] text-start block py-1 mx-2 cursor-pointer ${columnsHidden.includes(columnIndex) ? "hidden" : "block"
-                              }`}
-                          >
-                            {val && val.length > 20 ? val.slice(0, 20) + "..." : val}
-                          </p>
-                        ) : (
-                          <input
-                            key={columnIndex}
-                            autoFocus
-                            type="text"
-                            className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
-                            defaultValue={val}
-                            onChange={(e) =>
-                              setIsChanging({
-                                ...isChanging,
-                                value: e.target.value,
-                              })
-                            }
-                            onClick={changeCell}
-                          />
-                        )}
-                      </>
-                    );
-                  })}
                 </div>
               );
             })}
