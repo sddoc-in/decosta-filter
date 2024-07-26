@@ -71,7 +71,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd /path/to/your/project
+            cd decosta-filter
             cd client
             pnpm install
             pnpm run build
