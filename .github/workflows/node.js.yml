@@ -15,10 +15,29 @@ jobs:
       - name: List files in the root directory
         run: ls -al
 
+      - name: Verify directory access
+        run: |
+          echo "Checking client directory:"
+          if [ -d "client" ]; then
+            echo "Client directory exists"
+            ls -al client
+          else
+            echo "Client directory does not exist"
+          fi
+          
+          echo "Checking server directory:"
+          if [ -d "server" ]; then
+            echo "Server directory exists"
+            ls -al server
+          else
+            echo "Server directory does not exist"
+          fi
+
       - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
       - name: Install pnpm
         run: |
           npm install -g pnpm
@@ -27,7 +46,6 @@ jobs:
 
       - name: Install dependencies and build client
         run: |
-          ls -al client
           cd client
           pnpm install
           pnpm run build
@@ -35,8 +53,7 @@ jobs:
 
       - name: Install dependencies and build server
         run: |
-          ls -al ../server
-          cd ../server
+          cd server
           pnpm install
           pnpm run build
         working-directory: server
@@ -80,7 +97,22 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /path/to/your/project
-            ls -al
+            echo "Checking client directory:"
+            if [ -d "client" ]; then
+              echo "Client directory exists"
+              ls -al client
+            else
+              echo "Client directory does not exist"
+            fi
+            
+            echo "Checking server directory:"
+            if [ -d "server" ]; then
+              echo "Server directory exists"
+              ls -al server
+            else
+              echo "Server directory does not exist"
+            fi
+
             cd client
             pnpm install
             pnpm run build
