@@ -16,11 +16,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+          cache: 'pnpm'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+        run: npm install -g pnpm
+
+      - name: Verify pnpm version
+        run: pnpm --version
 
       - name: Install dependencies and build client
         run: |
@@ -64,6 +66,7 @@ jobs:
             curl -fsSL https://get.pnpm.io/install.sh | sh
             export PATH="$HOME/.local/share/pnpm:$PATH"
             pnpm --version
+            echo $PATH
 
       - name: Deploy to Linux machine
         uses: appleboy/ssh-action@v0.1.10
