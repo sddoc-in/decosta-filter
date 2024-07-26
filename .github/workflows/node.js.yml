@@ -71,6 +71,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
+            ls -al
             cd decosta-filter
             cd client
             pnpm install
