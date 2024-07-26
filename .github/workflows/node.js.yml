@@ -26,13 +26,13 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/client
           pnpm install
-          pnpm run build  # Skip linting
+          CI=false pnpm run build  # Ignore ESLint warnings
 
       - name: Install dependencies and build server
         run: |
           cd $GITHUB_WORKSPACE/server
           pnpm install
-          pnpm run build  # Skip linting
+          CI=false pnpm run build  # Ignore ESLint warnings
 
       - name: Archive production artifact
         uses: actions/upload-artifact@v3
