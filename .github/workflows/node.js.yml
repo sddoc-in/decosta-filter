@@ -18,17 +18,17 @@ jobs:
       - name: Verify directory access
         run: |
           echo "Checking client directory:"
-          if [ -d "client" ]; then
+          if [ -d "$GITHUB_WORKSPACE/client" ]; then
             echo "Client directory exists"
-            ls -al client
+            ls -al "$GITHUB_WORKSPACE/client"
           else
             echo "Client directory does not exist"
           fi
           
           echo "Checking server directory:"
-          if [ -d "server" ]; then
+          if [ -d "$GITHUB_WORKSPACE/server" ]; then
             echo "Server directory exists"
-            ls -al server
+            ls -al "$GITHUB_WORKSPACE/server"
           else
             echo "Server directory does not exist"
           fi
@@ -46,17 +46,15 @@ jobs:
 
       - name: Install dependencies and build client
         run: |
-          cd client
+          cd $GITHUB_WORKSPACE/client
           pnpm install
           pnpm run build
-        working-directory: client
 
       - name: Install dependencies and build server
         run: |
-          cd server
+          cd $GITHUB_WORKSPACE/server
           pnpm install
           pnpm run build
-        working-directory: server
 
       - name: Archive production artifact
         uses: actions/upload-artifact@v3
