@@ -25,13 +25,13 @@ jobs:
       - name: Install dependencies and build client
         run: |
           cd $GITHUB_WORKSPACE/client
-          pnpm install
+          pnpm install --no-frozen-lockfile
           CI=false pnpm run build  # Ignore ESLint warnings
 
       - name: Install dependencies and build server
         run: |
           cd $GITHUB_WORKSPACE/server
-          pnpm install
+          pnpm install --no-frozen-lockfile
           CI=false pnpm run build  # Ignore ESLint warnings
 
       - name: Archive production artifact
