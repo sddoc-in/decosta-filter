@@ -19,8 +19,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
-          cache: 'pnpm'
-
       - name: Install pnpm
         run: |
           npm install -g pnpm
@@ -29,7 +27,7 @@ jobs:
 
       - name: Install dependencies and build client
         run: |
-          ls 
+          ls -al client
           cd client
           pnpm install
           pnpm run build
