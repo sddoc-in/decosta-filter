@@ -12,27 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: List files in the root directory
-        run: ls -al
-
-      - name: Verify directory access
-        run: |
-          echo "Checking client directory:"
-          if [ -d "$GITHUB_WORKSPACE/client" ]; then
-            echo "Client directory exists"
-            ls -al "$GITHUB_WORKSPACE/client"
-          else
-            echo "Client directory does not exist"
-          fi
-          
-          echo "Checking server directory:"
-          if [ -d "$GITHUB_WORKSPACE/server" ]; then
-            echo "Server directory exists"
-            ls -al "$GITHUB_WORKSPACE/server"
-          else
-            echo "Server directory does not exist"
-          fi
-
       - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
@@ -42,18 +21,19 @@ jobs:
         run: |
           npm install -g pnpm
           pnpm --version
-          echo "PATH: $PATH"
 
       - name: Install dependencies and build client
         run: |
           cd $GITHUB_WORKSPACE/client
           pnpm install
+          pnpm run lint || true  # Ignore linting errors
           pnpm run build
 
       - name: Install dependencies and build server
         run: |
           cd $GITHUB_WORKSPACE/server
           pnpm install
+          pnpm run lint || true  # Ignore linting errors
           pnpm run build
 
       - name: Archive production artifact
@@ -84,7 +64,6 @@ jobs:
             curl -fsSL https://get.pnpm.io/install.sh | sh
             export PATH="$HOME/.local/share/pnpm:$PATH"
             pnpm --version
-            echo "PATH: $PATH"
 
       - name: Deploy to Linux machine
         uses: appleboy/ssh-action@v0.1.10
@@ -95,22 +74,6 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /path/to/your/project
-            echo "Checking client directory:"
-            if [ -d "client" ]; then
-              echo "Client directory exists"
-              ls -al client
-            else
-              echo "Client directory does not exist"
-            fi
-            
-            echo "Checking server directory:"
-            if [ -d "server" ]; then
-              echo "Server directory exists"
-              ls -al server
-            else
-              echo "Server directory does not exist"
-            fi
-
             cd client
             pnpm install
             pnpm run build
