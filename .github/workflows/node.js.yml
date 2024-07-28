@@ -81,11 +81,17 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
+            # Ensure pnpm and pm2 are installed
+            npm install -g pnpm pm2
+
+            # Debugging step to check files
             cd /var/www/client
             ls -al
             pnpm install
             cd ../server
             ls -al
             pnpm install
+
+            # Restart the application using pm2
             pm2 delete 0 || true
             pm2 start pnpm --name decosta -- start
