@@ -79,8 +79,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd /path/to/your/actual/project
+            
             ls -al
+            cd /var/wwww/
             cd client
             pnpm install
             pnpm run build
