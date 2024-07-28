@@ -52,7 +52,7 @@ jobs:
           name: production-artifact
           path: ./artifact
 
-      - name: Deploy to Linux machine
+      - name: Connect to server and setup directories
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOST }}
@@ -62,13 +62,30 @@ jobs:
           script: |
             cd /var/www/
             mkdir -p client server
-            cd client
-            rm -rf *
-            cp -r $GITHUB_WORKSPACE/artifact/client/* .
+
+      - name: Deploy to Linux machine
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: ./artifact/
+          target: /var/www/
+
+      - name: Finalize Deployment
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd /var/www/client
+            ls -al
             pnpm install
             cd ../server
-            rm -rf *
-            cp -r $GITHUB_WORKSPACE/artifact/server/* .
+            ls -al
             pnpm install
             pm2 delete 0 || true
             pm2 start pnpm --name decosta -- start
