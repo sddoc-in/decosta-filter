@@ -23,7 +23,7 @@ export default function ExcelComponent() {
 
   const { setLoading } = React.useContext(AppContext);
 
-  const [data, setData] = React.useState<any>(fileData);
+  const [data, setData] = React.useState<any>(fileData || []);
   const [search, setSearch] = React.useState<string>("");
   const [filterType, setFilterType] = React.useState<string>("begins with");
 
@@ -36,6 +36,12 @@ export default function ExcelComponent() {
   });
 
   const [filterRecord, setFilterRecord] = React.useState<any>([]);
+
+  React.useEffect(() => {
+    if (data) {
+      setSelected(data);
+    }
+  }, [data]);
 
   function filterData(where: number) {
     setLoading(true);
@@ -120,9 +126,6 @@ export default function ExcelComponent() {
     setColumnsHidden([...columnsHidden, index]);
   }
   function clear() {
-    // const newData = data.filter((item: any, index: number) => {
-    //     return item[where].includes(search)
-    // })
     setSearch("");
     setData(fileData);
   }
@@ -136,6 +139,14 @@ export default function ExcelComponent() {
     }
     const newData = [...selected, item];
     setSelected(newData);
+  }
+
+  function selectAll() {
+    if (selected.length === data.length) {
+      setSelected([]);
+    } else {
+      setSelected(data);
+    }
   }
 
   function changeCell() {
@@ -193,37 +204,23 @@ export default function ExcelComponent() {
     rangeFilter(12, reachRange)
   }, [reachRange]);
 
-
-
   const classes = " w-[99%] h-[55vh] mx-auto";
   return (
     <>
-    
       <div
         id="scroll-hide"
         className={` overflow-scroll shadow-lg ${classes}`}
       >
         <div className="flex justify-start items-start ">
           <div>
-            <div className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-100">
-              {selected.length !== data.length ? (
-                <TiTickOutline
-                  onClick={() => {
-                    setSelected(data);
-                  }}
-                  className="text-blue-400 text-[20px] mx-2 cursor-pointer"
-                />
-              ) : (
-                <TiTick
-                  onClick={() => {
-                    setSelected([]);
-                  }}
-                  className="text-blue-400 text-[20px] mx-2 cursor-pointer"
-                />
-              )}
-              {header.map((item: any, index: number) => {
+            <div style={{ position: 'sticky', top: 0, }} className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-200">
+              <TiTick
+                onClick={selectAll}
+                className="text-green-400 text-[20px] mx-2 cursor-pointer"
+              />
+              {header && header.map((item: any, index: number) => {
                 return (
-                  <>
+                  <div key={index}>
                     {!(
                       isChanging.status &&
                       isChanging.columnIndex === index &&
@@ -232,7 +229,6 @@ export default function ExcelComponent() {
                       <div
                         className={`dropdown ${columnsHidden.includes(index) ? "hidden" : "block"
                           }`}
-                        key={index}
                       >
                         <label
                           tabIndex={index}
@@ -256,7 +252,6 @@ export default function ExcelComponent() {
                       </div>
                     ) : (
                       <input
-                        key={index}
                         autoFocus
                         type="text"
                         className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
@@ -270,114 +265,77 @@ export default function ExcelComponent() {
                         onClick={changeHeaderCell}
                       />
                     )}
-                  </>
+                  </div>
                 );
               })}
             </div>
-            {data.map((item: any, rowIndex: number) => {
+            {data && data.map((item: any, rowIndex: number) => {
               let flag = selected.includes(item);
               return (
                 <div
                   key={rowIndex}
-                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8]  ${flag ? "bg-blue-200" : ""
+                  className={`flex text-start justify-start items-center w-fit mx-auto py-1 border-b-[1px] border-[#bebbb8] ${rowIndex % 2 === 0 && "bg-blue-50"
                     }`}
                 >
-                  {!flag ? (
-                    <TiTickOutline
-                      className="text-blue-400 text-[20px] mx-2 cursor-pointer"
-                      onClick={() => selectItem(item)}
-                    />
-                  ) : (
-                    <TiTick
-                      className="text-blue-400 text-[20px] mx-2 cursor-pointer"
-                      onClick={() => selectItem(item)}
-                    />
-                  )}
-                  {item.map(
-                    (rowItem: string | number | boolean, valIndex: number) => {
-                      return (
-                        <>
-                          {!(
-                            isChanging.status &&
-                            isChanging.columnIndex === valIndex &&
-                            isChanging.rowIndex === rowIndex &&
-                            !isChanging.header
-                          ) ? (
-                            <div
-                              key={valIndex}
-                              className={`w-[250px!important] text-start mx-2 overflow-hidden ${columnsHidden.includes(valIndex)
-                                  ? "hidden"
-                                  : "block"
-                                }`}
-                              onClick={() => {
-                                if (valIndex === 7) return;
-                                setIsChanging({
-                                  status: true,
-                                  columnIndex: valIndex,
-                                  rowIndex: rowIndex,
-                                  header: false,
-                                  value: rowItem,
-                                });
-                              }}
-                            >
-                              {valIndex === 9 ||
-                                valIndex === 10 ||
-                                valIndex === 3 ? (
-                                <a
-                                  href={rowItem as string}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className=" p-2 underline-none bg-[#0330fc] text-white rounded-sm"
-                                >
-                                  Link
-                                </a>
-                              ) : valIndex === 11 ? (
-                                rowItem ? (
-                                  "Yes"
-                                ) : (
-                                  "No"
-                                )
-                              ) : parseInt(rowItem as string) === 0 ? (
-                                rowItem
-                              ) : rowItem ? (
-                                rowItem.toString().length > 20 ? (
-                                  rowItem.toString().slice(0, 20) + "..."
-                                ) : (
-                                  rowItem
-                                )
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          ) : (
-                            <input
-                              key={valIndex}
-                              type="text"
-                              className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
-                              defaultValue={rowItem as string}
-                              autoFocus
-                              onChange={(e) =>
-                                setIsChanging((prev: any) => ({
-                                  ...prev,
-                                  value: e.target.value,
-                                }))
-                              }
-                              onClick={changeCell}
-                            />
-                          )}
-                        </>
-                      );
-                    }
-                  )}
+                  <div
+                    className={`mx-2 ${isChanging.rowIndex === rowIndex ? "hidden" : "block"
+                      }`}
+                  >
+                    {!flag ? (
+                      <TiTickOutline
+                        onClick={() => selectItem(item)}
+                        className={`text-green-300 text-[20px] cursor-pointer`}
+                      />
+                    ) : (
+                      <TiTick
+                        onClick={() => selectItem(item)}
+                        className="text-green-400 text-[20px] cursor-pointer"
+                      />
+                    )}
+                  </div>
+                  {item.map((val: any, columnIndex: number) => {
+                    return (
+                      <>
+                        {!(isChanging.status && isChanging.rowIndex === rowIndex && isChanging.columnIndex === columnIndex) ? (
+                          <p
+                            key={columnIndex}
+                            onDoubleClick={() =>
+                              setIsChanging({
+                                status: true,
+                                header: false,
+                                rowIndex: rowIndex,
+                                columnIndex: columnIndex,
+                                value: val,
+                              })
+                            }
+                            className={`w-[250px] text-start block py-1 mx-2 cursor-pointer ${columnsHidden.includes(columnIndex) ? "hidden" : "block"
+                              }`}
+                          >
+                            {val && val.length > 20 ? val.slice(0, 20) + "..." : val}
+                          </p>
+                        ) : (
+                          <input
+                            key={columnIndex}
+                            autoFocus
+                            type="text"
+                            className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                            defaultValue={val}
+                            onChange={(e) =>
+                              setIsChanging({
+                                ...isChanging,
+                                value: e.target.value,
+                              })
+                            }
+                            onClick={changeCell}
+                          />
+                        )}
+                      </>
+                    );
+                  })}
                 </div>
               );
             })}
           </div>
-          <HiddenColumns
-            columnsHidden={columnsHidden}
-            header={header}
-            setColumnsHidden={setColumnsHidden}
-          />
         </div>
       </div>
     </>

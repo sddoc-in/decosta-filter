@@ -100,7 +100,8 @@ async function store(data: any) {
             page: data.page,
             currentStatus: SearchStatus.Created,
             name: data.name,
-            CreatedDate: new Date().toLocaleDateString()
+            CreatedDate: new Date().toLocaleDateString(),
+            status:0
         });
 
         return { searchId: searchId }
