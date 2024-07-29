@@ -13,6 +13,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Recurrence from "../../constants/Recurrence";
 import ScheduleDialog from "./ScheduleDialog";
+import APIParams from "../../constants/SearchParams";
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
@@ -164,6 +165,7 @@ export default function NewSearch() {
 
       if (res.message === "Search started successfully") {
         raiseToast("Search started successfully", "success");
+        setApiParams(APIParams  )
       } else {
         raiseToast("Something went wrong", "error");
       }
@@ -176,7 +178,7 @@ export default function NewSearch() {
 
   async function ScheduleSearch() {
     try {
-      if(Schedule.date === "" || Schedule.time === "") {
+      if (Schedule.date === "" || Schedule.time === "") {
         raiseToast("Please select Date and Time", "error")
         return;
       }
@@ -191,9 +193,9 @@ export default function NewSearch() {
           uid: user.uid,
           access_token: user.access_token,
           session: user.session,
-          recurrence : Schedule.recurrence,
-          time : new Date(Schedule.date + " " + Schedule.time).getTime(),
-          
+          recurrence: Schedule.recurrence,
+          time: new Date(Schedule.date + " " + Schedule.time).getTime(),
+
         })
         .then((response) => response.data)
         .catch((err) => {

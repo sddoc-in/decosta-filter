@@ -18,12 +18,12 @@ export default function ExcelComponent() {
     reachRange,
     fileData,
     setFileData,
-    mainData,
+    mainData
   } = React.useContext(ExcelContext);
 
   const { setLoading } = React.useContext(AppContext);
 
-  const [data, setData] = React.useState<any>(fileData || []);
+  const [data, setData] = React.useState<any>(fileData);
   const [search, setSearch] = React.useState<string>("");
   const [filterType, setFilterType] = React.useState<string>("begins with");
 
@@ -36,12 +36,6 @@ export default function ExcelComponent() {
   });
 
   const [filterRecord, setFilterRecord] = React.useState<any>([]);
-
-  React.useEffect(() => {
-    if (data) {
-      setSelected(data);
-    }
-  }, [data]);
 
   function filterData(where: number) {
     setLoading(true);
@@ -126,6 +120,9 @@ export default function ExcelComponent() {
     setColumnsHidden([...columnsHidden, index]);
   }
   function clear() {
+    // const newData = data.filter((item: any, index: number) => {
+    //     return item[where].includes(search)
+    // })
     setSearch("");
     setData(fileData);
   }
@@ -139,14 +136,6 @@ export default function ExcelComponent() {
     }
     const newData = [...selected, item];
     setSelected(newData);
-  }
-
-  function selectAll() {
-    if (selected.length === data.length) {
-      setSelected([]);
-    } else {
-      setSelected(data);
-    }
   }
 
   function changeCell() {
@@ -176,7 +165,6 @@ export default function ExcelComponent() {
 
   const rangeFilter = React.useMemo(() => {
     return (where: number, range: number[]) => {
-      console.log("rangeFilter", where, range);
       setLoading(true);
       let newData = mainData;
       newData = newData.filter((item: any, index: number) => {
@@ -186,7 +174,6 @@ export default function ExcelComponent() {
         }
         return false;
       });
-      console.log("newData", newData);
       setFileData(newData);
       setLoading(false);
     }
@@ -197,30 +184,44 @@ export default function ExcelComponent() {
   }, [fileData]);
 
   React.useEffect(() => {
-    rangeFilter(2, likesRange);
+    rangeFilter(2, likesRange)
   }, [likesRange]);
 
   React.useEffect(() => {
-    rangeFilter(12, reachRange);
+    rangeFilter(12, reachRange)
   }, [reachRange]);
 
-  const classes = " w-[99%] h-[55vh] mx-auto";
+
+
+  const classes = " w-[99%] h-[62vh] mx-auto";
   return (
     <>
+    
       <div
         id="scroll-hide"
         className={` overflow-scroll shadow-lg ${classes}`}
       >
         <div className="flex justify-start items-start ">
           <div>
-            <div style={{ position: 'sticky', top: 0, zIndex:5}} className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-300">
-              <TiTick
-                onClick={selectAll}
-                className="text-green-500 text-[20px] mx-2 cursor-pointer"
-              />
-              {header && header.map((item: any, index: number) => {
+         < div style={{ position: 'sticky', top: 0, zIndex:5}} className="flex text-start justify-start items-center w-fit text-black mx-auto py-1 border-b-[1px] border-[#bebbb8] bg-blue-100">
+              {selected.length !== data.length ? (
+                <TiTickOutline
+                  onClick={() => {
+                    setSelected(data);
+                  }}
+                  className="text-blue-400 text-[20px] mx-2 cursor-pointer"
+                />
+              ) : (
+                <TiTick
+                  onClick={() => {
+                    setSelected([]);
+                  }}
+                  className="text-blue-400 text-[20px] mx-2 cursor-pointer"
+                />
+              )}
+              {header.map((item: any, index: number) => {
                 return (
-                  <div key={index}>
+                  <>
                     {!(
                       isChanging.status &&
                       isChanging.columnIndex === index &&
@@ -229,6 +230,7 @@ export default function ExcelComponent() {
                       <div
                         className={`dropdown ${columnsHidden.includes(index) ? "hidden" : "block"
                           }`}
+                        key={index}
                       >
                         <label
                           tabIndex={index}
@@ -252,9 +254,10 @@ export default function ExcelComponent() {
                       </div>
                     ) : (
                       <input
+                        key={index}
                         autoFocus
                         type="text"
-                        className="w-[250px] mx-2 border-2 px-2 border-green-900 focus:outline-none"
+                        className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
                         defaultValue={item}
                         onChange={(e) =>
                           setIsChanging({
@@ -265,81 +268,114 @@ export default function ExcelComponent() {
                         onClick={changeHeaderCell}
                       />
                     )}
-                  </div>
+                  </>
                 );
               })}
             </div>
-            {data && data.map((item: any, rowIndex: number) => {
-              const flag = selected.includes(item);
+            {data.map((item: any, rowIndex: number) => {
+              let flag = selected.includes(item);
               return (
                 <div
                   key={rowIndex}
-                  className={`w-full border-b-[1px] border-[#bebbb8] hover:bg-blue-100 ${flag ? "bg-blue-200" : "bg-blue-0"}`}
+                  className={`flex justify-start items-center my-[3px] h-[40px]  text-black mx-auto  border-b w-fit border-[#bebbb8]  ${flag ? "bg-blue-200" : ""
+                    }`}
                 >
-                  <div className="flex text-start justify-start items-center">
-                    {!flag ? (
-                      <TiTickOutline
-                        onClick={() => selectItem(item)}
-                        className="text-green-500 text-[20px] mx-2 cursor-pointer"
-                      />
-                    ) : (
-                      <TiTick
-                        onClick={() => selectItem(item)}
-                        className="text-green-500 text-[20px] mx-2 cursor-pointer"
-                      />
-                    )}
-                    {item && item.map((value: any, columnIndex: number) => {
+                  {!flag ? (
+                    <TiTickOutline
+                      className="text-blue-400 text-[20px] mx-2 cursor-pointer"
+                      onClick={() => selectItem(item)}
+                    />
+                  ) : (
+                    <TiTick
+                      className="text-blue-400 text-[20px] mx-2 cursor-pointer"
+                      onClick={() => selectItem(item)}
+                    />
+                  )}
+                  {item.map(
+                    (rowItem: string | number | boolean, valIndex: number) => {
                       return (
-                        <div
-                          key={columnIndex}
-                          className={`dropdown mx-2 w-[250px] overflow-hidden ${columnsHidden.includes(columnIndex) ? "hidden" : "block"
-                            }`}
-                        >
+                        <>
                           {!(
                             isChanging.status &&
-                            isChanging.columnIndex === columnIndex &&
-                            isChanging.rowIndex === rowIndex
+                            isChanging.columnIndex === valIndex &&
+                            isChanging.rowIndex === rowIndex &&
+                            !isChanging.header
                           ) ? (
-                            <label
-                              tabIndex={columnIndex}
-                              onClick={() =>
+                            <div
+                              key={valIndex}
+                              className={`w-[250px!important] text-start mx-2 overflow-hidden ${columnsHidden.includes(valIndex)
+                                  ? "hidden"
+                                  : "block"
+                                }`}
+                              onClick={() => {
+                                if (valIndex === 7) return;
                                 setIsChanging({
                                   status: true,
-                                  header: false,
+                                  columnIndex: valIndex,
                                   rowIndex: rowIndex,
-                                  columnIndex: columnIndex,
-                                  value: value,
-                                })
-                              }
-                              className="block cursor-pointer w-full border-green-900 hover:outline-none overflow-hidden"
+                                  header: false,
+                                  value: rowItem,
+                                });
+                              }}
                             >
-                              {value && value.length > 20
-                                ? value.slice(0, 20) + "..."
-                                : value}
-                            </label>
+                              {valIndex === 9 ||
+                                valIndex === 10 ||
+                                valIndex === 3 ? (
+                                <a
+                                  href={rowItem as string}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className=" p-2 underline-none bg-[#0330fc] text-white rounded-sm"
+                                >
+                                  Link
+                                </a>
+                              ) : valIndex === 11 ? (
+                                rowItem ? (
+                                  "Yes"
+                                ) : (
+                                  "No"
+                                )
+                              ) : parseInt(rowItem as string) === 0 ? (
+                                rowItem
+                              ) : rowItem ? (
+                                rowItem.toString().length > 20 ? (
+                                  rowItem.toString().slice(0, 20) + "..."
+                                ) : (
+                                  rowItem
+                                )
+                              ) : (
+                                ""
+                              )}
+                            </div>
                           ) : (
                             <input
-                              autoFocus
+                              key={valIndex}
                               type="text"
-                              className="w-[250px] mx-2 px-2 border-2 border-green-900 bg-transparent focus:outline-none"
-                              defaultValue={value}
+                              className="w-[250px] mx-2 border-2 px-2 border-green-900 bg-transparent focus:outline-none"
+                              defaultValue={rowItem as string}
+                              autoFocus
                               onChange={(e) =>
-                                setIsChanging({
-                                  ...isChanging,
+                                setIsChanging((prev: any) => ({
+                                  ...prev,
                                   value: e.target.value,
-                                })
+                                }))
                               }
                               onClick={changeCell}
                             />
                           )}
-                        </div>
+                        </>
                       );
-                    })}
-                  </div>
+                    }
+                  )}
                 </div>
               );
             })}
           </div>
+          <HiddenColumns
+            columnsHidden={columnsHidden}
+            header={header}
+            setColumnsHidden={setColumnsHidden}
+          />
         </div>
       </div>
     </>

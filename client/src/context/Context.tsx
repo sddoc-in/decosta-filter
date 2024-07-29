@@ -2,6 +2,7 @@ import React from "react";
 import Loading from "../components/loader/Loading";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@chakra-ui/react";
+import APIParams from "../constants/SearchParams";
 
 export const AppContext = React.createContext<any>({});
 
@@ -19,23 +20,7 @@ export const AppProvider = ({ children }: any) => {
     role: "",
   });
 
-  const [apiParams, setApiParams] = React.useState<any>({
-    name: "",
-    country: "",
-    content_languages: "",
-    filtterStart_date: new Date("01/02/2024"),
-    filtterEnd_date: new Date(),
-    querry: "",
-    ad_status_type: "1",
-    reach: 0,
-    ad_type: "all",
-    media_type: "all",
-    publisher_platforms: "all",
-    Nextforward_cursor: "",
-    Nextbackward_cursor: "",
-    Nextcollation_token: "",
-    page: "1",
-  });
+  const [apiParams, setApiParams] = React.useState<any>(APIParams);
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -155,21 +140,20 @@ export const AppProvider = ({ children }: any) => {
         user.session === "" ||
         user.session === null
       ) {
+        console.log("User not logged in");
         const currentUrl = window.location.pathname;
         if (currentUrl !== "/sign-in") navigate("/sign-in");
         Logout();
         return;
       }
+      else {
+        const currentUrl = window.location.pathname;
+        if (currentUrl === "/sign-in" || currentUrl === "/") navigate("/dashboard/searches");
+        else navigate(currentUrl);
+      }
 
       setDataForUser(user);
 
-      if (!user.uid) {
-        setLoading(false);
-        let currentUrl = window.location.pathname;
-        if (currentUrl === "/mi/default" || currentUrl === "/")
-          navigate("/mi/default");
-        else navigate(currentUrl);
-      }
     } catch (err) {
       Logout();
       navigate("/sign-in");

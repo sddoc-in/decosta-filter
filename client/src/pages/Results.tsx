@@ -21,7 +21,7 @@ export default function Results() {
     setFileData,
     setLikesRange,
     likesRange,
-    reachRange
+    reachRange,
   } = React.useContext(ExcelContext);
 
   const [filterIndex, setFilterIndex] = React.useState(0);

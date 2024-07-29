@@ -226,7 +226,7 @@ export default function SearchHistory(props: {
     }
 
     setLoading(true);
-    let headers, data :any[]= [];
+    let headers, data: any[] = [];
 
     for (let i = 0; i < selected.length; i++) {
       const searchId = users[selected[i]].searchId;
@@ -268,6 +268,7 @@ export default function SearchHistory(props: {
       setHeader(headers);
       changeFileData(data);
       setColumnsHidden([0, 16, 17]);
+      setSelected(data);
       navigate("/dashboard/results")
     }
   }

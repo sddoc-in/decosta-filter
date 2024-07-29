@@ -32,8 +32,8 @@ export default function Admin() {
             return err.response.data;
         });
 
-      if (data.message === "Admin settings fetched successfully") {
-        setAdminSettings(data.settings);
+      if (data.status === 200) {
+        setAdminSettings(data.data);
       } else {
         raiseToast(data.message, "error");
       }

@@ -382,6 +382,10 @@ export async function scheduleJob(req: Request, res: Response) {
                 break;
             case Recurrence.HOURLY:
                 rule.hour = [0, new schedule.Range(0, 23), 1];
+                rule.minute = time.getMinutes();
+                rule.date = time.getDate();
+                rule.month = time.getMonth();
+                rule.year = new Date().getFullYear();
                 break;
             case Recurrence.DAILY:
                 rule.hour = time.getHours();
