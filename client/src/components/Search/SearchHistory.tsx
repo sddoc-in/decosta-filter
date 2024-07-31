@@ -305,38 +305,42 @@ export default function SearchHistory(props: {
 
   return (
     <>
-      <FormTopBar options={options} refreh={getSearches.current} data={users} />
-
-      <TableComponent
-        head={[
-          "Name",
-          "Country",
-          "Content Languages",
-          "Query",
-          "Start date",
-          "End Date",
-          "Data fetched",
-          "Created Date",
-          "Status",
-        ]}
-        body={users.map((user) => [
-          user.name,
-          user.country,
-          user.content_languages.join(", "),
-          user.querry,
-          new Date(user.filtterStart_date).toDateString(),
-          new Date(user.filtterEnd_date).toDateString(),
-          user.status || 0,
-          user.CreatedDate ? new Date(user.CreatedDate).toDateString() : "",
-          SearchStatus[user.currentStatus],
-        ])}
-        hidden={[9]}
-        link={[{
-          index: 10,
-          form: "results",
-          key: 9
-        }]}
-      />
+    <FormTopBar options={options} refreh={getSearches.current} data={users} />
+    <TableComponent
+    head={[
+      "Name",
+      "Country",
+      "Content Languages",
+      "Query",
+      "Start date",
+      "End Date",
+      "Data fetched",
+      "Created Date",
+      "Status",
+    ]}
+    body={users.map((user) => [
+      user.name,
+      user.country,
+      user.content_languages.join(", "),
+      user.querry,
+      new Date(user.filtterStart_date).toDateString(),
+      new Date(user.filtterEnd_date).toDateString(),
+      <div className="flex items-center">
+        <span>{user.status || 0}</span>
+        {user.currentStatus === SearchStatus.InProgress && (
+          <img src="/EllipsisLoading.gif" alt="Loading" className="ml-2" />
+        )}
+      </div>,
+      user.CreatedDate ? new Date(user.CreatedDate).toDateString() : "",
+      SearchStatus[user.currentStatus],
+    ])}
+    hidden={[9]}
+    link={[{
+      index: 10,
+      form: "results",
+      key: 9
+    }]}
+   />
     </>
   );
 }
