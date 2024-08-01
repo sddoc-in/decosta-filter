@@ -21,7 +21,6 @@ function App() {
 }
 
 function Router() {
-  // const { user: currentUser } = React.useContext(AppContext);
   return (
     <>
       <BrowserRouter>

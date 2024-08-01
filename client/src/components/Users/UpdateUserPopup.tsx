@@ -9,18 +9,17 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import React from "react";
-import InputSelect from "../input/InputSelect";
 import RolesEnum from "../../constants/Roles";
-import InputEmail from "../input/InputEmail";
-import InputName from "../input/InputName";
 import axios from "axios";
 import { API_URL } from "../../constants/data";
 import UserErrorInterface from "../../interface/Error";
-import validateUser from "../../functions/validateUser";
 import Users from "../../interface/Users";
 import toTitleCase from "../../functions/toTitle";
 import { AppContext } from "../../context/Context";
 import { UserClientStatus } from "../../constants/UserClientStatus";
+import FormInput from "../input/FormInput";
+import validateEmail from "../../functions/validateEmail";
+import InputSelect from "../input/InputSelect";
 
 interface Props {
   isOpen: boolean;
@@ -76,11 +75,22 @@ export default function UpdateUserPopup(props: Props) {
   }
 
   function ValidateUser() {
-    let error: UserErrorInterface = validateUser(panelUser, "", false);
-    if (error.hasError) {
-      setError(error);
+    let error = validateEmail(panelUser.email);
+    if (error) {
+      setError({ field: "email", message: error, hasError: true });
       return false;
     }
+
+    if (!panelUser.username) {
+      setError({ field: "username", message: "Username is required", hasError: true });
+      return false;
+    }
+
+    if (!panelUser.name) {
+      setError({ field: "name", message: "Name is required", hasError: true });
+      return false;
+    }
+
     return true;
   }
 
@@ -106,62 +116,59 @@ export default function UpdateUserPopup(props: Props) {
           <ModalHeader>Update Lawyer - {props.data.username}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <InputName
+            <FormInput
+              label="Name"
+              handleChange={onChange}
               name="name"
-              defValue={panelUser.name || ""}
-              placeholder="Name"
-              inputClassName="w-full"
-              onChangeHandler={onChange}
-              error={
-                error.hasError && error.field === "name" ? error.message : ""
-              }
+              isRequired={true}
+              isInvalid={error.field === "name"}
+              error={error.message}
+              placeholder="Enter Name"
+              focus="username"
             />
-            <InputName
+            <FormInput
+              label="UserName"
+              handleChange={onChange}
               name="username"
-              defValue={panelUser.username || ""}
-              placeholder="Username"
-              disabled={true}
-              inputClassName="w-full"
-              onChangeHandler={onChange}
-              error={
-                error.hasError && error.field === "username"
-                  ? error.message
-                  : ""
-              }
+              isRequired={true}
+              isInvalid={error.field === "username"}
+              error={error.message}
+              placeholder="Enter UserName"
+              focus="email"
             />
-            <InputEmail
+            <FormInput
+              label="Email"
+              handleChange={onChange}
               name="email"
-              defValue={panelUser.email || ""}
-              placeholder="Email"
-              inputClassName="w-full"
-              onChangeHandler={onChange}
-              error={
-                error.hasError && error.field === "email" ? error.message : ""
-              }
+              isRequired={true}
+              isInvalid={error.field === "email"}
+              error={error.message}
+              placeholder="Enter email"
+              focus="role"
             />
             <InputSelect
               name="role"
+              label="Role"
               selectArray={Object.values(RolesEnum).map((item) => {
                 return {
                   value: item,
                   name: toTitleCase(item),
                 };
               })}
-              onChange={onRoleChange}
-              defValue={toTitleCase(panelUser.role || "")}
+              handleChange={onRoleChange}
+              defaultValue={panelUser.role}
               placeholder="Select your role"
-              inputClassName="w-full"
               error={
                 error.hasError && error.field === "role" ? error.message : ""
               }
             />
             <InputSelect
               name="status"
+              label="Status"
+              defaultValue={panelUser.status}
               selectArray={UserClientStatus}
-              onChange={onRoleChange}
-              defValue={toTitleCase(panelUser.status || "")}
+              handleChange={onRoleChange}
               placeholder="Select your status"
-              inputClassName="w-full"
               error={
                 error.hasError && error.field === "status" ? error.message : ""
               }

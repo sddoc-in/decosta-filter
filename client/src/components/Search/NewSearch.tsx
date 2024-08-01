@@ -4,7 +4,6 @@ import { AppContext } from "../../context/Context";
 import InputSearch from "../input/InputSearch";
 import { ADS_API_URL, API_URL } from "../../constants/data";
 import InputCountry from "../input/InputCountry";
-import InputSelect from "../input/InputSelect";
 import { Languages } from "../../constants/Languages";
 import InputMultiSelect from "../input/InputMultiSelect";
 import { AdStatus } from "../../constants/AdStatus";
@@ -14,6 +13,8 @@ import { useParams } from "react-router-dom";
 import Recurrence from "../../constants/Recurrence";
 import ScheduleDialog from "./ScheduleDialog";
 import APIParams from "../../constants/SearchParams";
+import InputSelect from "../input/InputSelect";
+import FormInput from "../input/FormInput";
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
@@ -165,7 +166,7 @@ export default function NewSearch() {
 
       if (res.message === "Search started successfully") {
         raiseToast("Search started successfully", "success");
-        setApiParams(APIParams  )
+        setApiParams(APIParams)
       } else {
         raiseToast("Something went wrong", "error");
       }
@@ -249,47 +250,49 @@ export default function NewSearch() {
         </div>
         <div className="flex justify-center items-center w-full">
           <InputCountry
-            defValue={apiParams.country || ""}
+            defaultValue={apiParams.country || ""}
             placeholder="Select Country"
             name="country"
-            onChange={handleChange}
-            inputClassName={` w-[49%!important] mr-2`}
+            handleChange={handleChange}
+            label="Country"
+            className="w-[49%!important] mr-2"
           />
-          <InputMultiSelect
-            defValue={apiParams.content_languages || ""}
+          <InputSelect
+            defaultValue={apiParams.content_languages || ""}
             placeholder="Select language"
             name="content_languages"
             selectArray={Languages}
-            inputClassName={` w-[49%!important]`}
-            onChange={handleMultiSelect}
+            handleChange={handleChange}
+            label="Content Language"
+            className="w-[49%!important] mr-2"
           />
         </div>
         <div className="flex justify-center items-center w-full">
           <InputMultiSelect
-            defValue={apiParams.media_type || ""}
+            defaultValue={apiParams.media_type || ""}
             label="Media Type"
             placeholder="Select Media Type"
             name="media_type"
             selectArray={MediaType}
-            inputClassName={` w-[49%!important] mr-2`}
-            onChange={handleMultiSelect}
+            className={` w-[49%!important] mr-2`}
+            handleChange={handleMultiSelect}
           />
           <InputSelect
-            defValue={apiParams.ad_status_type || ""}
+            defaultValue={apiParams.ad_status_type || ""}
             placeholder="Select Ad Status"
             label="Ad Status"
             name="ad_status_type"
             selectArray={AdStatus}
-            inputClassName={` w-[49%!important]`}
-            onChange={handleChange}
+            handleChange={handleChange}
+            className="w-[49%!important] mr-2"
           />
-          <InputName
-            defValue={numberofAds}
-            disabled={true}
+          <FormInput
+            defaultValue={numberofAds.toString()}
+            isDisabled={true}
             label="Results Found"
             placeholder="Enter Page Size"
             name="query"
-            inputClassName={` w-[30%!important] mr-2`}
+            className={` w-[30%!important] mr-2`}
           />
         </div>
 

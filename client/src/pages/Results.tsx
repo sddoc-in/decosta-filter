@@ -1,12 +1,13 @@
 import React from "react";
-import {  PRICE, RATING, TOTAL_REVIEW } from "../constants/data";
+import { PRICE, RATING, TOTAL_REVIEW } from "../constants/data";
 import { ExcelContext } from "../context/ExcelContext";
 import ExcelComponent from "../excel-component/ExcelComponent";
 import { BsFiletypeCsv } from "react-icons/bs";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { Stack } from "@chakra-ui/react";
-import InputSelect from "../components/input/InputSelect";
 import InputNumber from "../components/input/InputNumber";
+import InputSelect from "../components/input/InputSelect";
+import FormInput from "../components/input/FormInput";
 
 export default function Results() {
   const {
@@ -88,9 +89,9 @@ export default function Results() {
       <div className="flex justify-between items-center flex-wrap">
         <div className=" flex justify-start items-center w-5/12 ">
           <InputSelect
-            defValue={filterIndex.toString() }
+            label="Sort By"
+            defaultValue={filterIndex.toString()}
             name="sort_by"
-            inputClassName="w-4/12"
             placeholder="Sort By"
             selectArray={
               header.length > 0
@@ -101,7 +102,7 @@ export default function Results() {
                   })
                 : []
             }
-            onChange={(type: string, value: string) => {
+            handleChange={(type: string, value: string) => {
               setFilterIndex(header.indexOf(value));
             }}
           />
@@ -122,22 +123,32 @@ export default function Results() {
           <p className="text-md">
             Likes Range
           </p>
-          <InputNumber
-            defValue={likesRange[0]}
-            name="minlikes"
-            placeholder="Min Likes"
-            inputClassName="w-20"
-            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => {              
-              setLikesRange([Number(e.target.value) ,likesRange[1]])}
+          <FormInput
+            label="Min Likes"
+            handleChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setLikesRange([Number(e.target.value), likesRange[1]])
             }
+            }
+            name="likes"
+            type="text"
+            isRequired={false}
+            isInvalid={false}
+            error={""}
+            placeholder="Enter Likes Range"
           />
-          <InputNumber
-            defValue={likesRange[1]}
-            name="maxlikes"
-            placeholder="Max Likes"
-            inputClassName="w-36"
-            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => 
-              setLikesRange([likesRange[0],Number(e.target.value)])}
+
+          <FormInput
+            label="Max Range"
+            handleChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setLikesRange([likesRange[0], Number(e.target.value)])
+            }
+            }
+            name="likes"
+            type="text"
+            isRequired={false}
+            isInvalid={false}
+            error={""}
+            placeholder="Enter Likes Range"
           />
         </div>
 
@@ -150,8 +161,9 @@ export default function Results() {
             name="minreach"
             placeholder="Min Reach"
             inputClassName="w-20"
-            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => {              
-              setReachRange([Number(e.target.value) ,reachRange[1]])}
+            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setReachRange([Number(e.target.value), reachRange[1]])
+            }
             }
           />
           <InputNumber
@@ -159,15 +171,15 @@ export default function Results() {
             name="maxreach"
             placeholder="Max Reach"
             inputClassName="w-36"
-            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => 
-              setReachRange([reachRange[0],Number(e.target.value)])}
+            onChangeHandler={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setReachRange([reachRange[0], Number(e.target.value)])}
           />
         </div>
         <button className="bg-[#F2F2F2] text-[#000] px-2 py-1 rounded-md mx-2 w-fit"
-        onClick={clearAll}
-      >
-        Clear All
-      </ button>
+          onClick={clearAll}
+        >
+          Clear All
+        </ button>
       </div>
 
 
@@ -194,7 +206,7 @@ export default function Results() {
       </div>
 
       {header.length > 0 ? (
-        <ExcelComponent  />
+        <ExcelComponent />
       ) : (
         <div className="flex justify-center items-center">
           <p className="text-lg">No data to display</p>
