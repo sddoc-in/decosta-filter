@@ -9,7 +9,7 @@ import { closeConn } from "../connection/closeConn";
 
 export async function login(req: Request, res: Response) {
 
-  let user = req.query.user as string;
+  let user = req.query.email as string;
   let password = req.query.password as string;
  
   try {

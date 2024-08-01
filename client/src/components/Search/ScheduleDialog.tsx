@@ -11,8 +11,8 @@ import {
 } from '@chakra-ui/react'
 import InputDate from '../input/InputDate';
 import InputTime from '../input/InputTime';
-import InputSelect from '../input/InputSelect';
 import Recurrence from '../../constants/Recurrence';
+import InputSelect from '../input/InputSelect';
 
 type Props = {
     open: boolean;
@@ -31,6 +31,10 @@ export default function ScheduleDialog(props: Props) {
 
     const handlleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         props.setOpen({ ...props, [e.target.name]: e.target.value });
+    }
+
+    const handlleChangeSelect = (type: string, value: string) => {
+        props.setOpen({ ...props, [type]: value });
     }
 
     return (
@@ -58,14 +62,14 @@ export default function ScheduleDialog(props: Props) {
 
                         <InputSelect
                             name='recurrence'
-                            defValue={props.recurrence}
+                            defaultValue={props.recurrence}
                             label='Recurrence'
                             selectArray={
                                 Object.keys(Recurrence).map((key) => {
                                     return { value: key, name: Recurrence[key as keyof typeof Recurrence] }
                                 })
                             }
-                            onChangeHandler={handlleChange}
+                            handleChange={handlleChangeSelect}
                         />
 
                     </ModalBody>

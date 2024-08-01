@@ -1,9 +1,35 @@
 import React from "react";
 
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import Input from "../../interface/Input";
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+} from "@chakra-ui/react";
+import { SelectArray } from "../../interface/SelectArray";
+import focus from "../../functions/focus";
 
-export default function InputMultiSelect(props: Input) {
+type Props = {
+  label: string;
+  handleChange: (type: string, value: string) => void;
+  name: string;
+  type?: string;
+  isRequired?: boolean;
+  isDisabled?: boolean;
+  isInvalid?: boolean;
+  error?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  focus?: string;
+  selectArray: SelectArray[];
+  className?: string;
+}
+
+export default function InputMultiSelect(props: Props) {
   const [show, setShow] = React.useState(false);
   const [fileteredCountries, setFilteredCountries] = React.useState(
     props.selectArray || []
@@ -14,11 +40,10 @@ export default function InputMultiSelect(props: Input) {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   function Show() {
-    if (!props.disabled) {
+    if (!props.isDisabled) {
       setShow(!show);
     }
   }
-
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     setShow(true);
 
@@ -69,24 +94,34 @@ export default function InputMultiSelect(props: Input) {
     }
 
     // setShow(false);
-    if (props.onChange) {
-      props.onChange(props.name, [...selectedValue, data.value].join(","));
+    if (props.handleChange) {
+      props.handleChange(props.name, [...selectedValue, data.value].join(","));
     }
     setFilteredCountries(props.selectArray || []);
+  }
+
+
+  function onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (props.onKeyPress) {
+      props.onKeyPress(e);
+    }
+    if (e.key === "Enter") {
+      focus(props.focus || "");
+    }
   }
 
   React.useEffect(() => {
     let defLan =
       props.selectArray !== undefined
         ? props.selectArray.filter((item) => {
-            return props.defValue.toString().toLowerCase().split(",").includes(item.value);
-          })
+          return props.defaultValue?.toString().toLowerCase().split(",").includes(item.value);
+        })
         : [{ name: "", value: "" }];
 
     let newdefLan = defLan.map((item) => item.name);
 
     inputRef.current!.value = newdefLan.join(",") || "";
-  }, [props.defValue]);
+  }, [props.defaultValue]);
 
   React.useEffect(() => {
     setFilteredCountries(props.selectArray || []);
@@ -94,70 +129,63 @@ export default function InputMultiSelect(props: Input) {
 
   return (
     <>
-      <div className={"w-full h-fit text-start my-1 " + props.inputClassName}>
-        {props.label && (
-          <label
-            htmlFor={props.name ? props.name : "password"}
-            className="text-[16px] block leading-[24px] text-[#23262F] font-[700] mt-4 ml-3 md:mt-0  md:ml-0 my-1 md:my-2"
-          >
-            {props.label}
-          </label>
-        )}
-        <div className="relative w-[95%] mx-auto">
-          <div
-            className="absolute right-4"
-            onClick={Show}
-            style={{ top: "18.5px" }}
-          >
-            {show ? (
-              <IoMdArrowDropup className="text-[#777E91] text-[20px] cursor-pointer" />
-            ) : (
-              <IoMdArrowDropdown className="text-[#777E91] text-[20px] cursor-pointer" />
-            )}
-          </div>
-          <input
-            type="text"
-            ref={inputRef}
-            disabled={props.disabled ? true : false}
-            onClick={() => setShow(!show)}
-            name={props.name ? props.name : "select"}
-            onChange={(e) => onChange(e)}
-            placeholder={props.placeholder ? props.placeholder : `Select`}
-            className={
-              "input w-full rounded-lg text-[14px] text-black font-medium disabled:bg-white disabled:text-black placeholder:font-normal placeholder:text-[#000] bg-white my-1 "
-            }
-            style={{ borderColor: "rgb(189, 189, 189)" }}
-          />
-          {props.error && (
-            <p className="text-[12px] text-red-500">{props.error}</p>
-          )}
 
-          <div
-            className={`absolute z-50 mt-2 top-full left-0 w-full bg-white rounded-lg shadow-md border border-gray-200 h-fit  max-h-[200px] overflow-y-scroll scroll-hide ${
-              show ? "block" : "hidden"
-            }`}
-          >
-            {fileteredCountries.map((data, i) => {
-              let selected =
-                selectedName.filter(
-                  (data2: any) =>
-                    data2.toLowerCase() === data.name.toLowerCase()
-                ).length > 0;
-              return (
-                <div
-                  key={i}
-                  onClick={() => onCountryClick(data)}
-                  className={`flex items-center justify-between text-black px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-[#004D3D] hover:text-[white!important]  transition-all ${
-                    selected ? "bg-[#004D3D] text-[white!important]" : ""
-                  }`}
-                >
-                  <p className="text-[16px]  country-flag ">{data.name}</p>
-                </div>
-              );
-            })}
-          </div>
+      <FormControl isInvalid={props.isInvalid} className={props.className}>
+        <FormLabel>{props.label}</FormLabel>
+        <div className="relative">
+          <InputGroup>
+            <Input
+              type="text"
+              ref={inputRef}
+              disabled={props.isDisabled}
+              name={props.name ? props.name : "select"}
+              onChange={onChange}
+              onClick={Show}
+              placeholder={props.placeholder ? props.placeholder : `Select`}
+              style={{ borderColor: "rgb(189, 189, 189)", position: "unset" }}
+              onKeyPress={onKeyPress}
+            />
+            <InputRightElement >
+              {show ? (
+                <IoMdArrowDropup
+                  onClick={() => setShow(!show)}
+                  className="text-[#777E91] text-[20px] cursor-pointer"
+                />
+              ) : (
+                <IoMdArrowDropdown
+                  onClick={() => setShow(!show)}
+                  className="text-[#777E91] text-[20px] cursor-pointer"
+                />
+              )}
+            </InputRightElement>
+          </InputGroup>
+          {show && (
+
+            <div className="absolute !z-50 mt-2 top-full left-0 w-full bg-white rounded-lg shadow-md border border-gray-200 h-fit  max-h-[200px] overflow-y-scroll scroll-hide">
+              {fileteredCountries.map((data, i) => {
+                let selected =
+                  selectedName.filter(
+                    (data2: any) =>
+                      data2.toLowerCase() === data.name.toLowerCase()
+                  ).length > 0;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => onCountryClick(data)}
+                    className={`flex items-center justify-between text-black px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-[#004D3D] hover:text-[white!important]  transition-all ${selected ? "bg-[#004D3D] text-[white!important]" : ""
+                      }`}
+                  >
+                    <p className="text-[16px]  country-flag ">{data.name}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </div>
+        {props.isInvalid && <FormErrorMessage>{props.error}</FormErrorMessage>}
+      </FormControl>
+
+
     </>
   );
 }

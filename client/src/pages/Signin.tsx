@@ -1,33 +1,41 @@
 import React from "react";
 import SkyBidder from "../components/common/SkyBidder";
-import InputPass from "../components/input/InputPass";
 // import SigninFacebook from "../components/user/SigninFacebook";
 // import SigninGoogle from "../components/user/SigninGoogle";
-import { IoIosSend } from "react-icons/io";
 import { AppContext } from "../context/Context";
-import InputName from "../components/input/InputName";
 import { API_URL } from "../constants/data";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import InputPassword from "../components/input/InputPassword";
+import UserErrorInterface from "../interface/Error";
+import FormInput from "../components/input/FormInput";
+import { Button } from "@chakra-ui/react";
 
 export default function Signin() {
+
+  const {setData: setLoggedInUser,raiseToast,setLoading} = React.useContext(AppContext);
   const navigate = useNavigate();
-  const { setDataForUser:setCookies,setLoading,raiseToast } = React.useContext(AppContext);
 
-
-  const [user, setUser] = React.useState({
-    password: "",
-    user: "",
+  const [error, setError] = React.useState<UserErrorInterface>({
+    field: "",
+    message: "",
+    hasError: false,
   });
 
-  function handleChanges(
-    e:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>
-  ) {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  }
+  const [user, setUser] = React.useState({
+    email: "",
+    password: "",
+  });
 
-  async function login() {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+    if (error.hasError) setError({ field: "", message: "", hasError: false });
+  };
+
+
+  async function handleSignIn() {
     try {
       setLoading(true)
       const data = await fetch(
@@ -47,16 +55,18 @@ export default function Signin() {
         });
 
       if (data.message === "User logged in successfully") {
-        setCookies(data.user);
+        setLoggedInUser(data.user);
         raiseToast("Logged in successfully", "success");
         navigate("/dashboard/searches");
-        
+
       } else {
         raiseToast(data.message, "error");
       }
-      setLoading(false)
     } catch (err) {
       raiseToast("Something went wrong!", "error");
+    }
+    finally{
+      setLoading(false)
     }
   }
   return (
@@ -73,27 +83,42 @@ export default function Signin() {
           </div> */}
           {/* <p className="w-fit mx-auto text-[#878787] text-[26px]">- OR -</p> */}
           <div className="w-full md:w-10/12 mx-auto text-start my-6">
-            <InputName
-              defValue=""
-              onChangeHandler={handleChanges}
-              placeholder="Enter Username or Email"
-              name="user"
+            <FormInput
+              label="Email"
+              handleChange={handleChange}
+              name="email"
+              isRequired={true}
+              isInvalid={error.field === "email"}
+              error={error.message}
+              placeholder="Enter email"
+              focus="password"
             />
-            <InputPass
-              defValue=""
-              onChangeHandler={handleChanges}
+
+            <InputPassword
+              label="Password"
+              handleChange={handleChange}
               name="password"
+              isRequired={true}
+              isInvalid={error.field === "password"}
+              error={error.message}
+              placeholder="Enter password"
+              onKeyPress={(e) => {
+                if (e.key === "Enter") handleSignIn();
+              }}
             />
-            <button
-              onClick={login}
-              className="w-full bg-[#002F53] text-white text-[16px] font-[600] leading-[20px] py-4 rounded-xl mt-4 flex justify-center items-center"
+            <Link
+              to="/password/forget"
+              className="text-blue-500 text-md cursor-pointer block w-fit mr-0 my-1 ml-auto"
             >
-              <IoIosSend className="mr-3 text-[20px]" /> Log in
-            </button>
-            {/* <p className="text-[#878787] text-[16px] font-[700] mt-4">
-              Forgot your password?{" "}
-              <span className="text-[#002F53] font-[900]">Reset Password</span>
-            </p> */}
+              Forgot password?
+            </Link>
+
+            <Button
+              onClick={handleSignIn}
+              className="w-full mt-4 !bg-[#004d3d] !text-white"
+            >
+              Sign in
+            </Button>
           </div>
         </div>
       </div>
