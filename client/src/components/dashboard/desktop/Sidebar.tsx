@@ -10,10 +10,7 @@ export default function Sidebar() {
       <div className="hidden lg:block md:w-[40%] lg:w-[25%] absolute top-0 left-0 bg-[#002F53] h-full z-10">
         <div className=" z-40 relative">
           <h1 className="p-7 pb-5">
-            <span className="text-white text-[30px] font-[900]">Facebook</span>
-            {/* <span className="text-[#FFC107] text-[30px] font-[900]">
-              Task
-            </span> */}
+            <span className="text-white text-[30px] font-[900]">ADinsight</span>
           </h1>
           <div className="mt-6 pl-4">
             {SidebarData.map((item, index) => {

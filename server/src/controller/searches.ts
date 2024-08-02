@@ -8,6 +8,8 @@ import SearchStatus from '../config/SearchStatus';
 import schedule from 'node-schedule';
 import store from '../functions/utills/store';
 import Recurrence from '../config/Recurrence';
+import { v4 as uuidv4 } from 'uuid';
+
 
 import dotenv from "dotenv";
 
@@ -60,6 +62,42 @@ export async function deleteSearch(req: Request, res: Response) {
         result.deleteMany({ SearchUid: searchId });
 
         return res.status(200).json({ message: "Search deleted successfully" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function deleteScheduleSearch(req: Request, res: Response) {
+    const { uid, access_token, session, searchId } = req.query;
+
+    try {
+        if (uid === undefined) {
+            return res.status(400).json({ message: "User id required" });
+        }
+        if (access_token === undefined) {
+            return res.status(400).json({ message: "Access token required" });
+        }
+        if (session === undefined) {
+            return res.status(400).json({ message: "Session required" });
+        }
+        if (searchId === undefined) {
+            return res.status(400).json({ message: "Search id required" });
+        }
+
+        // create connection
+        const connect: ConnectionRes = await connectToCluster();
+        if (typeof connect.conn === "string") {
+            return res.status(500).json(connect);
+        }
+
+        const conn = connect.conn;
+        const db: Db = conn.db("Master");
+        const search: Collection = db.collection("recurrence");
+
+        search.deleteOne({ scheduleId: searchId });
+
+        return res.status(200).json({ message: "Recurrence deleted successfully" });
     }
     catch (err) {
         return res.status(500).json({ message: "Internal server error" });
@@ -137,21 +175,19 @@ export async function getSearchesByUser(req: Request, res: Response) {
 
 }
 export async function getScheduledByUser(req: Request, res: Response) {
-    const { uid, access_token, session, status } = req.body;
+    const { uid, access_token, session } = req.body;
 
     try {
         if (uid === undefined) {
-            return res.status(400).json({ message: "User id required" });
+            return res.status(400).json({ message: "User id required", status: 400 });
         }
         if (access_token === undefined) {
-            return res.status(400).json({ message: "Access token required" });
+            return res.status(400).json({ message: "Access token required", status: 400 });
         }
         if (session === undefined) {
-            return res.status(400).json({ message: "Session required" });
+            return res.status(400).json({ message: "Session required", status: 400 });
         }
-        if (status === undefined) {
-            return res.status(400).json({ message: "Status required" });
-        }
+
 
         // create connection
         const connect: ConnectionRes = await connectToCluster();
@@ -170,39 +206,26 @@ export async function getScheduledByUser(req: Request, res: Response) {
             "searchId": 1,
             "country": 1,
             "content_languages": 1,
-            "filtterStart_date": 1,
-            "filtterEnd_date": 1,
             "querry": 1,
             "status": 1,
-            "CreatedDate": 1,
+            "time": 1,
+            "recurrence": 1,
             "currentStatus": 1
         }
 
-        if (Array.isArray(status)) {
 
-            searches = await recurrence.find({
-                uid: uid,
-                currentStatus: {
-                    $in: status
-                }
-            }, {
-                projection: projections
-            }).toArray();
-        }
-        else {
-            searches = await recurrence.find({
-                uid: uid,
-                currentStatus: status
-            }, {
-                projection: projections
-            }).toArray();
-        }
+        searches = await recurrence.find({
+            uid: uid,
+        }, {
+            projection: projections
+        }).toArray();
+
         closeConn(conn);
 
-        return res.status(200).json({ searches: searches, message: "Scheduled Data fetched successfully" });
+        return res.status(200).json({ searches: searches, message: "Scheduled Data fetched successfully", status: 200 });
     }
     catch (err) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", status: 500 });
     }
 
 }
@@ -289,6 +312,43 @@ export async function stopSearch(req: Request, res: Response) {
     }
 
 }
+
+export async function stopScheduleSearch(req: Request, res: Response) {
+    const { uid, access_token, session, searchId } = req.body;
+
+    try {
+        if (uid === undefined) {
+            return res.status(400).json({ message: "User id required" });
+        }
+        if (access_token === undefined) {
+            return res.status(400).json({ message: "Access token required" });
+        }
+        if (session === undefined) {
+            return res.status(400).json({ message: "Session required" });
+        }
+
+        // create connection
+        const connect: ConnectionRes = await connectToCluster();
+        if (typeof connect.conn === "string") {
+            return res.status(500).json(connect);
+        }
+
+        const conn = connect.conn;
+        const db: Db = conn.db("Master");
+        const search: Collection = db.collection("recurrence");
+
+        await search.updateOne({ scheduleId:searchId }, { $set: { currentStatus: SearchStatus.Stopped } });
+        closeConn(conn);
+
+        return res.status(200).json({ message: "Recurrence stopped successfully" });
+
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Something went Wrong" });
+    }
+
+}
+
 
 export async function getSearchBySearchId(req: Request, res: Response) {
     const { searchId } = req.query;
@@ -417,7 +477,10 @@ export async function scheduleJob(req: Request, res: Response) {
         const searchCol = db.collection("search");
         const recurrenceCol = db.collection("recurrence");
 
+        let scheduleId = uuidv4();
+
         await recurrenceCol.insertOne({
+            scheduleId:scheduleId,
             name: name,
             country: country,
             content_languages: content_languages,
@@ -437,7 +500,8 @@ export async function scheduleJob(req: Request, res: Response) {
             session: session,
             page: page,
             time: time,
-            recurrence: recurrence
+            recurrence: recurrence,
+            currentStatus: SearchStatus.Created
         });
 
         const rule = new schedule.RecurrenceRule();
@@ -484,7 +548,16 @@ export async function scheduleJob(req: Request, res: Response) {
         }
 
         const job = schedule.scheduleJob(rule, async () => {
-            console.log('Job running');
+
+            let search = await recurrenceCol.findOne({ scheduleId: scheduleId });
+
+            if(search?.currentStatus === SearchStatus.Stopped){
+                return;
+            }
+            if(!search){
+                return;
+            }
+
             let searchData = {
                 name: name,
                 country: country,

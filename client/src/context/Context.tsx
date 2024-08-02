@@ -13,11 +13,12 @@ export const AppProvider = ({ children }: any) => {
   let notSignIn = React.useRef(()=>{})
   const [show, setShow] = React.useState(1)
   const [user, setUser] = React.useState({
-    username: "",
+    name: "",
     session: "",
     access_token: "",
     uid: "",
     role: "",
+    email: "",
   });
 
   const [apiParams, setApiParams] = React.useState<any>(APIParams);
@@ -39,9 +40,10 @@ export const AppProvider = ({ children }: any) => {
     setUser({
       uid: data.uid,
       access_token: data.access_token,
-      username: data.name,
       session: data.session,
-      role: data.role,
+      name: data.name,
+      email: data.email,
+      role: data.role
     });
 
     localStorage.setItem("user", JSON.stringify(data));
@@ -59,8 +61,8 @@ export const AppProvider = ({ children }: any) => {
     document.cookie = `access_token=${JSON.stringify(
       data.access_token
     )}; expires=${date.toUTCString()}; path=/`;
-    document.cookie = `username=${JSON.stringify(
-      data.username
+    document.cookie = `name=${JSON.stringify(
+      data.name
     )}; expires=${date.toUTCString()}; path=/`;
     document.cookie = `email=${JSON.stringify(
       data.email
@@ -68,8 +70,8 @@ export const AppProvider = ({ children }: any) => {
     document.cookie = `session=${JSON.stringify(
       data.session
     )}; expires=${date.toUTCString()}; path=/`;
-    document.cookie = `name=${JSON.stringify(
-      data.name
+    document.cookie = `role=${JSON.stringify(
+      data.role
     )}; expires=${date.toUTCString()}; path=/`;
   }
 
@@ -103,21 +105,9 @@ export const AppProvider = ({ children }: any) => {
               "$1"
             )
           ),
-          username: JSON.parse(
+          name: JSON.parse(
             document.cookie.replace(
-              /(?:(?:^|.*;\s*)username\s*=\s*([^;]*).*$)|^.*$/,
-              "$1"
-            )
-          ),
-          Session: JSON.parse(
-            document.cookie.replace(
-              /(?:(?:^|.*;\s*)Session\s*=\s*([^;]*).*$)|^.*$/,
-              "$1"
-            )
-          ),
-          email: JSON.parse(
-            document.cookie.replace(
-              /(?:(?:^|.*;\s*)email\s*=\s*([^;]*).*$)|^.*$/,
+              /(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/,
               "$1"
             )
           ),
@@ -127,9 +117,15 @@ export const AppProvider = ({ children }: any) => {
               "$1"
             )
           ),
-          name: JSON.parse(
+          email: JSON.parse(
             document.cookie.replace(
-              /(?:(?:^|.*;\s*)name\s*=\s*([^;]*).*$)|^.*$/,
+              /(?:(?:^|.*;\s*)email\s*=\s*([^;]*).*$)|^.*$/,
+              "$1"
+            )
+          ),
+          role: JSON.parse(
+            document.cookie.replace(
+              /(?:(?:^|.*;\s*)role\s*=\s*([^;]*).*$)|^.*$/,
               "$1"
             )
           ),
@@ -147,6 +143,7 @@ export const AppProvider = ({ children }: any) => {
         user.session === "" ||
         user.session === null
       ) {
+        console.log("Not signed in");
         notSignIn.current();
       }
       else {
@@ -157,11 +154,12 @@ export const AppProvider = ({ children }: any) => {
 
       setDataForUser(user);
     } catch (err) {
+      console.log(err);
       notSignIn.current();
     }
 
 
-    notSignIn.current = ()=>{
+    notSignIn.current = () => {
       const currentUrl = window.location.pathname;
       if (currentUrl !== "/sign-in" && currentUrl !== "/password/forget" && !currentUrl.includes("/password/reset") ) navigate("/sign-in");
       else navigate(currentUrl);
@@ -179,19 +177,20 @@ export const AppProvider = ({ children }: any) => {
     document.cookie =
       "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie =
-      "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie =
       "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     localStorage.clear();
     sessionStorage.clear();
     setUser({
-      username: "",
+      name: "",
       session: "",
       access_token: "",
       uid: "",
       role: "",
+      email: "",
     });
   }
 

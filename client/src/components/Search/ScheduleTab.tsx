@@ -10,6 +10,7 @@ import { ExcelContext } from "../../context/ExcelContext";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import SearchStatus from "../../constants/SearchStatus";
+import Recurrence from "../../constants/Recurrence";
 
 export default function ScheduleTab(props: {
   status: SearchStatus | SearchStatus[];
@@ -19,10 +20,9 @@ export default function ScheduleTab(props: {
   const navigate = useNavigate();
   const [users, setUsers] = useState<any[]>([]);
   const { user, setLoading, raiseToast } = React.useContext(AppContext);
-  const { selected, setSelected, changeFileData, setHeader, setColumnsHidden } = React.useContext(ExcelContext);
+  const { selected, setSelected} = React.useContext(ExcelContext);
 
-  const getSearches = React.useRef(() => {});
-  const getAfterDetails = React.useRef(() => {});
+  const getSearches = React.useRef(() => { });
 
   getSearches.current = async () => {
     setLoading(true);
@@ -39,8 +39,8 @@ export default function ScheduleTab(props: {
           return err.response.data;
         });
 
-      if (data.message === "Recurrences fetched successfully") {
-        setUsers(data.recurrences);
+      if (data.status === 200) {
+        setUsers(data.searches);
       } else {
         raiseToast(data.message, "error");
       }
@@ -50,38 +50,6 @@ export default function ScheduleTab(props: {
     setLoading(false);
   };
 
-  getAfterDetails.current = async () => {
-    try {
-      const data = await axios
-        .post(API_URL + "/recurrence/schedule", {
-          session: user.session,
-          uid: props.user === undefined ? user.uid : props.user.uid,
-          access_token: user.access_token,
-          status: props.status,
-        })
-        .then((res) => res.data)
-        .catch((err) => {
-          return err.response.data;
-        });
-
-      if (data.message === "Recurrences fetched successfully") {
-        setUsers(data.recurrences);
-      } else {
-        raiseToast(data.message, "error");
-      }
-    } catch (err) {
-      raiseToast("Internal server error", "error");
-    }
-  };
-
-  React.useEffect(() => {
-    if (!user.uid && users.length === 0) return;
-    const interval = setInterval(() => {
-      getAfterDetails.current();
-    }, 5000);
-    if (props.status !==SearchStatus.recurrence && !props.recur) clearInterval(interval);
-    return () => clearInterval(interval);
-  }, [props.recur, props.status]);
 
   React.useEffect(() => {
     getSearches.current();
@@ -91,18 +59,18 @@ export default function ScheduleTab(props: {
     setLoading(true);
 
     for (let i = 0; i < selected.length; i++) {
-      const searchId = users[selected[i]].searchId;
+      const searchId = users[selected[i]].scheduleId;
       try {
         let res = await axios
           .delete(
             API_URL +
-              "/searches/delete?" +
-              new URLSearchParams({
-                session: user.session,
-                uid: user.uid,
-                access_token: user.access_token,
-                searchId: searchId,
-              })
+            "/recurrence/delete?" +
+            new URLSearchParams({
+              session: user.session,
+              uid: user.uid,
+              access_token: user.access_token,
+              searchId: searchId,
+            })
           )
           .then((res) => res.data)
           .catch((err) => {
@@ -111,7 +79,7 @@ export default function ScheduleTab(props: {
 
         if (res.message === "Recurrence deleted successfully") {
           const updatedUsers = users.filter(
-            (user) => user.searchId !== searchId
+            (user) => user.scheduleId !== searchId
           );
           setUsers(updatedUsers);
         } else {
@@ -122,47 +90,6 @@ export default function ScheduleTab(props: {
         raiseToast("Internal server error", "error");
       }
     }
-    setSelected([]);
-    setLoading(false);
-  };
-
-  const Start = async () => {
-    if (selected.length === 0) {
-      raiseToast("Please select a search to start", "error");
-      return;
-    }
-
-    setLoading(true);
-    selected.forEach(async (element) => {
-      try {
-        const searchId = users[element].searchId;
-
-        let res = await axios
-          .post(API_URL + "/searches/start", {
-            session: user.session,
-            uid: user.uid,
-            access_token: user.access_token,
-            searchId: searchId,
-          })
-          .then((res) => res.data)
-          .catch((err) => {
-            return err.response.data;
-          });
-
-        if (res.message === "Recurrence started successfully") {
-          const updatedUsers = users.filter(
-            (user) => user.searchId !== searchId
-          );
-          setUsers(updatedUsers);
-          raiseToast(res.message, "success");
-        } else {
-          raiseToast(res.message, "error");
-        }
-      } catch (err) {
-        console.log(err);
-        raiseToast("Internal server error", "error");
-      }
-    });
     setSelected([]);
     setLoading(false);
   };
@@ -176,10 +103,10 @@ export default function ScheduleTab(props: {
     setLoading(true);
     selected.forEach(async (element) => {
       try {
-        const searchId = users[element].searchId;
+        const searchId = users[element].scheduleId;
 
         let res = await axios
-          .post(API_URL + "/searches/stop", {
+          .post(API_URL + "/recurrence/stop", {
             session: user.session,
             uid: user.uid,
             access_token: user.access_token,
@@ -208,60 +135,6 @@ export default function ScheduleTab(props: {
     setLoading(false);
   };
 
-  async function viewDetails() {
-    if (selected.length === 0) {
-      raiseToast("Please select a search to view", "error");
-      return;
-    }
-
-    setLoading(true);
-    let headers, data: any[] = [];
-
-    for (let i = 0; i < selected.length; i++) {
-      const searchId = users[selected[i]].searchId;
-      try {
-        let res = await axios
-          .get(
-            API_URL +
-              "/results/all?" +
-              new URLSearchParams({
-                session: user.session,
-                uid: user.uid,
-                access_token: user.access_token,
-                searchId: searchId,
-              })
-          )
-          .then((res) => res.data)
-          .catch((err) => {
-            return err.response.data;
-          });
-
-        let results = res.results.map((item: any) => {
-          return item.results;
-        });
-        if (i === 0) {
-          headers = Object.keys(results[0]);
-        }
-        let mainData = results.map((item: any) => {
-          return Object.values(item);
-        });
-
-        data = data.concat(mainData);
-      } catch (err) {
-        console.log(err);
-        raiseToast("Internal server error", "error");
-      }
-    }
-    setLoading(false);
-    if (headers) {
-      setHeader(headers);
-      changeFileData(data);
-      setColumnsHidden([0, 16, 17]);
-      setSelected(data);
-      navigate("/dashboard/results");
-    }
-  }
-
   const options: FormTopBarInterface[] = [
     {
       name: "Delete",
@@ -271,24 +144,10 @@ export default function ScheduleTab(props: {
       },
     },
     {
-      name: "Start",
-      Icon: FaPlay,
-      Object() {
-        Start();
-      },
-    },
-    {
       name: "Stop",
       Icon: FaPause,
       Object() {
         Stop();
-      },
-    },
-    {
-      name: "View",
-      Icon: MdCalendarViewWeek,
-      Object() {
-        viewDetails();
       },
     },
   ];
@@ -303,23 +162,21 @@ export default function ScheduleTab(props: {
           "Country",
           "Content Languages",
           "Query",
-          "Start date",
-          "End Date",
-          "Data fetched",
           "Created Date",
+          "Recurrence",
           "Status",
         ]}
-        body={users.map((user) => [
-          user.name,
-          user.country,
-          user.content_languages.join(", "),
-          user.query,
-          new Date(user.filterStartDate).toDateString(),
-          new Date(user.filterEndDate).toDateString(),
-          user.status || 0,
-          user.CreatedDate ? new Date(user.CreatedDate).toDateString() : "",
-          user.currentStatus,
-        ])}
+        body={
+          users.length === 0 ? [] :
+            users.map((data) => [
+              data.name,
+              data.country,
+              data.content_languages.join(", "),
+              data.query,
+              data.time ? new Date(data.time).toDateString() : "",
+              Recurrence[data.recurrence as Recurrence],
+              SearchStatus[data.status],
+            ])}
         hidden={[9]}
         link={[{
           index: 10,
