@@ -161,9 +161,9 @@ export async function getscheduleData(req: Request, res: Response) {
 
         const conn = connect.conn;
         const db: Db = conn.db("Master");
-        const search: Collection = db.collection("recurrence");
+        const recurrence: Collection = db.collection("recurrence");
 
-        let searches;
+        let schedule;
         let projections = {
             _id: 0,
             "name": 1,
@@ -180,7 +180,7 @@ export async function getscheduleData(req: Request, res: Response) {
 
         if (Array.isArray(status)) {
 
-            searches = await search.find({
+            schedule = await recurrence.find({
                 uid: uid,
                 currentStatus: {
                     $in: status
@@ -190,7 +190,7 @@ export async function getscheduleData(req: Request, res: Response) {
             }).toArray();
         }
         else {
-            searches = await search.find({
+            schedule = await recurrence.find({
                 uid: uid,
                 currentStatus: status
             }, {
@@ -199,7 +199,7 @@ export async function getscheduleData(req: Request, res: Response) {
         }
         closeConn(conn);
 
-        return res.status(200).json({ searches: searches, message: "Scheduled Data fetched successfully" });
+        return res.status(200).json({ schedule: schedule, message: "Scheduled Data fetched successfully" });
     }
     catch (err) {
         return res.status(500).json({ message: "Internal server error" });

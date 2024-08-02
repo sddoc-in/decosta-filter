@@ -78,7 +78,7 @@ export default function SearchHistory(props: {
   getscheduleData.current = async () => {
     try {
       const data = await axios
-        .post(`${API_URL}/recurrence/get`, {
+        .post(API_URL + "/recurrence/get", {
           session: user.session,
           uid: props.user === undefined ? user.uid : props.user.uid,
           access_token: user.access_token,
@@ -90,7 +90,7 @@ export default function SearchHistory(props: {
         });
 
       if (data.message === "Searches fetched successfully") {
-        setUsers(data.searches);
+        setUsers(data.schedule);
       } else {
         raiseToast(data.message, "error");
       }
