@@ -9,6 +9,8 @@ import WrongUrl from "./pages/WrongUrl";
 import { ChakraProvider } from "@chakra-ui/react";
 import ContextProvider from "./context/ContextProvider";
 import Results from "./pages/Results";
+import PassReset from "./pages/PassReset";
+import ForgetPass from "./pages/ForgetPass";
 
 function App() {
   return (
@@ -38,6 +40,27 @@ function Router() {
             <Route
               path="/wrong-url"
               element={<ContextProvider children={<WrongUrl />} />}
+            />
+
+            <Route
+              path="/password/reset/:email/:uid"
+              element={
+                <ContextProvider
+                  children={
+                    <PassReset />
+                  }
+                />
+              }
+            />
+             <Route
+              path="/password/forget"
+              element={
+                <ContextProvider
+                  children={
+                    <ForgetPass />
+                  }
+                />
+              }
             />
 
             <Route
