@@ -11,6 +11,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));  
 app.use(cors());
 app.use("/", router);
+app.use("/home",
+    (req, res) => {
+        res.send("Hello from home");
+    }
+ );
 
 // for deploying on heroku also move client from ../client to ./client also change api url from "http://localhost:8000" to nothin
 // just remove that
