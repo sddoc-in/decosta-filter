@@ -23,6 +23,7 @@ export default function SearchHistory(props: {
 
   const getSearches = React.useRef(() => { });
   const getAfterDetails = React.useRef(() => { });
+  const getscheduleData = React.useRef(() => { });
 
   getSearches.current = async () => {
     setLoading(true);
@@ -74,6 +75,41 @@ export default function SearchHistory(props: {
     }
   };
 
+  getscheduleData.current = async () => {
+    try {
+      const data = await axios
+        .post(`${API_URL}/recurrence/get`, {
+          session: user.session,
+          uid: props.user === undefined ? user.uid : props.user.uid,
+          access_token: user.access_token,
+          status: props.status,
+        })
+        .then((res) => res.data)
+        .catch((err) => {
+          return err.response.data
+        });
+
+      if (data.message === "Searches fetched successfully") {
+        setUsers(data.searches);
+      } else {
+        raiseToast(data.message, "error");
+      }
+    } catch (err) {
+      raiseToast("Internal server error", "error");
+    }
+  };
+
+  React.useEffect(() => {
+    if (!user.uid && users.length === 0) return;
+    const interval = setInterval(() => {
+      getscheduleData.current();
+    }, 5000);
+    if (props.status !== SearchStatus.Scheduled && !props.recur)
+      clearInterval(interval);
+    return () => clearInterval(interval);
+  }, [props.recur, props.status]);
+
+  
   React.useEffect(() => {
     if (!user.uid && users.length === 0) return;
     const interval = setInterval(() => {
