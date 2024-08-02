@@ -4,10 +4,18 @@ import SearchHistory from "../components/Search/SearchHistory";
 import SearchStatus from "../constants/SearchStatus";
 import NewSearch from "../components/Search/NewSearch";
 import { AppContext } from "../context/Context";
+import ScheduleTab from "../components/Search/ScheduleTab";
 
-export default function Searches(props: { user?: any; newCVal?: boolean }) {
-  const {show, setShow} = React.useContext(AppContext);
+interface SearchesProps {
+  user?: any;
+  newCVal?: boolean;
+  recur?: SearchStatus[];
+}
+
+export default function Searches(props: SearchesProps) {
+  const { show, setShow } = React.useContext(AppContext);
   const [newVal, setNew] = React.useState(true);
+
   React.useEffect(() => {
     setNew(props.newCVal !== undefined ? props.newCVal : true);
   }, [props.newCVal]);
@@ -48,10 +56,10 @@ export default function Searches(props: { user?: any; newCVal?: boolean }) {
           </TabPanel>
           <TabPanel>
             {show === 4 && (
-              <SearchHistory
+              <ScheduleTab
                 user={props.user}
-                status={SearchStatus.Scheduled}
-                recur={false}
+                status={SearchStatus.recurrence}
+                recur={true}
               />
             )}
           </TabPanel>
