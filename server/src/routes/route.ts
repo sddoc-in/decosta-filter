@@ -1,6 +1,6 @@
 import express from "express";
 import { register, registerAdmin } from "../controller/register";
-import { login } from "../controller/login";
+import { login, resetPassword, sendEmailOTP, validateOTP } from "../controller/login";
 import { deleteSearch, getSearchBySearchId, getSearchesByUser, scheduleJob, startSearching, stopSearch, storeSearch, getScheduledByUser } from "../controller/searches";
 import { getAllResultsByUser } from "../controller/results";
 import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
@@ -32,6 +32,9 @@ router.get("/api/users/admins", getAllAdmins);
 router.put("/api/users/update", updateUser);
 router.delete("/api/users/delete", deleteUser);
 router.post("/api/users/create", register);
+router.get("/api/users/validate/otp", validateOTP);
+router.get("/api/users/validate/email", sendEmailOTP);
+router.put("/api/users/password/update", resetPassword);
 
 // analytics
 router.get("/api/analytics/search/daily",getSearchCountOnDailyBasis)

@@ -69,6 +69,7 @@ export default function Signin() {
       setLoading(false)
     }
   }
+
   return (
     <div className="relative w-full h-auto md:h-[100vh] overflow-hidden">
       <SkyBidder />
