@@ -136,6 +136,76 @@ export async function getSearchesByUser(req: Request, res: Response) {
     }
 
 }
+export async function getScheduledByUser(req: Request, res: Response) {
+    const { uid, access_token, session, status } = req.body;
+
+    try {
+        if (uid === undefined) {
+            return res.status(400).json({ message: "User id required" });
+        }
+        if (access_token === undefined) {
+            return res.status(400).json({ message: "Access token required" });
+        }
+        if (session === undefined) {
+            return res.status(400).json({ message: "Session required" });
+        }
+        if (status === undefined) {
+            return res.status(400).json({ message: "Status required" });
+        }
+
+        // create connection
+        const connect: ConnectionRes = await connectToCluster();
+        if (typeof connect.conn === "string") {
+            return res.status(500).json(connect);
+        }
+
+        const conn = connect.conn;
+        const db: Db = conn.db("Master");
+        const recurrence: Collection = db.collection("recurrence");
+
+        let searches;
+        let projections = {
+            _id: 0,
+            "name": 1,
+            "searchId": 1,
+            "country": 1,
+            "content_languages": 1,
+            "filtterStart_date": 1,
+            "filtterEnd_date": 1,
+            "querry": 1,
+            "status": 1,
+            "CreatedDate": 1,
+            "currentStatus": 1
+        }
+
+        if (Array.isArray(status)) {
+
+            searches = await recurrence.find({
+                uid: uid,
+                currentStatus: {
+                    $in: status
+                }
+            }, {
+                projection: projections
+            }).toArray();
+        }
+        else {
+            searches = await recurrence.find({
+                uid: uid,
+                currentStatus: status
+            }, {
+                projection: projections
+            }).toArray();
+        }
+        closeConn(conn);
+
+        return res.status(200).json({ searches: searches, message: "Scheduled Data fetched successfully" });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+
+}
 
 export async function startSearching(req: Request | any, res: Response) {
     const { uid, access_token, session, searchId } = req.body;

@@ -8,6 +8,7 @@ enum SearchStatus {
     InProgress = 1,
     Stopped = 2,
     Completed = 3,
+    recurrence = 4,
 }
 
 
