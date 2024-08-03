@@ -9,17 +9,20 @@ import InputMultiSelect from "../input/InputMultiSelect";
 import { AdStatus } from "../../constants/AdStatus";
 import { MediaType } from "../../constants/MediaType";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Recurrence from "../../constants/Recurrence";
 import ScheduleDialog from "./ScheduleDialog";
 import APIParams from "../../constants/SearchParams";
 import InputSelect from "../input/InputSelect";
 import FormInput from "../input/FormInput";
+import { FaUserCircle } from 'react-icons/fa'; // Importing a user icon from react-icons
+import ProfilePage from "../../pages/ProfilePage"; // Importing the ProfilePage component
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
     React.useContext(AppContext);
   const { Id } = useParams();
+  const navigate = useNavigate(); // Using useNavigate hook for navigation
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
   const [searchId, setSearchId] = React.useState<string>("");
   const [Schedule, setSchedule] = React.useState<any>({
@@ -219,10 +222,16 @@ export default function NewSearch() {
 
   return (
     <>
-      <h1 className="text-black font-bold text-[32px] mt-4 mb-5">
-        Enter Your Query
-      </h1>
-      <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center">
+      <div className="flex justify-between items-center w-full p-4 bg-gray-100">
+        <h1 className="text-black font-bold text-[32px]">
+         <span style={{display:"flex", justifyContent:'center', alignItems:'center'}}>Enter Your Query</span> 
+        </h1>
+        <div className="flex items-center cursor-pointer" onClick={() => navigate('/ProfilePage')}>
+          <span className="mr-2">Hi, {user.name}</span>
+          <FaUserCircle size={32} />
+        </div>
+      </div>
+      <div className="w-11/12 md:w-10/12 mx-auto flex-col flex justify-center items-center mt-5">
         <div className="flex justify-center items-center w-full">
           <InputSearch
             defValue={apiParams.querry || ""}
@@ -295,25 +304,19 @@ export default function NewSearch() {
             className={` w-[30%!important] mr-2`}
           />
         </div>
-
-
         <div className="flex justify-center items-end w-full">
-
           <button
             className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4 mx-2 my-1"
             onClick={getQueryData}
           >
             Fetch Results
           </button>
-
-
           <button
             className="btn btn-primary btn-active-shadow capitalize px-3 py-3 h-[auto] w-[auto] min-h-[auto] mb-4 mx-2 my-1"
             onClick={() => setSchedule({ ...Schedule, open: true })}
           >
             Schedule
           </button>
-
         </div>
       </div>
       <ScheduleDialog

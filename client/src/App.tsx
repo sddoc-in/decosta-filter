@@ -11,6 +11,7 @@ import ContextProvider from "./context/ContextProvider";
 import Results from "./pages/Results";
 import PassReset from "./pages/PassReset";
 import ForgetPass from "./pages/ForgetPass";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function Router() {
                     </GlobalLayout>
                   }
                 />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ContextProvider>
+                  <ProfilePage />
+                </ContextProvider>
               }
             />
 

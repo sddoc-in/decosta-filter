@@ -6,6 +6,7 @@ import { getAllResultsByUser } from "../controller/results";
 import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
 import { getNumberOfResultsOnDailyBasis, getNumberOfSearchesPerUser, getSearchCountOnDailyBasis } from "../controller/getGraphs";
 import { getSettings, updateSettings } from "../controller/admin";
+import {getUserProfile} from "../controller/profileData"
 const router = express.Router();
 
 router.post("/api/register", register);
@@ -23,6 +24,7 @@ router.post("/api/searches/schedule", scheduleJob);
 router.post("/api/recurrence/schedule", getScheduledByUser);
 router.post("/api/recurrence/stop", stopScheduleSearch);
 router.delete("/api/recurrence/delete", deleteScheduleSearch);
+
 
 // results routes
 router.get("/api/results/all", getAllResultsByUser);
@@ -47,5 +49,7 @@ router.get("/api/analytics/user/searches",getNumberOfSearchesPerUser)
 router.put("/api/admin/settings",updateSettings)
 router.get("/api/admin/settings",getSettings)
 
+//profile setting
+router.get("api/profile/settings", getUserProfile);
 
 export default router;
