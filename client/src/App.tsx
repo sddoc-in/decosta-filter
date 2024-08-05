@@ -11,6 +11,7 @@ import ContextProvider from "./context/ContextProvider";
 import Results from "./pages/Results";
 import PassReset from "./pages/PassReset";
 import ForgetPass from "./pages/ForgetPass";
+import ProfilePage from "./components/Search/ProfilePage";
 
 function App() {
   return (
@@ -75,6 +76,7 @@ function Router() {
                 />
               }
             />
+            <Route path="/ProfilePage" element={<ProfilePage />} />
 
             {SidebarData.map((item, index) => {
               return (
