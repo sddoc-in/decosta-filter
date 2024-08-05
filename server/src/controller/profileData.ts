@@ -17,24 +17,13 @@ interface UserProfile {
 }
 
 export async function getUserProfile(req: Request, res: Response) {
-    const { uid, access_token, session } = req.body;
+    const { uid } = req.body;
 
     try {
-        if (!uid || !access_token || !session) {
-            return res.status(400).json({ message: "UID, access token, and session are required" });
+        if (!uid ) {
+            return res.status(400).json({ message: "UID is required" });
         }
 
-        const sessionInvalid = !validateSession(session as string);
-        if (sessionInvalid) {
-            return res.status(400).json({ message: "Invalid session" });
-        }
-
-        const tokenErr = validateToken(access_token as string);
-        if (tokenErr) {
-            return res.status(400).json({ message: tokenErr });
-        }
-
-        // Create connection to MongoDB
         const connect: ConnectionRes = await connectToCluster();
         if (typeof connect.conn === "string") {
             return res.status(500).json({ message: "Database connection error", error: connect.conn });
@@ -44,7 +33,6 @@ export async function getUserProfile(req: Request, res: Response) {
         const db: Db = conn.db("Master");
         const usercollection: Collection<Document> = db.collection("users");
 
-        // Fetch user document with projection
         const userDocument = await usercollection.findOne({ uid: uid as string }, {
             projection: {
                 _id: 0,
@@ -78,7 +66,7 @@ export async function getUserProfile(req: Request, res: Response) {
 
         return res.status(200).json({ user, message: "User profile fetched successfully" });
     } catch (err: any) {
-        console.error(err); // Improved error logging
+        console.error(err);
         return res.status(500).json({ message: "Internal server error", error: err.message });
     }
 }

@@ -15,8 +15,8 @@ import ScheduleDialog from "./ScheduleDialog";
 import APIParams from "../../constants/SearchParams";
 import InputSelect from "../input/InputSelect";
 import FormInput from "../input/FormInput";
-import { FaUserCircle } from 'react-icons/fa'; // Importing a user icon from react-icons
-import ProfilePage from "../../pages/ProfilePage"; // Importing the ProfilePage component
+import { FaUserCircle } from 'react-icons/fa'; 
+import ProfilePage from "./ProfilePage"; 
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
@@ -226,7 +226,7 @@ export default function NewSearch() {
         <h1 className="text-black font-bold text-[32px]">
          <span style={{display:"flex", justifyContent:'center', alignItems:'center'}}>Enter Your Query</span> 
         </h1>
-        <div className="flex items-center cursor-pointer" onClick={() => navigate('/ProfilePage')}>
+        <div className="flex items-center cursor-pointer" onClick={() => navigate(`/ProfilePage${ProfilePage}`)}>
           <span className="mr-2">Hi, {user.name}</span>
           <FaUserCircle size={32} />
         </div>

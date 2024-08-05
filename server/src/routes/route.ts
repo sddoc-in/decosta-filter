@@ -6,7 +6,7 @@ import { getAllResultsByUser } from "../controller/results";
 import { deleteUser, getAllAdmins, getAllUsers, getUser, updateUser } from "../controller/users";
 import { getNumberOfResultsOnDailyBasis, getNumberOfSearchesPerUser, getSearchCountOnDailyBasis } from "../controller/getGraphs";
 import { getSettings, updateSettings } from "../controller/admin";
-import {getUserProfile} from "../controller/profileData"
+import {getUserProfile} from "../controller/profileData";
 const router = express.Router();
 
 router.post("/api/register", register);
