@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import ResStatus from "../../../config/response/ResStatus";
+import ResStatus from "../../../Base/Config/response/ResStatus";
 import ResponseClass from "../../../Base/Class/Response";
-import UserFieldsMessage from "../../../config/response/User";
-import CommonMessage from "../../../config/response/CommonMessage";
+import UserFieldsMessage from "../../../Base/Config/response/User";
+import CommonMessage from "../../../Base/Config/response/CommonMessage";
 import UserAccess from "../../../Base/Class/UserAccess";
 import User from "../../../Base/Class/User";
-import Collections from "../../../config/collections";
+import Collections from "../../../Base/Config/collections";
 import Hash from "../../../Base/Class/Hash";
 
 /**

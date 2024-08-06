@@ -17,6 +17,7 @@ UserRouter.post("/add",new CreateUser().addUser);
 UserRouter.get("/access",new LoginUser().loginUser)
 UserRouter.put("/update",new UpdateUser().updateUser)
 UserRouter.put("/password/reset",new UpdateUser().updatePassword);
+UserRouter.put("/otp/verify",new UpdateUser().updatePassword);
 UserRouter.delete("/delete",new DeleteUser().deleteUser);
 UserRouter.put("/password/forget",new ForgetPass().forgetPass);
 

@@ -182,6 +182,47 @@ class EmailSender extends Start {
   }
 
   /**
+   * Send email Through GMail Service
+   * @param {EMails} from
+   * @param {EMails[]} To
+   * @param {string} subject
+   * @param {string} body
+   * @param {string} senderEmail
+   * @param {string} senderPassword
+   * @param {EMails[]} BCC - Optional
+   * @param {EMails[]} CC - Optional
+   * @returns {Promise<void>}
+   */
+  async sendEmailGMail(
+    from: EMails,
+    To: EMails[],
+    subject: string,
+    body: string,
+    senderEmail: string,
+    senderPassword: string,
+    BCC?: EMails[],
+    CC?: EMails[],
+  ): Promise<void> {
+    const transporter = createTransport({
+      service: "gmail",
+      auth: {
+        user: senderEmail,
+        pass: senderPassword,
+      },
+    });
+
+    await transporter.sendMail({
+      from: from.mailTo,
+      to: To.map((email) => email.mailTo),
+      cc: CC ? CC.map((email) => email.mailTo) : undefined,
+      bcc: BCC ? BCC.map((email) => email.mailTo) : undefined,
+      subject: subject,
+      html: body,
+    });
+  }
+
+
+  /**
    * Generate Body For New User
    * @description Generate Designed Html Content For New User Joining which contains the email and password
    * @param {string} name
@@ -205,23 +246,68 @@ class EmailSender extends Start {
   /**
    * Generate Body For Forget Password
    * @description Generate Designed Html Content For Forget Password which contains the email and password
-   * @param {string} name
-   * @param {string} email
-   * @param {string} RecId
+   * @param {string} Name
+   * @param {number} OTP
+   * @param {string} Id
+   * @param {string} Email
    */
-  generateBodyForForgetPassword(name: string, email: string, RecId: string): string {
+  generateBodyForForgetPassword(Name: string, OTP: number, Id: string, Email: string) {
     return `
-    <div style="background-color: #f4f4f4; padding: 20px;">
-      <div style="background-color: white; padding: 20px; border-radius: 10px;">
-        <h1>Forget Password</h1>
-        <p>Reset Password Request has been received from your email</p>
-        <p>
-          Click <a href="https://dashboard.designelementary.com/password/reset/${RecId}/${name}/${email} ">here</a> to reset your password
-        </p>
-        <p>If you did not request a password reset, please ignore this email.</p>
-      </div>
-    </div>
-    `;
+    <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Email Template</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f4f4f4;
+                  margin: 0;
+                  padding: 0;
+              }
+              .container {
+                  width: 100%;
+                  max-width: 600px;
+                  margin: 0 auto;
+                  background-color: #ffffff;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+              }
+              h1 {
+                  color: #333333;
+              }
+              p {
+                  color: #666666;
+                  line-height: 1.6;
+              }
+              .footer {
+                  text-align: center;
+                  padding: 10px;
+                  background-color: #333333;
+                  color: #ffffff;
+                  border-radius: 0 0 8px 8px;
+                  font-size: 14px;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>Hello, ${Name}!</h1>
+              <p>We received a request to reset your password. Enter the following OTP to reset your password:</p>
+              <h2 style="text-align: center; font-size: 36px; color: #333333;">${OTP}</h2>
+              <p>This OTP is valid for 1 minute only.</p>
+              <p> Click <a href="https://facebook.sddoc.in/password/reset/${Email}/${Id}">here</a> to reset your password.</p>
+              <p>If you didn't request a password reset, you can ignore this email.</p>
+              <p>Best Regards,<br>The Team</p>
+          </div>
+          <div class="footer">
+              &copy; 2024 Your Company. All rights reserved.
+          </div>
+      </body>
+      </html>
+    `
   }
 
 
@@ -245,12 +331,12 @@ class EmailSender extends Start {
     // let emailParams = await new SysEmailParams().getPrimary();
     let emailParams = {
       Type: EMailType.SendGrid,
-      FromEmail: "",
-      FromName: "",
+      FromEmail: "deepakpythonwork@gmail.com",
+      FromName: "Adinsight",
       SMTPDomain: "",
       SMTPPortNumber: 0,
-      SMTPUserName: "",
-      SMTPPassword: "",
+      SMTPUserName: "deepakpythonwork@gmail.com",
+      SMTPPassword: "uzed ghqu tkxz mjxf",
     }
     let from: EMails = {
       mailTo: emailParams.FromEmail,
@@ -264,8 +350,11 @@ class EmailSender extends Start {
       // case EMailType.Brevo:
       //   await this.sendEmailBrevo(from, To, subject, body, emailParams.BrevoAPIKey, BCC, CC);
       //   break;
-      case EMailType.SMTP:
-        await this.sendEmailSMTP(from, To, subject, body, emailParams.SMTPDomain, emailParams.SMTPPortNumber.toString(), emailParams.SMTPUserName, emailParams.SMTPPassword, BCC, CC);
+      // case EMailType.SMTP:
+      //   await this.sendEmailSMTP(from, To, subject, body, emailParams.SMTPDomain, emailParams.SMTPPortNumber.toString(), emailParams.SMTPUserName, emailParams.SMTPPassword, BCC, CC);
+      //   break;
+        case EMailType.GMail:
+          await this.sendEmailGMail(from, To, subject, body, emailParams.SMTPUserName, emailParams.SMTPPassword, BCC, CC);
         break;
       default:
         throw new ResponseClass(ResStatus.BadRequest, SysEmailParamsMessage.SysEmailParamsNotFound);

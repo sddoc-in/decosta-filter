@@ -42,6 +42,8 @@ enum CommonFields {
   PasswordSpace = "Password must not contain any spaces",
   Country = "Country is required",
   CountryNotValid = "Country is not valid",
+  ContentLanguages = "Content Languages is required",
+  ContentLanguagesNotValid = "Content Languages is not valid",
   State = "State is required",
   PostalCode = "Postal Code is required",
   PostalCodeInvalid = "Postal Code is invalid",

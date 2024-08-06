@@ -32,7 +32,7 @@
  * @param NextCollationToken - Next collation token of the search
  * 
  */
-interface  SearchInterface {
+export interface  SearchInterface {
 
     // Filter
     Country:string;
@@ -40,8 +40,8 @@ interface  SearchInterface {
     StartDate:Date;
     EndDate:Date;
     Query:string;
-    AdStatus:number;
-    AdType:number;
+    AdStatus:string;
+    AdType:string;
     MinReach:number;
     MaxReach:number;
     MediaType:string;
@@ -54,11 +54,75 @@ interface  SearchInterface {
     Progress:number;
     CreatedDateTime:string;
     CreatedBy:string;
-    RecId:number;
+    RecId?:number;
     
     // Extra
     Page:number;
-    NextForwardCursor:string;
-    NextBackwardCursor:string;
-    NextCollationToken:string;
+    NextForwardCursor?:string;
+    NextBackwardCursor?:string;
+    NextCollationToken?:string;
+}
+
+
+export default interface SearchClass extends SearchInterface {
+    setSearch(search: SearchInterface): void;
+    checkExists(SearchId: string): void;
+    checkNotExists(SearchId: string): void;
+    setBlank(): void;
+    validate(): void;
+    modified(): void;
+    insert(): void;
+    update(): void;
+    delete(): void;
+    get(): SearchInterface;
+    flush(): void;
+
+    // params
+    paramCountry(Country: string): string;
+    paramContentLanguages(ContentLanguages: string): string;
+    paramStartDate(StartDate: Date): Date;
+    paramEndDate(EndDate: Date): Date;
+    paramQuery(Query: string): string;
+    paramAdStatus(AdStatus: string): string;
+    paramAdType(AdType: string): string;
+    paramMinReach(MinReach: number): number;
+    paramMaxReach(MaxReach: number): number;
+    paramMediaType(MediaType: string): string;
+    paramPublisherPlatforms(PublisherPlatforms: string): string;
+    paramSearchId(SearchId: string): string;
+    paramSearchStatus(SearchStatus: number): number;
+    paramFoundResults(FoundResults: number): number;
+    paramProgress(Progress: number): number;
+    paramCreatedDateTime(CreatedDateTime: string): string;
+    paramCreatedBy(CreatedBy: string): string;
+    paramRecId(RecId: number): number;
+    paramPage(Page: number): number;
+    paramNextForwardCursor(NextForwardCursor: string): string;
+    paramNextBackwardCursor(NextBackwardCursor: string): string;
+    paramNextCollationToken(NextCollationToken: string): string;
+}
+
+export const EmptySearch: SearchInterface = {
+    Country: "",
+    ContentLanguages: "",
+    StartDate: new Date(),
+    EndDate: new Date(),
+    Query: "",
+    AdStatus: "",
+    AdType: "",
+    MinReach: 0,
+    MaxReach: 0,
+    MediaType: "",
+    PublisherPlatforms: "",
+    SearchId: "",
+    SearchStatus: 0,
+    FoundResults: 0,
+    Progress: 0,
+    CreatedDateTime: "",
+    CreatedBy: "",
+    RecId: 0,
+    Page: 0,
+    NextForwardCursor: "",
+    NextBackwardCursor: "",
+    NextCollationToken: ""
 }

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import ResStatus from "../../../config/response/ResStatus";
+import ResStatus from "../../../Base/Config/response/ResStatus";
 import ResponseClass from "../../../Base/Class/Response";
-import UserFieldsMessage from "../../../config/response/User";
-import CommonMessage from "../../../config/response/CommonMessage";
+import UserFieldsMessage from "../../../Base/Config/response/User";
+import CommonMessage from "../../../Base/Config/response/CommonMessage";
 import UserAccess from "../../../Base/Class/UserAccess";
 import User from "../../../Base/Class/User";
 import SecurityUserRole from "../../../Base/Class/SecurityUserRole";
@@ -43,11 +43,11 @@ class DeleteUser {
       await userAccess.delete();
       userAccess.flush()
 
-      let securityUserRole = new SecurityUserRole()
-      securityUserRole.paramUser(deleteId)
-      await securityUserRole.connectDb();
-      await securityUserRole.delete();
-      securityUserRole.flush()
+      // let securityUserRole = new SecurityUserRole()
+      // securityUserRole.paramUser(deleteId)
+      // await securityUserRole.connectDb();
+      // await securityUserRole.delete();
+      // securityUserRole.flush()
 
       return res
         .status(ResStatus.Success)

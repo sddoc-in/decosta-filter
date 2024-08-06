@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import ResStatus from "../../../config/response/ResStatus";
+import ResStatus from "../../../Base/Config/response/ResStatus";
 import ResponseClass from "../../../Base/Class/Response";
-import UserFieldsMessage from "../../../config/response/User";
-import CommonMessage from "../../../config/response/CommonMessage";
+import UserFieldsMessage from "../../../Base/Config/response/User";
+import CommonMessage from "../../../Base/Config/response/CommonMessage";
 import UserAccess from "../../../Base/Class/UserAccess";
 import User from "../../../Base/Class/User";
-import SecurityUserRole from "../../../Base/Class/SecurityUserRole";
 import EmailSender from "../../../Base/Class/Email";
+import SecurityRole from "../../../Base/Class/SecurityRole";
+import SecurityUserRole from "../../../Base/Class/SecurityUserRole";
 
 /**
  * Create User
@@ -35,23 +36,23 @@ class CreateUser {
       await user.connectDb();
       await user.insert();
 
-      // const securityRole = new SecurityRole({
-      //   Name:"System Administator",
-      //   Description:"System Administator with full access to the system",
-      //   CreatedBy:"Admin",
-      //   ModifiedBy:"Admin"
-      // });
-      // await securityRole.connectDb();
-      // await securityRole.insert();
+      const securityRole = new SecurityRole({
+        Name:"System Administator",
+        Description:"System Administator with full access to the system",
+        CreatedBy:"Admin",
+        ModifiedBy:"Admin"
+      });
+      await securityRole.connectDb();
+      await securityRole.insert();
 
-      // let securityUserRole = new SecurityUserRole({
-      //   UserId:user.Id,
-      //   SecurityRole:securityRole.paramRecId(),
-      //   CreatedBy:"Admin",
-      //   ModifiedBy:"Admin"
-      // });
-      // await securityUserRole.connectDb();
-      // await securityUserRole.insert();
+      let securityUserRole = new SecurityUserRole({
+        UserId:user.Id,
+        SecurityRole:securityRole.paramRecId(),
+        CreatedBy:"Admin",
+        ModifiedBy:"Admin"
+      });
+      await securityUserRole.connectDb();
+      await securityUserRole.insert();
 
 
       let userAccess = new UserAccess();
@@ -70,8 +71,8 @@ class CreateUser {
       });
       user.flush();
       userAccess.flush();
-      // securityRole.flush();
-      // securityUserRole.flush();
+      securityRole.flush();
+      securityUserRole.flush();
 
       return res.status(ResStatus.Success).send(response.getResponse());
     } catch (error) {
@@ -129,7 +130,6 @@ class CreateUser {
         Name: user.paramName(),
         Email: user.paramEmail(),
         Enabled: user.paramEnabled(),
-        StartPage: user.paramStartPage(),
         Language: user.paramLanguage(),
         CreatedBy: user.paramCreatedBy(),
         CreatedDateTime: user.paramCreatedDateTime(),

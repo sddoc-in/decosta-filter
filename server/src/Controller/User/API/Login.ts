@@ -1,13 +1,14 @@
 
 import { Request, Response } from "express";
-import ResStatus from "../../../config/response/ResStatus";
+import ResStatus from "../../../Base/Config/response/ResStatus";
 import ResponseClass from "../../../Base/Class/Response";
-import UserFieldsMessage from "../../../config/response/User";
-import CommonMessage from "../../../config/response/CommonMessage";
+import UserFieldsMessage from "../../../Base/Config/response/User";
+import CommonMessage from "../../../Base/Config/response/CommonMessage";
 import Hash from "../../../Base/Class/Hash";
 import UserAccess from "../../../Base/Class/UserAccess";
 import User from "../../../Base/Class/User";
 import SecurityUserRole from "../../../Base/Class/SecurityUserRole";
+// import SecurityUserRole from "../../../Base/Class/SecurityUserRole";
 
 /**
  * Login User
@@ -65,7 +66,6 @@ class LoginUser {
       response.setData({
         Name: curUser.Name,
         Email: curUser.Email,
-        StartPage: curUser.StartPage,
         Enabled: curUser.Enabled,
         ...userAccess.get(),
         Roles:await new SecurityUserRole().getSecurityRole(userAccess.paramId())

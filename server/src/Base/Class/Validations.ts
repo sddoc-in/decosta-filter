@@ -2,6 +2,8 @@
 import ResStatus from "../Config/response/ResStatus";
 import CommonFields from "../Config/response/CommonFields";
 import ResponseClass from "./Response";
+import AllCountriesData from "../Config/Search/Allcountries";
+import { Languages } from "../Config/Search/Languages";
 
 class Validations {
 
@@ -170,26 +172,49 @@ class Validations {
     }
   }
 
-  /**
-   * Validate Website
-   * @param website
+   /**
+   * Validate Content Languages
+   * @param country
    */
-  validateWebsite(website: string) {
-    if (website === "" || website === undefined || website === null) {
-      throw new ResponseClass(ResStatus.BadRequest, CommonFields.Website);
+   validateContentLanguage(country: string) {
+    if (country === "" || country === undefined || country === null) {
+      throw new ResponseClass(ResStatus.BadRequest, CommonFields.ContentLanguages);
     }
 
-    if (!website.match(/^(http|https):\/\/[^ "]+$/)) {
-      throw new ResponseClass(
-        ResStatus.BadRequest,
-        CommonFields.WebsiteInvalid
+    country.split(",").forEach((country) => {
+      let countryData = Languages.find(
+        (countryData) => countryData.value === country
       );
-    }
-
-    if (website.length > 50) {
-      throw new ResponseClass(ResStatus.BadRequest, CommonFields.WebsiteLength);
-    }
+      if (!countryData) {
+        throw new ResponseClass(
+          ResStatus.BadRequest,
+          CommonFields.ContentLanguagesNotValid
+        );
+      }
+    });
   }
+
+     /**
+   * Validate Country
+   * @param country
+   */
+     validateCountry(country: string) {
+      if (country === "" || country === undefined || country === null) {
+        throw new ResponseClass(ResStatus.BadRequest, CommonFields.Country);
+      }
+  
+      country.split(",").forEach((country) => {
+        let countryData = AllCountriesData.find(
+          (countryData) => countryData.code === country
+        );
+        if (!countryData) {
+          throw new ResponseClass(
+            ResStatus.BadRequest,
+            CommonFields.CountryNotValid
+          );
+        }
+      });
+    }
 
   /**
    * Validate Phone
