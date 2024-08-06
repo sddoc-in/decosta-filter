@@ -32,6 +32,16 @@ class ForgetPass {
             await user.connectDb();
             let userDetails = await user.getUser("", req.body.email);
 
+            if(userDetails == null){
+                user.flush();
+                return res.status(ResStatus.Success).send(new ResponseClass(ResStatus.Success, UserFieldsMessage.UserNotFound).getResponse());
+            }
+
+            if(userDetails.Enabled == 0){
+                user.flush();
+                return res.status(ResStatus.Success).send(new ResponseClass(ResStatus.Success, UserFieldsMessage.UserDisabled).getResponse());
+            }
+
             let OTP = Math.floor(100000 + Math.random() * 900000)
 
             let emailSender = new EmailSender();

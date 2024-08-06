@@ -21,6 +21,7 @@ enum UserFieldsMessage {
   CannotUpdateEmail = "Cannot Update Email",
   UserFound = "User Found",
   EMailSentForgetPassword = "Email Sent For Forget Password",
+  UserDisabled = "User Disabled",
 }
 
 export default UserFieldsMessage;
