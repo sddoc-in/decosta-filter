@@ -13,8 +13,8 @@ import Start from "./Start";
 class Recurrence extends Start implements RecurrenceClass {
     Country: string = '';
     ContentLanguages: string = '';
-    StartDate: Date = new Date();
-    EndDate: Date = new Date();
+    StartDate: string = "2024-01-01";
+    EndDate: string = this.getDate();
     Query: string = '';
     AdStatus: string = '';
     AdType: string = '';
@@ -48,8 +48,8 @@ class Recurrence extends Start implements RecurrenceClass {
     setRecurrence(recurrence: RecurrenceInterface): void {
         this.Country = recurrence.Country || '';
         this.ContentLanguages = recurrence.ContentLanguages || '';
-        this.StartDate = recurrence.StartDate || new Date();
-        this.EndDate = recurrence.EndDate || new Date();
+        this.StartDate = recurrence.StartDate || "2024-01-01";
+        this.EndDate = recurrence.EndDate || this.getDate();
         this.Query = recurrence.Query || '';
         this.AdStatus = recurrence.AdStatus || '';
         this.AdType = recurrence.AdType || '';
@@ -74,8 +74,8 @@ class Recurrence extends Start implements RecurrenceClass {
     setBlank(): void {
         this.Country = '';
         this.ContentLanguages = '';
-        this.StartDate = new Date();
-        this.EndDate = new Date();
+        this.StartDate = "2024-01-01";
+        this.EndDate = this.getDate();
         this.Query = '';
         this.AdStatus = '';
         this.AdType = '';
@@ -133,12 +133,12 @@ class Recurrence extends Start implements RecurrenceClass {
         return this.ContentLanguages;
     }
 
-    paramStartDate(StartDate: Date = this.StartDate): Date {
+    paramStartDate(StartDate: string = this.StartDate): string {
         this.StartDate = StartDate;
         return this.StartDate;
     }
 
-    paramEndDate(EndDate: Date = this.EndDate): Date {
+    paramEndDate(EndDate: string = this.EndDate): string {
         this.EndDate = EndDate;
         return this.EndDate;
     }
@@ -249,7 +249,7 @@ class Recurrence extends Start implements RecurrenceClass {
         this.validateContentLanguage(this.ContentLanguages);
         if (this.StartDate == null) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateEmpty);
         if (this.EndDate == null) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.EndDateEmpty);
-        if (this.StartDate > this.EndDate) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateGreaterThanEndDate);
+        if (new Date(this.StartDate).getTime() > new Date(this.EndDate).getTime()) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateGreaterThanEndDate);
         if (this.RecurrenceType !== RecurrenceType.None) {
             if (this.RecurenceStartDateTime == null) throw new ResponseClass(ResStatus.BadRequest, RecurrenceMessage.RecurrenceStartDateTime);
             if (this.RecurrenceEndDateTime == null) throw new ResponseClass(ResStatus.BadRequest, RecurrenceMessage.RecurrenceEndDateTime);

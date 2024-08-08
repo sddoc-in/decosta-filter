@@ -31,8 +31,8 @@ export interface RecurrenceInterface {
     // Filter
     Country: string;
     ContentLanguages: string;
-    StartDate: Date;
-    EndDate: Date;
+    StartDate: string;
+    EndDate: string;
     Query: string;
     AdStatus: string;
     AdType: string;
@@ -78,8 +78,8 @@ export default interface RecurrenceClass extends RecurrenceInterface {
     paramProgress(Progress: number): number;
     paramCountry(Country: string): string;
     paramContentLanguages(ContentLanguages: string): string;
-    paramStartDate(StartDate: Date): Date;
-    paramEndDate(EndDate: Date): Date;
+    paramStartDate(StartDate: string): string;
+    paramEndDate(EndDate: string): string;
     paramQuery(Query: string): string;
     paramAdStatus(AdStatus: string): string;
     paramAdType(AdType: string): string;
@@ -117,8 +117,8 @@ export default interface RecurrenceClass extends RecurrenceInterface {
 export const EmptyRecurrence: RecurrenceInterface = {
     Country: '',
     ContentLanguages: '',
-    StartDate: new Date(),
-    EndDate: new Date(),
+    StartDate: "",
+    EndDate: "",
     Query: '',
     AdStatus: '',
     AdType: '',

@@ -37,8 +37,8 @@ export interface  SearchInterface {
     // Filter
     Country:string;
     ContentLanguages:string;
-    StartDate:Date;
-    EndDate:Date;
+    StartDate:string;
+    EndDate:string;
     Query:string;
     AdStatus:string;
     AdType:string;
@@ -82,8 +82,8 @@ export default interface SearchClass extends SearchInterface {
     // params
     paramCountry(Country: string): string;
     paramContentLanguages(ContentLanguages: string): string;
-    paramStartDate(StartDate: Date): Date;
-    paramEndDate(EndDate: Date): Date;
+    paramStartDate(StartDate: string): string;
+    paramEndDate(EndDate: string): string;
     paramQuery(Query: string): string;
     paramAdStatus(AdStatus: string): string;
     paramAdType(AdType: string): string;
@@ -111,8 +111,8 @@ export default interface SearchClass extends SearchInterface {
 export const EmptySearch: SearchInterface = {
     Country: "",
     ContentLanguages: "",
-    StartDate: new Date(),
-    EndDate: new Date(),
+    StartDate: "",
+    EndDate: "",
     Query: "",
     AdStatus: "",
     AdType: "",

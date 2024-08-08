@@ -22,8 +22,8 @@ class Search extends Start implements SearchClass {
     // Filter
     Country: string = "";
     ContentLanguages: string = "";
-    StartDate: Date = new Date("2024-01-01");
-    EndDate: Date = new Date();
+    StartDate: string = "2024-01-01";
+    EndDate: string = this.getDate();
     Query: string = "";
     AdStatus: string = AdStatus.Active.toString();
     AdType: string = AdType.All.toString();
@@ -59,8 +59,8 @@ class Search extends Start implements SearchClass {
     setSearch(search: SearchInterface): void {
         this.Country = search.Country || "";
         this.ContentLanguages = search.ContentLanguages || "";
-        this.StartDate = search.StartDate || new Date("2024-01-01");
-        this.EndDate = search.EndDate || new Date();
+        this.StartDate = search.StartDate || "2024-01-01";
+        this.EndDate = search.EndDate || this.getDate();
         this.Query = search.Query || "";
         this.AdStatus = search.AdStatus || AdStatus.Active.toString();
         this.AdType = search.AdType || AdType.All.toString();
@@ -86,8 +86,8 @@ class Search extends Start implements SearchClass {
     setBlank(): void {
         this.Country = "";
         this.ContentLanguages = "";
-        this.StartDate = new Date("2024-01-01");
-        this.EndDate = new Date();
+        this.StartDate = "2024-01-01";
+        this.EndDate = this.getDate();
         this.Query = "";
         this.AdStatus = AdStatus.Active.toString();
         this.AdType = AdType.All.toString();
@@ -120,12 +120,12 @@ class Search extends Start implements SearchClass {
         return this.ContentLanguages;
     }
 
-    paramStartDate(StartDate: Date = this.StartDate): Date {
+    paramStartDate(StartDate: string = this.StartDate): string {
         this.StartDate = StartDate;
         return this.StartDate;
     }
 
-    paramEndDate(EndDate: Date = this.EndDate): Date {
+    paramEndDate(EndDate: string = this.EndDate): string {
         this.EndDate = EndDate;
         return this.EndDate;
     }
@@ -269,7 +269,7 @@ class Search extends Start implements SearchClass {
         this.validateContentLanguage(this.ContentLanguages);
         if (this.StartDate == null) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateEmpty);
         if (this.EndDate == null) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.EndDateEmpty);
-        if (this.StartDate > this.EndDate) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateGreaterThanEndDate);
+        if (new Date(this.StartDate).getTime() > new Date(this.EndDate).getTime()) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateGreaterThanEndDate);
     }
 
     modified(): void {

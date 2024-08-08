@@ -35,6 +35,13 @@ class Start extends Validations {
   }
 
   /**
+   * Get Date
+   */
+  getDate() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  /**
    * Add Days
    * @param date
    * @param days
