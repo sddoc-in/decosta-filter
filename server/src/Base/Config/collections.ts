@@ -9,10 +9,14 @@ enum Collections {
   OTP = "OTP",
   Settings = "Settings",
   UserGroup = "UserGroup",
+  Sequence = "Sequence",
+  SysTableId = "SysTableIdTable",
+
 
   // views
   SecurityUser = "SecurityUser",
   NotificationDetails = "NotificationDetails",
+  SequenceFull = "SequenceFull",
 }
 
 export default Collections;

@@ -4,6 +4,7 @@ import CommonFields from "../Config/response/CommonFields";
 import ResponseClass from "./Response";
 import AllCountriesData from "../Config/Search/Allcountries";
 import { Languages } from "../Config/Search/Languages";
+import SequenceFields from "../Config/response/Sequence";
 
 class Validations {
 
@@ -342,6 +343,95 @@ class Validations {
   }
 
   
+  /**
+   * Validate Sequence For
+   * @param SequenceFor
+   */
+  validateSequenceFor(SequenceFor: number) {
+    if (
+      SequenceFor === 0 ||
+      SequenceFor === undefined ||
+      SequenceFor === null
+    ) {
+      throw new ResponseClass(ResStatus.BadRequest, SequenceFields.SequenceFor);
+    }
+  }
+
+  /**
+   * Validate Current
+   * @param current
+   */
+  validateCurrent(current: number) {
+    if (current === undefined || current === null) {
+      throw new ResponseClass(ResStatus.BadRequest, SequenceFields.Current);
+    }
+  }
+
+  /**
+   * Validate Increment
+   * @param increment
+   */
+  validateIncrement(increment: number) {
+    if (increment === undefined || increment === null) {
+      throw new ResponseClass(ResStatus.BadRequest, SequenceFields.Increment);
+    }
+  }
+
+  /**
+   * Validate Max Digits
+   * @param maxDigits
+   */
+  validateMaxDigits(maxDigits: number) {
+    if (maxDigits === undefined || maxDigits === null) {
+      throw new ResponseClass(ResStatus.BadRequest, SequenceFields.MaxDigits);
+    }
+  }
+
+  /**
+   * Validate Sequence Name
+   * @param name
+   */
+  validateSequenceName(name: string) {
+    if (name === "" || name === undefined || name === null) {
+      throw new ResponseClass(ResStatus.BadRequest, SequenceFields.Name);
+    }
+  }
+
+  /**
+   * Validate Sequence Description
+   * @param description
+   */
+  validateSequenceDescription(description: string) {
+    if (
+      description === "" ||
+      description === undefined ||
+      description === null
+    ) {
+      throw new ResponseClass(
+        ResStatus.BadRequest,
+        SequenceFields.SequenceDescription
+      );
+    }
+  }
+
+  /**
+   * Validate Sequence Prefix
+   * @param prefix
+   * @param suffix
+   */
+  validateSequencePrefix(prefix: string, suffix: string) {
+    if (
+      (prefix === "" || prefix === null || prefix === undefined) &&
+      (suffix === "" || suffix === undefined || suffix === null)
+    ) {
+      throw new ResponseClass(
+        ResStatus.BadRequest,
+        SequenceFields.PrefixOrSuffix
+      );
+    }
+  }
+
+
 
 
 }
