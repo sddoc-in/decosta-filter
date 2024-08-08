@@ -7,6 +7,8 @@ enum Collections {
   SecurityRole = "SecurityRole",
   SecurityUserRole = "SecurityUserRole",
   OTP = "OTP",
+  Settings = "Settings",
+  UserGroup = "UserGroup",
 
   // views
   SecurityUser = "SecurityUser",
