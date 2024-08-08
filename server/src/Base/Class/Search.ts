@@ -37,8 +37,10 @@ class Search extends Start implements SearchClass {
     SearchStatus: number = 0;
     FoundResults: number = 0;
     Progress: number = 0;
-    CreatedDateTime: string = new Date().toISOString();
+    CreatedDateTime: string = "";
     CreatedBy: string = "";
+    ModifiedBy: string  = "";
+    ModifiedDateTime: string = "";
     RecId: number = 0;
 
     // Extra
@@ -72,6 +74,8 @@ class Search extends Start implements SearchClass {
         this.Progress = search.Progress || 0;
         this.CreatedDateTime = search.CreatedDateTime || new Date().toISOString();
         this.CreatedBy = search.CreatedBy || "";
+        this.ModifiedBy = search.ModifiedBy || "";
+        this.ModifiedDateTime = search.ModifiedDateTime || "";
         this.RecId = search.RecId || 0;
         this.Page = search.Page || 1;
         this.NextForwardCursor = search.NextForwardCursor || "";
@@ -97,6 +101,8 @@ class Search extends Start implements SearchClass {
         this.Progress = 0;
         this.CreatedDateTime = new Date().toISOString();
         this.CreatedBy = "";
+        this.ModifiedBy = "";
+        this.ModifiedDateTime = "";
         this.RecId = 0;
         this.Page = 0;
         this.NextForwardCursor = "";
@@ -194,6 +200,16 @@ class Search extends Start implements SearchClass {
         return this.CreatedBy;
     }
 
+    paramModifiedBy(ModifiedBy: string = this.ModifiedBy): string {
+        this.ModifiedBy = ModifiedBy;
+        return this.ModifiedBy;
+    }
+
+    paramModifiedDateTime(ModifiedDateTime: string = this.ModifiedDateTime): string {
+        this.ModifiedDateTime = ModifiedDateTime;
+        return this.ModifiedDateTime;
+    }
+
     paramRecId(RecId: number = this.RecId): number {
         this.RecId = RecId;
         return this.RecId;
@@ -238,6 +254,8 @@ class Search extends Start implements SearchClass {
             Progress: this.Progress,
             CreatedDateTime: this.CreatedDateTime,
             CreatedBy: this.CreatedBy,
+            ModifiedBy: this.ModifiedBy,
+            ModifiedDateTime: this.ModifiedDateTime,
             Page: this.Page,
             NextForwardCursor: this.NextForwardCursor,
             NextBackwardCursor: this.NextBackwardCursor,
@@ -246,6 +264,7 @@ class Search extends Start implements SearchClass {
     }
 
     validate(): void {
+        if(!this.Query) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.QueryEmpty);
         this.validateCountry(this.Country);
         this.validateContentLanguage(this.ContentLanguages);
         if (this.StartDate == null) throw new ResponseClass(ResStatus.BadRequest, SearchMessage.StartDateEmpty);

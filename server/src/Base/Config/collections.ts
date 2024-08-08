@@ -11,6 +11,8 @@ enum Collections {
   UserGroup = "UserGroup",
   Sequence = "Sequence",
   SysTableId = "SysTableIdTable",
+  Recurrence = "Recurrence",
+  RecurrenceSearch = "RecurrenceSearch",
 
 
   // views

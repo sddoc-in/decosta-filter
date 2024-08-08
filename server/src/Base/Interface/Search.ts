@@ -54,6 +54,8 @@ export interface  SearchInterface {
     Progress:number;
     CreatedDateTime:string;
     CreatedBy:string;
+    ModifiedBy?:string;
+    ModifiedDateTime?:string;
     RecId?:number;
     
     // Extra
@@ -95,6 +97,10 @@ export default interface SearchClass extends SearchInterface {
     paramProgress(Progress: number): number;
     paramCreatedDateTime(CreatedDateTime: string): string;
     paramCreatedBy(CreatedBy: string): string;
+    paramModifiedBy(ModifiedBy: string): string;
+    paramModifiedDateTime(ModifiedDateTime: string): string;
+    paramModifiedBy(ModifiedBy: string): string;
+    paramModifiedDateTime(ModifiedDateTime: string): string;
     paramRecId(RecId: number): number;
     paramPage(Page: number): number;
     paramNextForwardCursor(NextForwardCursor: string): string;
@@ -120,6 +126,8 @@ export const EmptySearch: SearchInterface = {
     Progress: 0,
     CreatedDateTime: "",
     CreatedBy: "",
+    ModifiedBy: "",
+    ModifiedDateTime: "",
     RecId: 0,
     Page: 0,
     NextForwardCursor: "",
