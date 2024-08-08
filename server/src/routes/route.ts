@@ -11,7 +11,7 @@ import SequenceRouter from "../Controller/Sequence/Router/SequenceRouter";
 const MainRouter = express.Router();
 
 MainRouter.use("/api/user/", UserRouter);
-MainRouter.use("/api/notifications/", NotificationRoute);
+// MainRouter.use("/api/notifications/", NotificationRoute);
 MainRouter.use("/api/search/", SearchRoute);
 MainRouter.use("/api/result/", ResultRouter);
 MainRouter.use("/api/sequence/", SequenceRouter);
