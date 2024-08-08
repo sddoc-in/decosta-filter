@@ -1,4 +1,4 @@
-import sql, { ConnectionError, Transaction } from "mssql";
+import sql, { ConnectionError, Transaction, config as SqlConfig } from "mssql";
 import CommonMessage from "../Config/response/CommonMessage";
 import ResStatus from "../Config/response/ResStatus";
 import ResponseClass from "./Response";
@@ -11,7 +11,7 @@ dotenv.config({ path: "data.env" });
  */
 class Connection {
 
-  private config = {
+  private config: SqlConfig = {
     server: process.env.DB_SERVER || "",
     authentication: {
       type: 'default',
@@ -29,15 +29,9 @@ class Connection {
   private client: sql.ConnectionPool;
   private transaction: Transaction;
 
-
-
-
-
-
   constructor() {
     this.client = new sql.ConnectionPool(this.config);
     this.transaction = new sql.Transaction(this.client);
-
   }
 
   /**
@@ -47,9 +41,7 @@ class Connection {
     try {
       await this.client.connect();
     } catch (error: any) {
-      if (
-        error instanceof ConnectionError
-      ) {
+      if (error instanceof ConnectionError) {
         throw new ResponseClass(
           ResStatus.ConnectionError,
           CommonMessage.ConnectionError
@@ -62,7 +54,6 @@ class Connection {
       }
     }
   }
-
 
   /**
    * Get the connection

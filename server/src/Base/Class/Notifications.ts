@@ -10,7 +10,6 @@ class Notifications extends Start implements NotificationsClass {
     Type: number = 0;
     Show: number = 0;
     Status: number = 0;
-    Action: number = 0;
     Title: string = "";
     Description: string = "";
     GeneratedBy: string = "";
@@ -33,7 +32,6 @@ class Notifications extends Start implements NotificationsClass {
         this.Show = Notification.Show || 0;
         this.Status = Notification.Status || 0;
         this.Title = Notification.Title || "";
-        this.Action = Notification.Action || 0;
         this.Description = Notification.Description || "";
         this.GeneratedBy = Notification.GeneratedBy || "";
         this.GeneratedFor = Notification.GeneratedFor || 0;
@@ -50,7 +48,6 @@ class Notifications extends Start implements NotificationsClass {
         this.Type = 0;
         this.Show = 0;
         this.Status = 0;
-        this.Action = 0;
         this.Title = "";
         this.Description = "";
         this.GeneratedBy = "";
@@ -72,11 +69,6 @@ class Notifications extends Start implements NotificationsClass {
     paramShow(Show: number = this.Show): number {
         this.Show = Show;
         return this.Show;
-    }
-
-    paramAction(Action: number = this.Action): number {
-        this.Action = Action;
-        return this.Action;
     }
 
     paramType(Type: number = this.Type): number {
@@ -151,7 +143,6 @@ class Notifications extends Start implements NotificationsClass {
             Type: this.Type,
             Show: this.Show,
             Status: this.Status,
-            Action: this.Action,
             Title: this.Title,
             Description: this.Description,
             GeneratedBy: this.GeneratedBy,

@@ -4,7 +4,6 @@ export interface NotificationsInterface {
     Type: number;
     Show:number;
     Status: number;
-    Action: number;
     Title: string;
     Description: string;
     GeneratedBy: string;
@@ -33,7 +32,6 @@ export default interface NotificationsClass extends  NotificationsInterface {
     paramType(Type: number): number;
     paramShow(Show:number):number;
     paramStatus(Status: number): number;
-    paramAction(Action: number): number
     paramTitle(Title: string): string;
     paramDescription(Description: string): string;
     paramGeneratedBy(GeneratedBy: string): string;
@@ -51,7 +49,6 @@ export const EmptyNotifications: NotificationsInterface = {
     Type: 0,
     Status: 0,
     Show:0,
-    Action: 0,
     Title: "",
     Description: "",
     GeneratedBy: '',
