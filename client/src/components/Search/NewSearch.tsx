@@ -9,21 +9,18 @@ import InputMultiSelect from "../input/InputMultiSelect";
 import { AdStatus } from "../../constants/AdStatus";
 import { MediaType } from "../../constants/MediaType";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Recurrence from "../../constants/Recurrence";
 import ScheduleDialog from "./ScheduleDialog";
 import APIParams from "../../constants/SearchParams";
 import InputSelect from "../input/InputSelect";
 import FormInput from "../input/FormInput";
-import { FaUserCircle } from 'react-icons/fa';
-import ProfilePage from "./ProfilePage";
 import InputDate from "../input/InputDate";
 
 export default function NewSearch() {
   const { apiParams, setApiParams, user, setLoading, raiseToast } =
     React.useContext(AppContext);
   const { Id } = useParams();
-  const navigate = useNavigate(); // Using useNavigate hook for navigation
   const [numberofAds, setNumberofAds] = React.useState<number>(0);
   const [searchId, setSearchId] = React.useState<string>("");
   const [Schedule, setSchedule] = React.useState<any>({

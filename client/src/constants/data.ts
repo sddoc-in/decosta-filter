@@ -1,4 +1,5 @@
-export const ADS_API_URL = "https://facebookapi.sddoc.in/"
+export const ADS_API_URL = "https://api.scrapy.software/"
+// export const ADS_API_URL = "https://facebookapi.sddoc.in/"
 
 
 // export const API_URL = '/api';

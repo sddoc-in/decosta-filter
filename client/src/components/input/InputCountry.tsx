@@ -13,25 +13,25 @@ import AllCountriesData from "../../constants/Allcountries";
 import focus from "../../functions/focus";
 
 export default function InputCountry(props: {
-    label: string;
-    handleChange: (type: string, value: string) => void;
-    name: string;
-    type?: string;
-    isRequired?: boolean;
-    isDisabled?: boolean;
-    isInvalid?: boolean;
-    error?: string;
-    defaultValue?: string;
-    placeholder?: string;
-    onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-    focus?:string;
-    className?:string
+  label: string;
+  handleChange: (type: string, value: string) => void;
+  name: string;
+  type?: string;
+  isRequired?: boolean;
+  isDisabled?: boolean;
+  isInvalid?: boolean;
+  error?: string;
+  defaultValue?: string;
+  placeholder?: string;
+  onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  focus?: string;
+  className?: string;
 }) {
   const [show, setShow] = React.useState(false);
   const [fileteredCountries, setFilteredCountries] =
     React.useState<CountriesInterface[]>(AllCountriesData);
 
-  const [def,setDef] = React.useState(props.defaultValue)
+  const [def, setDef] = React.useState(props.defaultValue)
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   function Show() {
@@ -55,7 +55,7 @@ export default function InputCountry(props: {
     setFilteredCountries(filtered);
   }
 
-  function onKeyPress(e: React.KeyboardEvent<HTMLInputElement>){
+  function onKeyPress(e: React.KeyboardEvent<HTMLInputElement>) {
     if (props.onKeyPress) {
       props.onKeyPress(e);
     }
@@ -78,9 +78,9 @@ export default function InputCountry(props: {
       (data) => data.code === def
     );
     if (newDef) {
-      inputRef.current!.value = newDef.name;
+      inputRef.current!.defaultValue = newDef.name;
     }
-  }, [fileteredCountries,def]);
+  }, [fileteredCountries, def]);
 
   React.useEffect(() => {
     start();
@@ -99,7 +99,7 @@ export default function InputCountry(props: {
 
   return (
     <>
-         <FormControl isInvalid={props.isInvalid} style={{ position: "unset",zIndex:1000 }} className={props.className}>
+      <FormControl isInvalid={props.isInvalid} style={{ position: "unset", zIndex: 1000 }} className={props.className}>
         <FormLabel>{props.label}</FormLabel>
         <InputGroup>
           <Input
@@ -113,7 +113,7 @@ export default function InputCountry(props: {
             style={{ borderColor: "rgb(189, 189, 189)", position: "unset" }}
             onKeyPress={onKeyPress}
           />
-          <InputRightElement >
+          <InputRightElement>
             {show ? (
               <IoMdArrowDropup
                 onClick={() => setShow(!show)}
@@ -134,10 +134,10 @@ export default function InputCountry(props: {
                   onClick={() => onCountryClick(data)}
                   className="flex items-center justify-between text-black px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-[#004D3D] hover:text-white  transition-all"
                 >
-                <div className="flex items-center">
-                  <p className="text-[20px] country-flag ">{data.flag}</p>
-                  <p className="ml-2 text-[14px]">{data.name}</p>
-                </div>
+                  <div className="flex items-center">
+                    <p className="text-[20px] country-flag ">{data.flag}</p>
+                    <p className="ml-2 text-[14px]">{data.name}</p>
+                  </div>
                 </div>
               ))}
             </div>
