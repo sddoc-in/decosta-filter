@@ -4,7 +4,7 @@ import router from "./routes/route";
 import path from "path";
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 8000;
 
 
 app.use(express.json());

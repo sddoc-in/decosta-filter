@@ -59,18 +59,19 @@ export async function deleteSearch(req: Request, res: Response) {
         const search: Collection = db.collection("search");
         const result: Collection = db.collection("results");
 
-        search.deleteOne({ searchId: searchId });
-        result.deleteMany({ SearchUid: searchId });
+        // Await the delete operations
+        await search.deleteOne({ searchId: searchId });
+        await result.deleteMany({ SearchUid: searchId });
 
-        closeConn(conn);
-
+        // Close connection after all operations complete
+        await closeConn(conn);
 
         return res.status(200).json({ message: "Search deleted successfully" });
-    }
-    catch (err) {
+    } catch (err) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
 
 export async function deleteScheduleSearch(req: Request, res: Response) {
     const { uid, access_token, session, searchId } = req.query;
@@ -98,8 +99,8 @@ export async function deleteScheduleSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("recurrence");
-
-        search.deleteOne({ scheduleId: searchId });
+        console.log(searchId);
+        await search.deleteOne({ scheduleId: searchId });
         closeConn(conn);
 
         return res.status(200).json({ message: "Recurrence deleted successfully" });
