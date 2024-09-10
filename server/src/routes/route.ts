@@ -21,7 +21,7 @@ router.post("/api/searches/get", getSearchesByUser);
 router.get("/api/searches", getSearchBySearchId);
 router.delete("/api/searches/delete", deleteSearch);
 router.post("/api/searches/schedule", scheduleJob);
-router.post("/api/recurrence/schedule", getScheduledByUser);
+router.post("/api/recurrence/schexdule", getScheduledByUser);
 router.post("/api/recurrence/stop", stopScheduleSearch);
 router.delete("/api/recurrence/delete", deleteScheduleSearch);
 

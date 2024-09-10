@@ -40,6 +40,7 @@ export default function ScheduleTab(props: {
         });
 
       if (data.status === 200) {
+        console.log(data.searches);
         setUsers(data.searches);
       } else {
         raiseToast(data.message, "error");
@@ -59,6 +60,7 @@ export default function ScheduleTab(props: {
     setLoading(true);
 
     for (let i = 0; i < selected.length; i++) {
+      console.log(selected);
       const searchId = users[selected[i]].scheduleId;
       try {
         let res = await axios
@@ -169,6 +171,7 @@ export default function ScheduleTab(props: {
         body={
           users.length === 0 ? [] :
             users.map((data) => [
+              // console.log(data),
               data.name,
               data.country,
               data.content_languages.join(", "),
