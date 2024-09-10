@@ -99,11 +99,12 @@ export async function deleteScheduleSearch(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const search: Collection = db.collection("recurrence");
-        console.log(searchId);
-        await search.deleteOne({ scheduleId: searchId });
+       
+        const deleted_record =  await search.deleteOne({ scheduleId: searchId });
         closeConn(conn);
+        
 
-        return res.status(200).json({ message: "Recurrence deleted successfully" });
+        return res.status(200).json({ message: "Recurrence deleted successfully" , result: deleted_record});
     }
     catch (err) {
         return res.status(500).json({ message: "Internal server error" });
@@ -205,12 +206,12 @@ export async function getScheduledByUser(req: Request, res: Response) {
         const conn = connect.conn;
         const db: Db = conn.db("Master");
         const recurrence: Collection = db.collection("recurrence");
-
         let searches;
         let projections = {
             _id: 0,
             "name": 1,
             "searchId": 1,
+            "scheduleId": 1,
             "country": 1,
             "content_languages": 1,
             "querry": 1,

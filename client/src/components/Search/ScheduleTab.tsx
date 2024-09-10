@@ -60,9 +60,8 @@ export default function ScheduleTab(props: {
     setLoading(true);
 
     for (let i = 0; i < selected.length; i++) {
-      console.log(selected);
       const searchId = users[selected[i]].scheduleId;
-      try {
+            try {
         let res = await axios
           .delete(
             API_URL +
